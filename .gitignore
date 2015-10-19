@@ -14,8 +14,11 @@ gen/
 
 # Gradle files
 .gradle/
+gradle/
 build/
 /*/build/
+gradlew
+gradlew.bat
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -25,3 +28,8 @@ proguard/
 
 # Log Files
 *.log
+
+/app/app.iml
+MaxLeapGit-Android.iml
+
+.idea
