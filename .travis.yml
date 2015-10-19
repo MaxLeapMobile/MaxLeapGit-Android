@@ -9,5 +9,6 @@ android:
 branches:
   only:
     - master
+    - /^pr-.*$/
 
 script: gradle build
