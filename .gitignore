@@ -29,7 +29,6 @@ proguard/
 # Log Files
 *.log
 
-/app/app.iml
-MaxLeapGit-Android.iml
+*.iml
 
-.idea
+.idea/
