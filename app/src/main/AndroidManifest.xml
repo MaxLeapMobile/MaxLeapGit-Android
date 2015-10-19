@@ -18,9 +18,8 @@
             android:value="wandoujia" />
 
         <activity
-            android:name="com.maxleapmobile.gitmaster.ui.activity.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".ui.activity.MainActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
