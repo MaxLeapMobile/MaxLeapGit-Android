@@ -45,37 +45,25 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private CardView mStars;
 
     private FragmentUserinfoBinding mUserinfoBinding;
+    private String mUsername;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_userinfo, container, false);
         mUserinfoBinding = DataBindingUtil.bind(view);
+        mUsername = getArguments().getString("username");
         initViews(view);
         getUserInfo();
         getStarCount();
 
-        ApiManager.getInstance().getUserOrgs("daimajia", new ApiCallback<List<Organzation>>() {
-            @Override
-            public void success(List<Organzation> organzations, Response response) {
-                String orgs = "";
-                for (Organzation organzation : organzations) {
-                    orgs += organzation.getLogin() + " ";
-                }
-                mUserinfoBinding.setOrgs(orgs);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-            }
-        });
+        getOrgs();
 
         return view;
     }
 
     private void getStarCount() {
-        ApiManager.getInstance().listStarredRepoByAuthUser(1, 1, new ApiCallback<List<Repo>>() {
+        ApiManager.getInstance().listStarRepoByUser(mUsername, 1, 1, new ApiCallback<List<Repo>>() {
             @Override
             public void success(List<Repo> repos, Response response) {
                 List<Header> headers = response.getHeaders();
@@ -95,7 +83,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getUserInfo() {
-        ApiManager.getInstance().getUser("awind", new ApiCallback<User>() {
+        ApiManager.getInstance().getUser(mUsername, new ApiCallback<User>() {
             @Override
             public void success(User user, Response response) {
                 mUserinfoBinding.setUser(user);
@@ -103,6 +91,24 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                         .load(user.getAvatarUrl())
                         .centerCrop().fit()
                         .into(mAvatar);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                super.failure(error);
+            }
+        });
+    }
+
+    private void getOrgs() {
+        ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
+            @Override
+            public void success(List<Organzation> organzations, Response response) {
+                String orgs = "";
+                for (Organzation organzation : organzations) {
+                    orgs += organzation.getLogin() + " ";
+                }
+                mUserinfoBinding.setOrgs(orgs);
             }
 
             @Override

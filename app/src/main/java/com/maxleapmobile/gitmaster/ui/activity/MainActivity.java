@@ -35,6 +35,8 @@ public class MainActivity extends BaseActivity
 
     private TextView titleView;
 
+    private String mUsername;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +87,8 @@ public class MainActivity extends BaseActivity
             ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
                 @Override
                 public void success(User user, Response response) {
+                    mUsername = user.getLogin();
+                    PreferenceUtil.putString(getApplicationContext(), Const.USERNAME, mUsername);
                     Logger.d(TAG, user.getEmail() + " " + user.getName());
                 }
 
@@ -121,8 +125,12 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_recommend) {
 
         } else if (id == R.id.nav_mine) {
+            Bundle bundle = new Bundle();
+            bundle.putString(Const.USERNAME, mUsername);
+            MineFragment mineFragment = new MineFragment();
+            mineFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.content_main, new MineFragment());
+            transaction.replace(R.id.content_main, mineFragment);
             transaction.commit();
         }
 
