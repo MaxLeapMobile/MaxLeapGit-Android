@@ -29,4 +29,14 @@
     <string name="dialog_sort_most_joined">Most Joined</string>
     <string name="dialog_cancel">Cancel</string>
 
+    <!-- mine fragment -->
+    <string name="mine_label_followers">Followers</string>
+    <string name="mine_label_following">Followings</string>
+    <string name="mine_label_repos">Repos</string>
+    <string name="mine_label_stars">Stars</string>
+    <string name="mine_label_gene">Gene</string>
+    <string name="mine_label_location">Location</string>
+    <string name="mine_label_company">Company</string>
+    <string name="mine_label_joinin">Join In</string>
+    <string name="mine_label_organzation">Organzation</string>
 </resources>

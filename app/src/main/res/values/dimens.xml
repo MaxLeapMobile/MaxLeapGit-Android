@@ -6,4 +6,12 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
+
+    <!-- mine fragment -->
+    <dimen name="mine_card_height">72dp</dimen>
+    <dimen name="mine_avatar_size">54dp</dimen>
+    <dimen name="mine_info_label_height">70dp</dimen>
+    <dimen name="mine_card_padding">8dp</dimen>
+    <dimen name="mine_label_key_size">15sp</dimen>
+    <dimen name="mine_label_value_size">25sp</dimen>
 </resources>

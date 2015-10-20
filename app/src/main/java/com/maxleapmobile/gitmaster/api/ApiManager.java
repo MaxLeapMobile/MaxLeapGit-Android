@@ -14,6 +14,7 @@ import com.maxleapmobile.gitmaster.GithubApplication;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
+import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.SearchedRepos;
@@ -392,6 +393,23 @@ public class ApiManager {
     public void getRepoEvents(String owner, String repoName,
                               ApiCallback<List<TimeLineEvent>> callback) {
         mGithubApi.repoEvents(owner, repoName, callback);
+    }
+
+    /**
+     * get org list for auth user
+     * @param callback
+     */
+    public void getOrg(ApiCallback<List<Organzation>> callback) {
+        mGithubApi.getOrg(callback);
+    }
+
+    /**
+     * get org list for specified user
+     * @param username
+     * @param callback
+     */
+    public void getUserOrgs(String username, ApiCallback<List<Organzation>> callback) {
+        mGithubApi.getUserOrgs(username, callback);
     }
 
     RequestInterceptor mRequestInterceptor = new RequestInterceptor() {
