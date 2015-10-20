@@ -8,24 +8,33 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.ui.adapter.SearchPagerAdapter;
+import com.maxleapmobile.gitmaster.ui.fragment.RepoFragment;
+import com.maxleapmobile.gitmaster.ui.fragment.UserFragment;
 import com.maxleapmobile.gitmaster.ui.view.SlidingTabLayout;
+
+import java.util.List;
 
 public class SearchActivity extends BaseActivity {
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private EditText mSearchEdit;
+    private FragmentManager mFragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +52,8 @@ public class SearchActivity extends BaseActivity {
 
     private void initUI() {
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mViewPager.setAdapter(new SearchPagerAdapter(this, getSupportFragmentManager()));
+        mFragmentManager = getSupportFragmentManager();
+        mViewPager.setAdapter(new SearchPagerAdapter(this, mFragmentManager));
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
     }
@@ -64,9 +74,9 @@ public class SearchActivity extends BaseActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String searchContent = mSearchEdit.getText().toString();
-                    if (!searchContent.isEmpty()) {
-                        performSearch(searchContent);
+                    String keyWord = mSearchEdit.getText().toString();
+                    if (!keyWord.isEmpty()) {
+                        performSearch(keyWord);
                     }
                     return true;
                 }
@@ -75,7 +85,26 @@ public class SearchActivity extends BaseActivity {
         });
     }
 
-    private void performSearch(String searchContent) {
+    private void performSearch(String keyWord) {
+        hideSoftKeyBoard(mSearchEdit);
+        List<Fragment> fragmentList = mFragmentManager.getFragments();
+        for (Fragment fragment : fragmentList) {
+            if (fragment instanceof RepoFragment) {
+                RepoFragment repoFragment = (RepoFragment) fragment;
+                repoFragment.searchRepoData(keyWord, 1);
+            } else if (fragment instanceof UserFragment) {
+                UserFragment userFragment = (UserFragment) fragment;
+                userFragment.searchUserData(keyWord, 1);
+            }
+        }
+    }
+
+    private void hideSoftKeyBoard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void clickSortBy(View v){
 
     }
 }

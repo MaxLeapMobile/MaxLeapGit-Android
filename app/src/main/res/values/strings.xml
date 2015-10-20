@@ -17,4 +17,8 @@
     <string name="activity_search_sort_by">Sort by</string>
     <string name="activity_search_repo">Repo</string>
     <string name="activity_search_user">User</string>
+    <string name="activity_search_empty">No Results</string>
+
+    <string name="frag_repo_owner">Built by %1$s</string>
+
 </resources>
