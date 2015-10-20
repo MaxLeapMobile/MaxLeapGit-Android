@@ -17,4 +17,15 @@ public class Const {
 
     // Preference key
     public static final String ACCESS_TOKEN_KEY = "access_token";
+
+    // link header
+    public static final String META_REL = "rel";
+    public static final String META_LAST = "last";
+    public static final String META_NEXT = "next";
+    public static final String META_FIRST = "first";
+    public static final String META_PREV = "prev";
+
+    public static final String HEADER_LINK = "Link";
+    public static final String HEADER_NEXT = "X-Next";
+    public static final String HEADER_LAST = "X-Last";
 }
