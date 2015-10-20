@@ -17,6 +17,17 @@
     <string name="activity_search_sort_by">Sort by</string>
     <string name="activity_search_repo">Repo</string>
     <string name="activity_search_user">User</string>
+    <string name="activity_search_empty">No Results</string>
+
+    <string name="frag_repo_owner">Built by %1$s</string>
+    <string name="dialog_sort_best_match">Best Match(Default)</string>
+    <string name="dialog_sort_most_starts">Most Stars</string>
+    <string name="dialog_sort_most_forks">Most Forks</string>
+    <string name="dialog_sort_recent_updated">Recent Updated</string>
+    <string name="dialog_sort_most_followers">Most Followers</string>
+    <string name="dialog_sort_most_repositories">Most Repositories</string>
+    <string name="dialog_sort_most_joined">Most Joined</string>
+    <string name="dialog_cancel">Cancel</string>
 
     <!-- mine fragment -->
     <string name="mine_label_followers">Followers</string>
