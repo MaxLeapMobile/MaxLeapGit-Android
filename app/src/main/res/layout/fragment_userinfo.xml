@@ -21,7 +21,6 @@
         android:id="@+id/userinfo_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         >
 
         <android.support.design.widget.AppBarLayout
@@ -81,9 +80,8 @@
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/mine_card_followers"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/mine_label_width"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardElevation="2dp"
                     >
@@ -116,11 +114,13 @@
 
                 </android.support.v7.widget.CardView>
 
+                <include
+                    layout="@layout/item_divider"/>
+
                 <android.support.v7.widget.CardView
                     android:id="@+id/mine_card_followerings"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/mine_label_width"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardElevation="2dp"
                     >
@@ -153,12 +153,13 @@
 
                 </android.support.v7.widget.CardView>
 
+                <include
+                    layout="@layout/item_divider"/>
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/mine_card_repos"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/mine_label_width"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardElevation="2dp"
                     >
@@ -191,12 +192,13 @@
 
                 </android.support.v7.widget.CardView>
 
+                <include
+                    layout="@layout/item_divider"/>
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/mine_card_stars"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/mine_label_width"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardElevation="2dp"
                     >
@@ -287,7 +289,7 @@
                             android:id="@+id/label_location"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:text="@string/mine_label_location"
                             android:textColor="@color/label_name_color"
                             android:textSize="16sp"/>
@@ -297,7 +299,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_location"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
                             android:text="@{user.location}"/>
@@ -322,7 +324,7 @@
                             android:id="@+id/label_company"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:text="@string/mine_label_company"
                             android:textColor="@color/label_name_color"
                             android:textSize="16sp"/>
@@ -332,7 +334,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_company"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
                             android:text="@{user.company}"/>
@@ -357,7 +359,7 @@
                             android:id="@+id/label_joinin"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:text="@string/mine_label_joinin"
                             android:textColor="@color/label_name_color"
                             android:textSize="16sp"/>
@@ -367,7 +369,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_joinin"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
                             android:text="@{user.createAt.substring(0, 9)}"/>
@@ -375,7 +377,6 @@
                     </RelativeLayout>
 
                 </android.support.v7.widget.CardView>
-
 
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
@@ -393,7 +394,7 @@
                             android:id="@+id/label_organzation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:text="@string/mine_label_organzation"
                             android:textColor="@color/label_name_color"
                             android:textSize="16sp"/>
@@ -402,7 +403,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/label_organzation"
-                            android:padding="@dimen/mine_card_padding"
+                            android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
                             android:text="@{orgs}"
@@ -412,12 +413,10 @@
 
                 </android.support.v7.widget.CardView>
 
-
             </LinearLayout>
 
 
         </android.support.v4.widget.NestedScrollView>
-
 
     </android.support.design.widget.CoordinatorLayout>
 
