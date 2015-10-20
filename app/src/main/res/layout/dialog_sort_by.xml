@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dialog">
+
+    <RelativeLayout
+        android:layout_width="314dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/white"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/activity_search_sort_by"
+            android:textColor="@android:color/black"
+            android:textSize="20sp" />
+
+        <RadioGroup
+            android:id="@+id/dialog_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dialog_title"
+            android:layout_marginTop="16dp">
+
+            <RadioButton
+                android:id="@+id/dialog_radio_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:buttonTint="@color/color_radio_button"
+                android:text="@string/dialog_sort_best_match"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/dialog_radio_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="8dp"
+                android:buttonTint="@color/color_radio_button"
+                android:text="@string/dialog_sort_most_starts"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/dialog_radio_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="8dp"
+                android:buttonTint="@color/color_radio_button"
+                android:text="@string/dialog_sort_most_forks"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/dialog_radio_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="8dp"
+                android:buttonTint="@color/color_radio_button"
+                android:text="@string/dialog_sort_recent_updated"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/dialog_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/dialog_radio_group"
+            android:layout_marginTop="8dp"
+            android:text="@string/dialog_cancel"
+            android:textColor="@color/color_dialog_cancel"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -10,6 +10,8 @@ package com.maxleapmobile.gitmaster.model;
 
 public enum SortEnumUser {
 
+    DEFAULT(""),
+
     FOLLOWERS("followers"),
 
     RESPOSITORIES("repositories"),

@@ -58,7 +58,7 @@ public class SearchedUsers {
                 '}';
     }
 
-    private class Item {
+    public class Item {
         @Expose
         private String login;
         @Expose
