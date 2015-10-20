@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="user_verical_label">
-        <attr name="name" format="string" />
-        <attr name="value" format="string"/>
-        <attr name="name_color" format="color"/>
-        <attr name="value_color" format="color"/>
-    </declare-styleable>
-
     <!-- CircularImageView Custom Styling -->
     <declare-styleable name="CircularImageView">
 

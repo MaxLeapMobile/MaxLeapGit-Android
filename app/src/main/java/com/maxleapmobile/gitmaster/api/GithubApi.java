@@ -13,6 +13,7 @@ import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.AccessToken;
 import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
+import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.SearchedRepos;
@@ -149,5 +150,11 @@ public interface GithubApi {
     void repoEvents(@Path("owner") String owner,
                     @Path("repo") String repoName,
                     ApiCallback<List<TimeLineEvent>> callback);
+
+    @GET("/user/orgs")
+    void getOrg(ApiCallback<List<Organzation>> callback);
+
+    @GET("/users/{username}/orgs")
+    void getUserOrgs(@Path("username") String username, ApiCallback<List<Organzation>> callback);
 
 }
