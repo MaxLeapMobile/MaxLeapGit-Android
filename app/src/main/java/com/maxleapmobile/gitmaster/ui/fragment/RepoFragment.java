@@ -22,9 +22,11 @@ import android.widget.ProgressBar;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
+import com.maxleapmobile.gitmaster.model.OrderEnum;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.SearchedRepos;
+import com.maxleapmobile.gitmaster.model.SortEnumRepo;
 import com.maxleapmobile.gitmaster.ui.adapter.RepoAdapter;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -33,7 +35,7 @@ import java.util.List;
 
 import retrofit.client.Response;
 
-public class RepoFragment extends Fragment implements AbsListView.OnScrollListener{
+public class RepoFragment extends Fragment implements AbsListView.OnScrollListener {
     private ProgressBar mProgressBar;
     private RepoAdapter mRepoAdapter;
     private Context mContext;
@@ -45,11 +47,12 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
     public static final int FLAG_SEARCH = 11;
     public static final int FLAG_USER = 22;
     private int mFlag;
+    private SortEnumRepo mSortEnumRepo;
 
     public static RepoFragment newInstance(int flag) {
         RepoFragment fragment = new RepoFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("flag",flag);
+        bundle.putInt("flag", flag);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -57,8 +60,8 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args= getArguments();
-        if(args != null){
+        Bundle args = getArguments();
+        if (args != null) {
             mFlag = args.getInt("flag");
         }
     }
@@ -83,23 +86,24 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mRepoAdapter = new RepoAdapter(mContext, mRepos);
         listView.setAdapter(mRepoAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
-        if(mFlag == FLAG_SEARCH){
+        if (mFlag == FLAG_SEARCH) {
             listView.setOnScrollListener(this);
         }
     }
 
-    public void searchRepoData(String keyWord,int page) {
+    public void searchRepoData(String keyWord, int page, SortEnumRepo sortEnumRepo) {
         Logger.d("=======>> call searchRepoData");
         mKeyWord = keyWord;
-        if(page == 1){
+        mSortEnumRepo = sortEnumRepo;
+        if (page == 1) {
             mPage = page;
         }
         mProgressBar.setVisibility(View.VISIBLE);
-        ApiManager.getInstance().searchRepo(mKeyWord,mPage,PAGE_COUNT, new ApiCallback<SearchedRepos>() {
+        ApiManager.getInstance().searchRepo(mKeyWord, mSortEnumRepo, OrderEnum.DESC, mPage, PAGE_COUNT, new ApiCallback<SearchedRepos>() {
             @Override
             public void success(SearchedRepos searchedRepos, Response response) {
                 if (searchedRepos != null) {
-                    if(mPage == 1){
+                    if (mPage == 1) {
                         mRepos.clear();
                     }
                     List<SearchedRepos.Item> items = searchedRepos.getItems();
@@ -116,7 +120,7 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                     mProgressBar.setVisibility(View.GONE);
                     mRepoAdapter.notifyDataSetChanged();
                 }
-                if(mIsGettingMore){
+                if (mIsGettingMore) {
                     mIsGettingMore = false;
                 }
             }
@@ -130,11 +134,11 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if((firstVisibleItem + visibleItemCount) == totalItemCount && !mIsGettingMore
-                && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0){
+        if ((firstVisibleItem + visibleItemCount) == totalItemCount && !mIsGettingMore
+                && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0) {
             mIsGettingMore = true;
             mPage++;
-            searchRepoData(mKeyWord,mPage);
+            searchRepoData(mKeyWord, mPage, mSortEnumRepo);
         }
     }
 }

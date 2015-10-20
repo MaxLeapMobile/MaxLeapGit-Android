@@ -9,7 +9,6 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,12 +18,13 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
+import com.maxleapmobile.gitmaster.model.OrderEnum;
 import com.maxleapmobile.gitmaster.model.SearchedUsers;
+import com.maxleapmobile.gitmaster.model.SortEnumUser;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.adapter.UserAdapter;
 import com.maxleapmobile.gitmaster.util.Logger;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import retrofit.client.Response;
 
-public class UserFragment extends Fragment implements AbsListView.OnScrollListener{
+public class UserFragment extends Fragment implements AbsListView.OnScrollListener {
     private Context mContext;
     private ProgressBar mProgressBar;
     private ArrayList<User> mUsers;
@@ -46,11 +46,12 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
     public static final int FLAG_SEARCH = 11;
     public static final int FLAG_USER = 22;
     private int mFlag;
+    private SortEnumUser mSortEnumUser;
 
-    public static UserFragment newInstance(int flag){
+    public static UserFragment newInstance(int flag) {
         UserFragment fragment = new UserFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("flag",flag);
+        bundle.putInt("flag", flag);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -58,8 +59,8 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args= getArguments();
-        if(args != null){
+        Bundle args = getArguments();
+        if (args != null) {
             mFlag = args.getInt("flag");
         }
     }
@@ -78,29 +79,30 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.GONE);
 
         ListView listView = (ListView) view.findViewById(R.id.search_list);
-        if(mUsers == null){
+        if (mUsers == null) {
             mUsers = new ArrayList<>();
         }
-        mUserAdapter = new UserAdapter(mContext,mUsers);
+        mUserAdapter = new UserAdapter(mContext, mUsers);
         listView.setAdapter(mUserAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
-        if(mFlag == FLAG_SEARCH){
+        if (mFlag == FLAG_SEARCH) {
             listView.setOnScrollListener(this);
         }
     }
 
-    public void searchUserData(String keyWord,int page) {
+    public void searchUserData(String keyWord, int page, SortEnumUser sortEnumUser) {
         Logger.d("=======>> call searchUserData");
         mKeyWord = keyWord;
-        if(page == 1){
+        mSortEnumUser = sortEnumUser;
+        if (page == 1) {
             mPage = page;
         }
         mProgressBar.setVisibility(View.VISIBLE);
-        ApiManager.getInstance().searchUser(keyWord, page,PAGE_COUNT,new ApiCallback<SearchedUsers>() {
+        ApiManager.getInstance().searchUser(keyWord, mSortEnumUser, OrderEnum.DESC, page, PAGE_COUNT, new ApiCallback<SearchedUsers>() {
             @Override
             public void success(SearchedUsers searchedUsers, Response response) {
                 if (searchedUsers != null) {
-                    if(mPage == 1){
+                    if (mPage == 1) {
                         mUsers.clear();
                     }
                     List<SearchedUsers.Item> items = searchedUsers.getItems();
@@ -114,7 +116,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                     mProgressBar.setVisibility(View.GONE);
                     mUserAdapter.notifyDataSetChanged();
                 }
-                if(mIsGettingMore){
+                if (mIsGettingMore) {
                     mIsGettingMore = false;
                 }
             }
@@ -128,11 +130,11 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if((firstVisibleItem + visibleItemCount) == totalItemCount && !mIsGettingMore
-                && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0){
+        if ((firstVisibleItem + visibleItemCount) == totalItemCount && !mIsGettingMore
+                && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0) {
             mIsGettingMore = true;
             mPage++;
-            searchUserData(mKeyWord,mPage);
+            searchUserData(mKeyWord, mPage, mSortEnumUser);
         }
     }
 }

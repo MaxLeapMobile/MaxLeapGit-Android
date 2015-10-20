@@ -23,10 +23,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.model.SortEnumRepo;
+import com.maxleapmobile.gitmaster.model.SortEnumUser;
 import com.maxleapmobile.gitmaster.ui.adapter.SearchPagerAdapter;
 import com.maxleapmobile.gitmaster.ui.fragment.RepoFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.UserFragment;
 import com.maxleapmobile.gitmaster.ui.view.SlidingTabLayout;
+import com.maxleapmobile.gitmaster.util.DialogUtil;
 
 import java.util.List;
 
@@ -35,6 +38,10 @@ public class SearchActivity extends BaseActivity {
     private ViewPager mViewPager;
     private EditText mSearchEdit;
     private FragmentManager mFragmentManager;
+    private SortEnumRepo mSortEnumRepo;
+    private SortEnumUser mSortEnumUser;
+    private int mPosition;
+    private String mKeyWord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,8 @@ public class SearchActivity extends BaseActivity {
     }
 
     private void init() {
+        mSortEnumRepo = SortEnumRepo.DEFAULT;
+        mSortEnumUser = SortEnumUser.DEFAULT;
         initToolBar();
         initUI();
     }
@@ -56,6 +65,22 @@ public class SearchActivity extends BaseActivity {
         mViewPager.setAdapter(new SearchPagerAdapter(this, mFragmentManager));
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mPosition = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void initToolBar() {
@@ -76,7 +101,9 @@ public class SearchActivity extends BaseActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String keyWord = mSearchEdit.getText().toString();
                     if (!keyWord.isEmpty()) {
-                        performSearch(keyWord);
+                        mKeyWord = keyWord;
+                        hideSoftKeyBoard(mSearchEdit);
+                        performSearch();
                     }
                     return true;
                 }
@@ -85,16 +112,15 @@ public class SearchActivity extends BaseActivity {
         });
     }
 
-    private void performSearch(String keyWord) {
-        hideSoftKeyBoard(mSearchEdit);
+    private void performSearch() {
         List<Fragment> fragmentList = mFragmentManager.getFragments();
         for (Fragment fragment : fragmentList) {
             if (fragment instanceof RepoFragment) {
                 RepoFragment repoFragment = (RepoFragment) fragment;
-                repoFragment.searchRepoData(keyWord, 1);
+                repoFragment.searchRepoData(mKeyWord, 1, mSortEnumRepo);
             } else if (fragment instanceof UserFragment) {
                 UserFragment userFragment = (UserFragment) fragment;
-                userFragment.searchUserData(keyWord, 1);
+                userFragment.searchUserData(mKeyWord, 1, mSortEnumUser);
             }
         }
     }
@@ -104,7 +130,58 @@ public class SearchActivity extends BaseActivity {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public void clickSortBy(View v){
+    public void clickSortBy(View v) {
+        if (mPosition == 0) {
+            DialogUtil.showRepoSortByDialog(this, mSortEnumRepo, new DialogUtil.CheckListener() {
+                @Override
+                public void onCheck(int checkedID) {
+                    switch (checkedID) {
+                        case R.id.dialog_radio_1:
+                            mSortEnumRepo = SortEnumRepo.DEFAULT;
+                            break;
+                        case R.id.dialog_radio_2:
+                            mSortEnumRepo = SortEnumRepo.STARS;
+                            break;
+                        case R.id.dialog_radio_3:
+                            mSortEnumRepo = SortEnumRepo.FORKS;
+                            break;
+                        case R.id.dialog_radio_4:
+                            mSortEnumRepo = SortEnumRepo.UPDATED;
+                            break;
+                        default:
+                            break;
+                    }
+                    if(mKeyWord != null){
+                        performSearch();
+                    }
+                }
+            });
+        } else {
+            DialogUtil.showUserSortByDialog(this, mSortEnumUser, new DialogUtil.CheckListener() {
+                @Override
+                public void onCheck(int checkedID) {
+                    switch (checkedID) {
+                        case R.id.dialog_radio_1:
+                            mSortEnumUser = SortEnumUser.DEFAULT;
+                            break;
+                        case R.id.dialog_radio_2:
+                            mSortEnumUser = SortEnumUser.FOLLOWERS;
+                            break;
+                        case R.id.dialog_radio_3:
+                            mSortEnumUser = SortEnumUser.RESPOSITORIES;
+                            break;
+                        case R.id.dialog_radio_4:
+                            mSortEnumUser = SortEnumUser.JOINED;
+                            break;
+                        default:
+                            break;
+                    }
+                    if(mKeyWord != null){
+                        performSearch();
+                    }
+                }
+            });
+        }
 
     }
 }

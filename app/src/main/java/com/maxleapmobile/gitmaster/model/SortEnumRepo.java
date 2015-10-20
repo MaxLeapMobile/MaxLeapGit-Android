@@ -10,6 +10,8 @@ package com.maxleapmobile.gitmaster.model;
 
 public enum SortEnumRepo {
 
+    DEFAULT(""),
+
     STARS("stars"),
 
     FORKS("forks"),

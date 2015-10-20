@@ -14,5 +14,8 @@
 
     <color name="color_text_gray">#BFBFBF</color>
     <color name="color_divider">#1E000000</color>
+    <color name="bg_dialog">#80000000</color>
+    <color name="color_dialog_cancel">#009688</color>
+    <color name="color_radio_button">#010101</color>
 
 </resources>
