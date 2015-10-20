@@ -20,8 +20,8 @@
                 android:id="@+id/timeline_event_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="16dp" />
+                android:divider="#20000000"
+                android:dividerHeight="1px" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
 

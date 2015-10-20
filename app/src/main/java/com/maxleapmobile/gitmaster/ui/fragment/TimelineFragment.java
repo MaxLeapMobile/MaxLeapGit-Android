@@ -24,8 +24,8 @@ import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
-import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
+import com.maxleapmobile.gitmaster.ui.adapter.TimeLineAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +41,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private Context mContext;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listview;
+    private TimeLineAdapter mAdapter;
     private Handler mHandler;
     private List<TimeLineEvent> mEvents;
     private int initPageCount = 0;
@@ -73,7 +74,10 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void initData() {
-
+        mAdapter = new TimeLineAdapter(mContext, mEvents);
+        listview.setAdapter(mAdapter);
+        mHandler.removeCallbacks(mProgressRunnable);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -92,14 +96,14 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     @Override
                     public void success(List<TimeLineEvent> timeLineEvents, Response response) {
                         mEvents = timeLineEvents;
-                        for (int i = 0; i < mEvents.size(); ) {
-                            if (mEvents.get(i).getType() == ActionType.ForkEvent ||
-                                    mEvents.get(i).getType() == ActionType.WatchEvent) {
-                                i++;
-                            } else {
-                                mEvents.remove(i);
-                            }
-                        }
+//                        for (int i = 0; i < mEvents.size(); ) {
+//                            if (mEvents.get(i).getType() == ActionType.ForkEvent ||
+//                                    mEvents.get(i).getType() == ActionType.WatchEvent) {
+//                                i++;
+//                            } else {
+//                                mEvents.remove(i);
+//                            }
+//                        }
                         initData();
                     }
                 });

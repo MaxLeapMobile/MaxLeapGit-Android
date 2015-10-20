@@ -9,6 +9,11 @@
 package com.maxleapmobile.gitmaster.ui.adapter;
 
 import android.content.Context;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.format.DateUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +23,8 @@ import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
+import com.maxleapmobile.gitmaster.util.TimeUtil;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -25,10 +32,12 @@ public class TimeLineAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<TimeLineEvent> mEvents;
+    private long now;
 
     public TimeLineAdapter(Context context, List<TimeLineEvent> events) {
         this.mContext = context;
         this.mEvents = events;
+        now = System.currentTimeMillis();
     }
 
     @Override
@@ -60,6 +69,16 @@ public class TimeLineAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        TimeLineEvent event = mEvents.get(position);
+        SpannableString ss = new SpannableString(event.getActor().getLogin() +
+                " starred " + event.getRepo().getName());
+        ss.setSpan(new URLSpan(event.getActor().getUrl()), 0, event.getActor().getLogin().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new URLSpan(event.getRepo().getUrl()), event.getActor().getLogin().length() + 9, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        holder.content.setText(ss);
+        holder.content.setMovementMethod(LinkMovementMethod.getInstance());
+        holder.time.setText(getTime(event.getCreatedAt()));
+        Picasso.with(mContext).load(event.getActor().getAvatarUrl()).into(holder.userIcon);
+
         return convertView;
     }
 
@@ -67,6 +86,12 @@ public class TimeLineAdapter extends BaseAdapter {
         ImageView userIcon;
         TextView content;
         TextView time;
+    }
+
+    private String getTime(String formatedTime) {
+        long time = TimeUtil.getDateFromString(formatedTime).getTime();
+        int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH;
+        return DateUtils.getRelativeTimeSpanString(time * 1000, now, DateUtils.MINUTE_IN_MILLIS, flags).toString();
     }
 
 }

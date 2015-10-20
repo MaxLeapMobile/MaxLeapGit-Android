@@ -17,7 +17,6 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="12dp"
         android:layout_toRightOf="@id/timeline_user_icon"
-        android:text="111111111111111"
         android:textSize="14sp" />
 
     <TextView
@@ -28,7 +27,6 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="12dp"
         android:layout_toRightOf="@id/timeline_user_icon"
-        android:text="111111111111111"
         android:textColor="#BFBFBF"
         android:textSize="12sp" />
 

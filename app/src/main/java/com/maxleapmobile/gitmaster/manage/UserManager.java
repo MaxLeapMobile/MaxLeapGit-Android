@@ -23,9 +23,8 @@ import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.util.TimeUtil;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class UserManager {
@@ -95,13 +94,8 @@ public class UserManager {
         mlUser.put("followerCount", user.getFollowers());
         mlUser.put("followingCount", user.getFollowing());
         mlUser.put("publicRepoCount", user.getPublicRepos());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD'T'HH:mm:ss'Z'");
-        try {
-            mlUser.put("githubCreateTime", simpleDateFormat.parse(user.getCreateAt()));
-            mlUser.put("githubUpdateTime", simpleDateFormat.parse(user.getUpdateAt()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        mlUser.put("githubCreateTime", TimeUtil.getDateFromString(user.getCreateAt()));
+        mlUser.put("githubUpdateTime", TimeUtil.getDateFromString(user.getUpdateAt()));
 
         MLUserManager.checkUsernameExistInBackground(user.getLogin(), new ValidateUsernameCallback() {
             @Override
@@ -114,7 +108,6 @@ public class UserManager {
                                 MLUserManager.saveInBackground(mlUser, new SaveCallback() {
                                     @Override
                                     public void done(MLException e) {
-                                        MLUser.getCurrentUser();
                                         if (e == null) {
                                             callback.success();
                                         } else {
