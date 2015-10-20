@@ -17,9 +17,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.api.GithubApi;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
+import com.maxleapmobile.gitmaster.calllback.OperationCallback;
+import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.AccessToken;
+import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
@@ -69,18 +73,19 @@ public class LoginActivity extends BaseActivity {
 
         githubApi.getAccessToken(Const.CLIENT_ID, Const.CLIENT_SECRET, Const.CALLBACK_URL,
                 code, new ApiCallback<AccessToken>() {
-            @Override
-            public void success(AccessToken accessToken, Response response) {
-                Logger.d(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
-                PreferenceUtil.putString(mContext, Const.ACCESS_TOKEN_KEY,
-                        accessToken.getAccessToken());
-            }
+                    @Override
+                    public void success(AccessToken accessToken, Response response) {
+                        Logger.d(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
+                        PreferenceUtil.putString(mContext, Const.ACCESS_TOKEN_KEY,
+                                accessToken.getAccessToken());
+                        getGithubUserInfo();
+                    }
 
-            @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-            }
-        });
+                    @Override
+                    public void failure(RetrofitError error) {
+                        super.failure(error);
+                    }
+                });
     }
 
     private class OauthWebViewClient extends WebViewClient {
@@ -111,5 +116,34 @@ public class LoginActivity extends BaseActivity {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
         }
+    }
+
+    private void getGithubUserInfo() {
+        ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                Logger.d(TAG, user.getEmail() + " " + user.getName());
+                user.setAccessToken(PreferenceUtil.getString(mContext, Const.ACCESS_TOKEN_KEY, null));
+                UserManager.getInstance().login(user, new OperationCallback() {
+                    @Override
+                    public void success() {
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+
+                    @Override
+                    public void failed(String error) {
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+                });
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
     }
 }
