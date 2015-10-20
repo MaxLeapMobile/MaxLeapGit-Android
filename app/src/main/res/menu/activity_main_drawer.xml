@@ -4,17 +4,17 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_timeline"
-            android:icon="@android:drawable/ic_menu_camera"
-            android:title="Timeline"/>
+            android:checked="true"
+            android:icon="@mipmap/btn_timeline_normal"
+            android:title="@string/activity_main_item_timeline" />
         <item
             android:id="@+id/nav_recommend"
-            android:icon="@android:drawable/ic_menu_gallery"
-            android:title="Recommend"/>
+            android:icon="@mipmap/btn_recommend_normal"
+            android:title="@string/activity_main_item_recommend" />
         <item
             android:id="@+id/nav_mine"
-            android:icon="@android:drawable/ic_menu_slideshow"
-            android:title="Mine"/>
+            android:icon="@mipmap/btn_mine_normal"
+            android:title="@string/activity_main_item_mine" />
     </group>
-
 
 </menu>

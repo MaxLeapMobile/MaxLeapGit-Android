@@ -9,6 +9,10 @@
     <string name="toast_network_error">Nerwork error.</string>
     <string name="toast_request_unexpected_error">Unexpected error</string>
 
+    <string name="activity_main_item_timeline">Timeline</string>
+    <string name="activity_main_item_recommend">Recommend</string>
+    <string name="activity_main_item_mine">Mine</string>
+
     <string name="activity_search_hint">search</string>
     <string name="activity_search_sort_by">Sort by</string>
     <string name="activity_search_repo">Repo</string>
