@@ -6,6 +6,9 @@
     <color name="colorAccent">#80CBC4</color>
     <color name="color_search_hint">#1EFFFFFF</color>
 
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="grey">#808080</color>
     <color name="label_name_color">#D9000000</color>
     <color name="label_value_color">#8C000000</color>
 
