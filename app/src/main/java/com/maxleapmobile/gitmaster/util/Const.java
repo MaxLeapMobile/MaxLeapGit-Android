@@ -29,4 +29,6 @@ public class Const {
     public static final String HEADER_LINK = "Link";
     public static final String HEADER_NEXT = "X-Next";
     public static final String HEADER_LAST = "X-Last";
+
+    public static final int PER_PAGE_COUNT = 30;
 }
