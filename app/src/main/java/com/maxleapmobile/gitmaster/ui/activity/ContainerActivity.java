@@ -16,6 +16,7 @@ import android.view.View;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.ui.fragment.RepoFragment;
+import com.maxleapmobile.gitmaster.ui.fragment.UserFragment;
 
 public class ContainerActivity extends BaseActivity {
     public static final String INTENT_KEY_TITLE = "title";
@@ -28,7 +29,7 @@ public class ContainerActivity extends BaseActivity {
 
         String title = getIntent().getStringExtra(INTENT_KEY_TITLE);
         String username = getIntent().getStringExtra(INTENT_KEY_USERNAME);
-        if(title == null || username == null){
+        if (title == null || username == null) {
             throw new IllegalStateException("You should send title and username data");
         }
 
@@ -36,10 +37,14 @@ public class ContainerActivity extends BaseActivity {
 
         if (savedInstanceState == null) {
             Fragment fragment = null;
-            if(title.equals(getString(R.string.mine_label_repos))){
+            if (title.equals(getString(R.string.mine_label_repos))) {
                 fragment = RepoFragment.newInstance(RepoFragment.FLAG_USER_REPO, username);
-            }else if(title.equals(getString(R.string.mine_label_stars))){
+            } else if (title.equals(getString(R.string.mine_label_stars))) {
                 fragment = RepoFragment.newInstance(RepoFragment.FLAG_USER_STAR, username);
+            } else if (title.equals(getString(R.string.mine_label_followers))) {
+                fragment = UserFragment.newInstance(UserFragment.FLAG_USER_FOLLOWER, username);
+            } else if (title.equals(getString(R.string.mine_label_following))) {
+                fragment = UserFragment.newInstance(UserFragment.FLAG_USER_FOLLOWING, username);
             }
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
         }
