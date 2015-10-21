@@ -45,14 +45,17 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
     private String mKeyWord;
     private boolean mIsGettingMore;
     public static final int FLAG_SEARCH = 11;
-    public static final int FLAG_USER = 22;
+    public static final int FLAG_USER_REPO = 22;
+    public static final int FLAG_USER_STAR = 33;
     private int mFlag;
+    private String mUsername;
     private SortEnumRepo mSortEnumRepo;
 
-    public static RepoFragment newInstance(int flag) {
+    public static RepoFragment newInstance(int flag, String username) {
         RepoFragment fragment = new RepoFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("flag", flag);
+        bundle.putString("username", username);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -63,6 +66,7 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         Bundle args = getArguments();
         if (args != null) {
             mFlag = args.getInt("flag");
+            mUsername = args.getString("username");
         }
     }
 
@@ -86,9 +90,60 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mRepoAdapter = new RepoAdapter(mContext, mRepos);
         listView.setAdapter(mRepoAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
-        if (mFlag == FLAG_SEARCH) {
-            listView.setOnScrollListener(this);
+        listView.setOnScrollListener(this);
+        if (mFlag == FLAG_USER_REPO) {
+            fetchUserRepoData(1);
+        } else if (mFlag == FLAG_USER_STAR) {
+            fetchUserStarData(1);
         }
+    }
+
+    public void fetchUserRepoData(int page) {
+        Logger.d("=======>> call fetchUserRepoData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().listReposByPage(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
+            @Override
+            public void success(List<Repo> repos, Response response) {
+                if (repos != null) {
+                    if (mPage == 1) {
+                        mRepos.clear();
+                    }
+                    mRepos.addAll(repos);
+                    mProgressBar.setVisibility(View.GONE);
+                    mRepoAdapter.notifyDataSetChanged();
+                }
+                if (mIsGettingMore) {
+                    mIsGettingMore = false;
+                }
+            }
+        });
+    }
+
+    public void fetchUserStarData(int page) {
+        Logger.d("=======>> call fetchUserStarData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().listStarRepoByUser(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
+            @Override
+            public void success(List<Repo> repos, Response response) {
+                if (repos != null) {
+                    if (mPage == 1) {
+                        mRepos.clear();
+                    }
+                    mRepos.addAll(repos);
+                    mProgressBar.setVisibility(View.GONE);
+                    mRepoAdapter.notifyDataSetChanged();
+                }
+                if (mIsGettingMore) {
+                    mIsGettingMore = false;
+                }
+            }
+        });
     }
 
     public void searchRepoData(String keyWord, int page, SortEnumRepo sortEnumRepo) {
@@ -138,7 +193,13 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                 && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0) {
             mIsGettingMore = true;
             mPage++;
-            searchRepoData(mKeyWord, mPage, mSortEnumRepo);
+            if (mFlag == FLAG_SEARCH) {
+                searchRepoData(mKeyWord, mPage, mSortEnumRepo);
+            } else if (mFlag == FLAG_USER_REPO) {
+                fetchUserRepoData(mPage);
+            } else if (mFlag == FLAG_USER_STAR) {
+                fetchUserStarData(mPage);
+            }
         }
     }
 }

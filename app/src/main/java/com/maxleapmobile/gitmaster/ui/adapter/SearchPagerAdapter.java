@@ -30,7 +30,7 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = RepoFragment.newInstance(RepoFragment.FLAG_SEARCH);
+                fragment = RepoFragment.newInstance(RepoFragment.FLAG_SEARCH,null);
                 break;
             case 1:
                 fragment = UserFragment.newInstance(UserFragment.FLAG_SEARCH);

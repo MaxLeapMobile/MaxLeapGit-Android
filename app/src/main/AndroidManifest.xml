@@ -29,6 +29,7 @@
         <activity android:name=".ui.activity.LoginActivity" />
         <activity android:name=".ui.activity.SearchActivity" android:theme="@style/SearchTheme"/>
         <activity android:name=".ui.activity.UserInfoActivity"/>
+        <activity android:name=".ui.activity.ContainerActivity"/>
     </application>
 
 </manifest>
