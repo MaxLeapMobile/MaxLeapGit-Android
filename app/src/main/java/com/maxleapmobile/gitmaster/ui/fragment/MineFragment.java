@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.maxleap.MLUser;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
@@ -27,6 +26,7 @@ import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.PageLinks;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_userinfo, container, false);
         mUserinfoBinding = DataBindingUtil.bind(view);
-        mUsername = MLUser.getCurrentUser().getUserName();
+        mUsername = getArguments().getString(Const.USERNAME);
         initViews(view);
         getUserInfo();
         getStarCount();
