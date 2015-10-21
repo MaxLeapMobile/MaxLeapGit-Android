@@ -9,8 +9,12 @@
 package com.maxleapmobile.gitmaster.ui.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -40,24 +44,44 @@ public class LoginActivity extends BaseActivity {
     private static final String OAUTH_URL = "https://github.com";
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+    public static final String FROM_PERMISSION_ACTIVITY = "from_permission_activity";
 
+    private StringBuilder sb;
     private Context mContext;
     private ProgressWebView mWebView;
+    private boolean isFromPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mContext = getApplicationContext();
+        initToolBar();
         initViews();
     }
 
+
+    private void initToolBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.activity_login_title);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
     private void initViews() {
+        isFromPermission = getIntent().getBooleanExtra(FROM_PERMISSION_ACTIVITY, false);
         mWebView = (ProgressWebView) findViewById(R.id.login_webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new OauthWebViewClient());
 
-        StringBuilder sb = new StringBuilder(AUTH_URL);
+        sb = new StringBuilder(AUTH_URL);
         sb.append("client_id=" + Const.CLIENT_ID);
         sb.append("&redirect_uri=" + CALLBACK_URL);
         sb.append("&scope=user,repo");
@@ -123,17 +147,24 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void success(User user, Response response) {
                 Logger.d(TAG, user.getEmail() + " " + user.getName());
+                PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
                 user.setAccessToken(PreferenceUtil.getString(mContext, Const.ACCESS_TOKEN_KEY, null));
                 UserManager.getInstance().login(user, new OperationCallback() {
                     @Override
                     public void success() {
+                        if (isFromPermission) {
+                            toMainActivity();
+                        }
                         setResult(RESULT_OK);
                         finish();
                     }
 
                     @Override
                     public void failed(String error) {
-                        setResult(RESULT_OK);
+                        if (isFromPermission) {
+                            toMainActivity();
+                        }
+                        setResult(RESULT_CANCELED);
                         finish();
                     }
                 });
@@ -141,9 +172,15 @@ public class LoginActivity extends BaseActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                setResult(RESULT_OK);
-                finish();
+                super.failure(error);
+                Logger.toast(mContext, R.string.toast_login_failed);
+                mWebView.loadUrl(sb.toString());
             }
         });
+    }
+
+    private void toMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 }
