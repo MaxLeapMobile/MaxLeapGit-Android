@@ -8,6 +8,12 @@
 
     <string name="toast_network_error">Nerwork error.</string>
     <string name="toast_request_unexpected_error">Unexpected error</string>
+    <string name="toast_fork_success">"Forked repo "</string>
+    <string name="toast_fork_failed">Fork failed</string>
+    <string name="toast_star_success">Starred</string>
+    <string name="toast_star_failed">Star failed</string>
+    <string name="toast_unstar_success">Unstar</string>
+    <string name="toast_unstar_failed">Unstar failed</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
     <string name="activity_main_item_recommend">Recommend</string>
@@ -45,6 +51,7 @@
     <string name="mine_label_organzation">Organzation</string>
 
     <string name="bottom_label_star">Star</string>
+    <string name="bottom_label_unstar">Unstar</string>
     <string name="bottom_label_fork">Fork</string>
 
 </resources>

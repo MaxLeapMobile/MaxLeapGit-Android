@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:text="@{status ? @string/userinfo_unfollow : @string/userinfo_follow }"
+                    android:text="@{status ? @string/activity_userinfo_unfollow : @string/activity_userinfo_follow }"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     />

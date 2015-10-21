@@ -169,6 +169,7 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                         Repo repo = new Repo();
                         repo.setName(item.getName());
                         repo.setDescription(item.getDescription());
+                        repo.setHtmlUrl(item.getHtmlUrl());
                         Owner owner = new Owner();
                         owner.setAvatarUrl(item.getOwner().getAvatarUrl());
                         owner.setLogin(item.getOwner().getLogin());

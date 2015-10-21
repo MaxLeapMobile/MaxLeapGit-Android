@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.Repo;
-import com.maxleapmobile.gitmaster.ui.activity.RepoActivity;
+import com.maxleapmobile.gitmaster.ui.activity.RepoDetailActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -76,10 +76,10 @@ public class RepoAdapter extends BaseAdapter {
         holder.repoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, RepoActivity.class);
-                intent.putExtra(RepoActivity.REPONAME, item.getName());
-                intent.putExtra(RepoActivity.OWNER, item.getOwner().getLogin());
-                intent.putExtra(RepoActivity.REPOURL, item.getHtmlUrl());
+                Intent intent = new Intent(mContext, RepoDetailActivity.class);
+                intent.putExtra(RepoDetailActivity.REPONAME, item.getName());
+                intent.putExtra(RepoDetailActivity.OWNER, item.getOwner().getLogin());
+                intent.putExtra(RepoDetailActivity.REPOURL, item.getHtmlUrl());
                 mContext.startActivity(intent);
 
             }
