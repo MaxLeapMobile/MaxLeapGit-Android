@@ -12,14 +12,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.maxleap.MLUser;
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
+import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -27,6 +31,8 @@ public class MainActivity extends BaseActivity
     public static final int REQUEST_OAUTH = 1;
 
     private TextView titleView;
+    private ImageView mAvatarView;
+    private TextView mNavHeaderUser;
     private FragmentTransaction transaction;
 
     @Override
@@ -67,8 +73,24 @@ public class MainActivity extends BaseActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right,
+                                       int bottom, int oldLeft,
+                                       int oldTop, int oldRight, int oldBottom) {
+                mAvatarView = (ImageView) navigationView.findViewById(R.id.nav_header_avatar);
+                mNavHeaderUser = (TextView) navigationView.findViewById(R.id.nav_header_user);
+                Picasso.with(getApplicationContext())
+                        .load(UserManager.getInstance().getCurrentUser().getAvatarUrl())
+                        .centerInside().fit()
+                        .transform(new CircleTransform())
+                        .into(mAvatarView);
+                mNavHeaderUser.setText(UserManager.getInstance().getCurrentUser().getLogin());
+            }
+        });
+
     }
 
     private void checkAccessToken() {

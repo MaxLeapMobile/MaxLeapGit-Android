@@ -28,6 +28,7 @@ import com.maxleapmobile.gitmaster.model.PageLinks;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.activity.ContainerActivity;
+import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.squareup.picasso.Picasso;
 
@@ -95,6 +96,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 Picasso.with(getContext())
                         .load(user.getAvatarUrl())
                         .centerCrop().fit()
+                        .transform(new CircleTransform())
                         .into(mAvatar);
             }
 
