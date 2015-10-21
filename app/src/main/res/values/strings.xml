@@ -8,6 +8,7 @@
 
     <string name="toast_network_error">Nerwork error.</string>
     <string name="toast_request_unexpected_error">Unexpected error</string>
+    <string name="toast_unfollow_success">Unfollow success</string>
     <string name="toast_fork_success">"Forked repo "</string>
     <string name="toast_fork_failed">Fork failed</string>
     <string name="toast_star_success">Starred</string>
@@ -38,6 +39,9 @@
     <string name="dialog_sort_most_repositories">Most Repositories</string>
     <string name="dialog_sort_most_joined">Most Joined</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_sure">Sure</string>
+    <string name="dialog_unfollow">Are you sure to unfollow %1$s</string>
+    <string name="dialog_unfollow_title">Notice</string>
 
     <!-- mine fragment -->
     <string name="mine_label_followers">Followers</string>
