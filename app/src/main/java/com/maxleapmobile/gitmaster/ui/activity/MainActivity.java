@@ -15,27 +15,18 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
-import com.maxleapmobile.gitmaster.api.ApiManager;
-import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
+import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
 import com.maxleapmobile.gitmaster.util.Const;
-import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
-
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int REQUEST_OAUTH = 1;
-
-    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final int REQUEST_OAUTH = 1;
 
     private TextView titleView;
-
-    private String mUsername;
+    private FragmentTransaction transaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,24 +75,22 @@ public class MainActivity extends BaseActivity
             Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, REQUEST_OAUTH);
         } else {
-            ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
-                @Override
-                public void success(User user, Response response) {
-                    mUsername = user.getLogin();
-                    PreferenceUtil.putString(getApplicationContext(), Const.USERNAME, mUsername);
-                    Logger.d(TAG, user.getEmail() + " " + user.getName());
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
-                }
-            });
+            initUI();
         }
     }
 
     private void initUI() {
+        transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_main, new TimelineFragment());
+        transaction.commitAllowingStateLoss();
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_OAUTH && resultCode == RESULT_OK) {
+            initUI();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -125,12 +114,7 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_recommend) {
 
         } else if (id == R.id.nav_mine) {
-            Bundle bundle = new Bundle();
-            bundle.putString(Const.USERNAME, mUsername);
-            MineFragment mineFragment = new MineFragment();
-            mineFragment.setArguments(bundle);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.content_main, mineFragment);
+            transaction.replace(R.id.content_main, new MineFragment());
             transaction.commit();
         }
 

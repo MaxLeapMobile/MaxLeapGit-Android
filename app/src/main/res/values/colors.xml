@@ -6,6 +6,9 @@
     <color name="colorAccent">#80CBC4</color>
     <color name="color_search_hint">#1EFFFFFF</color>
 
+    <color name="green">#009900</color>
+    <color name="blue">#000099</color>
+    <color name="orange">#FF9900</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="grey">#808080</color>
@@ -14,7 +17,6 @@
 
     <color name="drawer_item_selected_color">#4285F4</color>
     <color name="drawer_item_normal_color">#DE000000</color>
-
     <color name="color_text_gray">#BFBFBF</color>
     <color name="color_divider">#1E000000</color>
     <color name="bg_dialog">#80000000</color>

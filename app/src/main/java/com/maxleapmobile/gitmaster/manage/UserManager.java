@@ -23,6 +23,7 @@ import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.util.TimeUtil;
 
 import java.util.Date;
 
@@ -46,7 +47,7 @@ public class UserManager {
      *
      * @return current login user
      */
-    public User getCurrentUser(){
+    public User getCurrentUser() {
         if (currentUser == null) {
             MLUser mlUser = MLUser.getCurrentUser();
             if (mlUser == null) return null;
@@ -66,8 +67,8 @@ public class UserManager {
             currentUser.setFollowers(mlUser.getLong("followers"));
             currentUser.setFollowing(mlUser.getLong("following"));
             currentUser.setPublicRepos(mlUser.getLong("publicRepos"));
-            currentUser.setCreateAt(mlUser.getDate("githubCreateAt").toString());
-            currentUser.setUpdateAt(mlUser.getDate("githubUpdateAt").toString());
+            currentUser.setCreateAt(mlUser.getDate("githubCreateTime").toString());
+            currentUser.setUpdateAt(mlUser.getDate("githubUpdateTime").toString());
         }
 
         return currentUser;
@@ -75,27 +76,48 @@ public class UserManager {
 
     /**
      * Create an user or update an user info with token and user id
+     *
      * @param user
      */
-    public void login(final  User user, final OperationCallback callback){
+    public void login(final User user, final OperationCallback callback) {
         final MLUser mlUser = new MLUser();
         mlUser.setUserName(user.getLogin());
         mlUser.setPassword(user.getLogin());
         mlUser.put("accessToken", user.getAccessToken());
+        mlUser.put("nickName", TextUtils.isEmpty(user.getName()) ? "" : user.getName());
+        mlUser.put("avatarUrl", user.getAvatarUrl());
+        mlUser.put("email", TextUtils.isEmpty(user.getEmail()) ? "" : user.getEmail());
+        mlUser.put("blog", TextUtils.isEmpty(user.getBlog()) ? "" : user.getBlog());
+        mlUser.put("company", TextUtils.isEmpty(user.getCompany()) ? "" : user.getCompany());
+        mlUser.put("location", TextUtils.isEmpty(user.getLocation()) ? "" : user.getLocation());
+        mlUser.put("hireable", user.isHireable());
+        mlUser.put("followerCount", user.getFollowers());
+        mlUser.put("followingCount", user.getFollowing());
+        mlUser.put("publicRepoCount", user.getPublicRepos());
+        mlUser.put("githubCreateTime", TimeUtil.getDateFromString(user.getCreateAt()));
+        mlUser.put("githubUpdateTime", TimeUtil.getDateFromString(user.getUpdateAt()));
 
         MLUserManager.checkUsernameExistInBackground(user.getLogin(), new ValidateUsernameCallback() {
             @Override
             public void done(MLException e) {
                 if (e == null) {
-                    MLUserManager.logInInBackground(user.getLogin(), user.getLogin(), new LogInCallback<MLUser>() {
+                    MLUserManager.logInInBackground(mlUser.getUserName(), mlUser.getUserName(), new LogInCallback<MLUser>() {
                         @Override
-                        public void done(MLUser MLUser, MLException e) {
+                        public void done(MLUser mlUser, MLException e) {
                             if (e == null) {
-                                callback.success();
+                                MLUserManager.saveInBackground(mlUser, new SaveCallback() {
+                                    @Override
+                                    public void done(MLException e) {
+                                        if (e == null) {
+                                            callback.success();
+                                        } else {
+                                            callback.failed(e.getMessage());
+                                        }
+                                    }
+                                });
                             } else {
                                 callback.failed(e.getMessage());
                             }
-
                         }
                     });
                 } else {
@@ -116,9 +138,10 @@ public class UserManager {
 
     /**
      * fill user information into MaxLeap cloud data using full user data from github
+     *
      * @param user
      */
-    public void updateUserInfo( User user, final OperationCallback callback){
+    public void updateUserInfo(User user, final OperationCallback callback) {
         if (TextUtils.isEmpty(user.getObjectId())) {
             callback.failed("User object id cannot be empty");
         }
@@ -155,9 +178,10 @@ public class UserManager {
 
     /**
      * add a gene to current user and push gene into cloud data
+     *
      * @param gene
      */
-    public void addGene( Gene gene, final OperationCallback callback){
+    public void addGene(Gene gene, final OperationCallback callback) {
         final MLObject obj = new MLObject("Gene");
         obj.put("language", gene.getLanguage());
         obj.put("skill", gene.getSkill());
@@ -165,7 +189,7 @@ public class UserManager {
         MLDataManager.saveInBackground(obj, new SaveCallback() {
             @Override
             public void done(MLException e) {
-                if (e == null){
+                if (e == null) {
                     MLRelation relation = MLUser.getCurrentUser().getRelation("genes");
                     relation.add(obj);
                     getCurrentUser().setGenes(relation);
@@ -191,7 +215,7 @@ public class UserManager {
      *
      * @param gene
      */
-    public void updateGene( Gene gene, final OperationCallback callback){
+    public void updateGene(Gene gene, final OperationCallback callback) {
         if (TextUtils.isEmpty(gene.getObjectId())) {
             callback.failed("gene object id must be set");
         }
@@ -205,7 +229,7 @@ public class UserManager {
         MLDataManager.saveInBackground(obj, new SaveCallback() {
             @Override
             public void done(MLException e) {
-                if (e == null){
+                if (e == null) {
                     callback.success();
                 } else {
                     callback.failed(e.getMessage());
@@ -219,7 +243,7 @@ public class UserManager {
      *
      * @param gene
      */
-    public void removeGene( Gene gene, final OperationCallback callback){
+    public void removeGene(Gene gene, final OperationCallback callback) {
         if (TextUtils.isEmpty(gene.getObjectId())) {
             callback.failed("gene object id must be set");
         }
