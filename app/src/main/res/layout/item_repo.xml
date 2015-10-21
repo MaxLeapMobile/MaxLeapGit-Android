@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_repo_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
@@ -9,7 +11,7 @@
         android:id="@+id/repo_photo"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"/>
 
     <TextView
         android:id="@+id/repo_name"
@@ -19,7 +21,7 @@
         android:layout_toRightOf="@+id/repo_photo"
         android:text="repo_name"
         android:textColor="@android:color/black"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/repo_info"
@@ -31,7 +33,7 @@
         android:layout_toRightOf="@+id/repo_photo"
         android:text="repo_info"
         android:textColor="@android:color/black"
-        android:textSize="14sp" />
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/repo_owner"
@@ -43,6 +45,6 @@
         android:layout_toRightOf="@+id/repo_photo"
         android:text="repo_owner"
         android:textColor="@color/color_text_gray"
-        android:textSize="12sp" />
+        android:textSize="12sp"/>
 
 </RelativeLayout>

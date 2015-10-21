@@ -9,6 +9,7 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -27,6 +29,7 @@ import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.SearchedRepos;
 import com.maxleapmobile.gitmaster.model.SortEnumRepo;
+import com.maxleapmobile.gitmaster.ui.activity.RepoDetailActivity;
 import com.maxleapmobile.gitmaster.ui.adapter.RepoAdapter;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -45,14 +48,17 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
     private String mKeyWord;
     private boolean mIsGettingMore;
     public static final int FLAG_SEARCH = 11;
-    public static final int FLAG_USER = 22;
+    public static final int FLAG_USER_REPO = 22;
+    public static final int FLAG_USER_STAR = 33;
     private int mFlag;
+    private String mUsername;
     private SortEnumRepo mSortEnumRepo;
 
-    public static RepoFragment newInstance(int flag) {
+    public static RepoFragment newInstance(int flag, String username) {
         RepoFragment fragment = new RepoFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("flag", flag);
+        bundle.putString("username", username);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -63,6 +69,7 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         Bundle args = getArguments();
         if (args != null) {
             mFlag = args.getInt("flag");
+            mUsername = args.getString("username");
         }
     }
 
@@ -86,9 +93,70 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mRepoAdapter = new RepoAdapter(mContext, mRepos);
         listView.setAdapter(mRepoAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
-        if (mFlag == FLAG_SEARCH) {
-            listView.setOnScrollListener(this);
+        listView.setOnScrollListener(this);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(mContext, RepoDetailActivity.class);
+                intent.putExtra(RepoDetailActivity.REPONAME, mRepos.get(position).getName());
+                intent.putExtra(RepoDetailActivity.OWNER, mRepos.get(position).getOwner().getLogin());
+                intent.putExtra(RepoDetailActivity.REPOURL, mRepos.get(position).getHtmlUrl());
+                mContext.startActivity(intent);
+            }
+        });
+        if (mFlag == FLAG_USER_REPO) {
+            fetchUserRepoData(1);
+        } else if (mFlag == FLAG_USER_STAR) {
+            fetchUserStarData(1);
         }
+    }
+
+    public void fetchUserRepoData(int page) {
+        Logger.d("=======>> call fetchUserRepoData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().listReposByPage(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
+            @Override
+            public void success(List<Repo> repos, Response response) {
+                if (!repos.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
+                    if (mPage == 1) {
+                        mRepos.clear();
+                    }
+                    mRepos.addAll(repos);
+                    mRepoAdapter.notifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void fetchUserStarData(int page) {
+        Logger.d("=======>> call fetchUserStarData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().listStarRepoByUser(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
+            @Override
+            public void success(List<Repo> repos, Response response) {
+                if (!repos.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
+                    if (mPage == 1) {
+                        mRepos.clear();
+                    }
+                    mRepos.addAll(repos);
+                    mRepoAdapter.notifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     public void searchRepoData(String keyWord, int page, SortEnumRepo sortEnumRepo) {
@@ -103,6 +171,9 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
             @Override
             public void success(SearchedRepos searchedRepos, Response response) {
                 if (searchedRepos != null) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
                     if (mPage == 1) {
                         mRepos.clear();
                     }
@@ -111,18 +182,16 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                         Repo repo = new Repo();
                         repo.setName(item.getName());
                         repo.setDescription(item.getDescription());
+                        repo.setHtmlUrl(item.getHtmlUrl());
                         Owner owner = new Owner();
                         owner.setAvatarUrl(item.getOwner().getAvatarUrl());
                         owner.setLogin(item.getOwner().getLogin());
                         repo.setOwner(owner);
                         mRepos.add(repo);
                     }
-                    mProgressBar.setVisibility(View.GONE);
                     mRepoAdapter.notifyDataSetChanged();
                 }
-                if (mIsGettingMore) {
-                    mIsGettingMore = false;
-                }
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -138,7 +207,13 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                 && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0) {
             mIsGettingMore = true;
             mPage++;
-            searchRepoData(mKeyWord, mPage, mSortEnumRepo);
+            if (mFlag == FLAG_SEARCH) {
+                searchRepoData(mKeyWord, mPage, mSortEnumRepo);
+            } else if (mFlag == FLAG_USER_REPO) {
+                fetchUserRepoData(mPage);
+            } else if (mFlag == FLAG_USER_STAR) {
+                fetchUserStarData(mPage);
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -23,10 +25,12 @@ import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
+import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.SearchedUsers;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
-import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.ui.activity.UserInfoActivity;
 import com.maxleapmobile.gitmaster.ui.adapter.UserAdapter;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 
 import java.util.ArrayList;
@@ -37,21 +41,24 @@ import retrofit.client.Response;
 public class UserFragment extends Fragment implements AbsListView.OnScrollListener {
     private Context mContext;
     private ProgressBar mProgressBar;
-    private ArrayList<User> mUsers;
+    private ArrayList<Owner> mUsers;
     private UserAdapter mUserAdapter;
     private static final int PAGE_COUNT = 30;
     private int mPage;
     private String mKeyWord;
     private boolean mIsGettingMore;
     public static final int FLAG_SEARCH = 11;
-    public static final int FLAG_USER = 22;
+    public static final int FLAG_USER_FOLLOWING = 22;
+    public static final int FLAG_USER_FOLLOWER = 33;
     private int mFlag;
+    private String mUsername;
     private SortEnumUser mSortEnumUser;
 
-    public static UserFragment newInstance(int flag) {
+    public static UserFragment newInstance(int flag, String username) {
         UserFragment fragment = new UserFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("flag", flag);
+        bundle.putString("username", username);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -62,6 +69,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         Bundle args = getArguments();
         if (args != null) {
             mFlag = args.getInt("flag");
+            mUsername = args.getString("username");
         }
     }
 
@@ -82,12 +90,76 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         if (mUsers == null) {
             mUsers = new ArrayList<>();
         }
-        mUserAdapter = new UserAdapter(mContext, mUsers);
+        if (mFlag == FLAG_USER_FOLLOWING) {
+            mUserAdapter = new UserAdapter(mContext, mUsers, true);
+        } else {
+            mUserAdapter = new UserAdapter(mContext, mUsers, false);
+        }
+        listView.setOnScrollListener(this);
         listView.setAdapter(mUserAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
-        if (mFlag == FLAG_SEARCH) {
-            listView.setOnScrollListener(this);
+
+        if (mFlag == FLAG_USER_FOLLOWING) {
+            fetchFollowingData(1);
+        } else if (mFlag == FLAG_USER_FOLLOWER) {
+            fetchFollowerData(1);
         }
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(mContext, UserInfoActivity.class);
+                intent.putExtra(Const.USERNAME, mUsers.get(position).getLogin());
+                mContext.startActivity(intent);
+            }
+        });
+    }
+
+    private void fetchFollowerData(int page) {
+        Logger.d("=======>> call fetchFollowingData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().getFollowersList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
+            @Override
+            public void success(List<Owner> owners, Response response) {
+                if (!owners.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
+                    if (mPage == 1) {
+                        mUsers.clear();
+                    }
+                    mUsers.addAll(owners);
+                    mUserAdapter.notifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void fetchFollowingData(int page) {
+        Logger.d("=======>> call fetchFollowingData");
+        if (page == 1) {
+            mPage = page;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().getFollowingList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
+            @Override
+            public void success(List<Owner> owners, Response response) {
+                if (!owners.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
+                    if (mPage == 1) {
+                        mUsers.clear();
+                    }
+                    mUsers.addAll(owners);
+                    mUserAdapter.notifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     public void searchUserData(String keyWord, int page, SortEnumUser sortEnumUser) {
@@ -102,23 +174,24 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
             @Override
             public void success(SearchedUsers searchedUsers, Response response) {
                 if (searchedUsers != null) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
                     if (mPage == 1) {
                         mUsers.clear();
                     }
                     List<SearchedUsers.Item> items = searchedUsers.getItems();
                     for (SearchedUsers.Item item : items) {
-                        User user = new User();
+                        Owner user = new Owner();
                         user.setAvatarUrl(item.getAvatarUrl());
-                        user.setName(item.getLogin());
-                        user.setUpdateAt(String.valueOf(item.getScore()));
+                        user.setLogin(item.getLogin());
+                        user.setHtmlUrl(item.getHtmlUrl());
                         mUsers.add(user);
                     }
-                    mProgressBar.setVisibility(View.GONE);
                     mUserAdapter.notifyDataSetChanged();
                 }
-                if (mIsGettingMore) {
-                    mIsGettingMore = false;
-                }
+                mProgressBar.setVisibility(View.GONE);
+
             }
         });
     }
@@ -134,7 +207,14 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                 && totalItemCount >= PAGE_COUNT && totalItemCount % PAGE_COUNT == 0) {
             mIsGettingMore = true;
             mPage++;
-            searchUserData(mKeyWord, mPage, mSortEnumUser);
+            if (mFlag == FLAG_SEARCH) {
+                searchUserData(mKeyWord, mPage, mSortEnumUser);
+            } else if (mFlag == FLAG_USER_FOLLOWER) {
+                fetchFollowerData(mPage);
+            } else if (mFlag == FLAG_USER_FOLLOWING) {
+                fetchFollowingData(mPage);
+            }
+
         }
     }
 }

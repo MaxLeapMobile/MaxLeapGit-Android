@@ -8,6 +8,7 @@
  */
 package com.maxleapmobile.gitmaster.ui.fragment;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.PageLinks;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.ui.activity.ContainerActivity;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.squareup.picasso.Picasso;
 
@@ -68,12 +70,14 @@ public class MineFragment extends Fragment implements View.OnClickListener {
             @Override
             public void success(List<Repo> repos, Response response) {
                 List<Header> headers = response.getHeaders();
+                String link = "";
                 for (Header header : headers) {
                     if (header.getName().equals("Link")) {
-                        PageLinks pageLinks = new PageLinks(header.getValue());
-                        mUserinfoBinding.setPagelinks(pageLinks);
+                        link = header.getValue();
                     }
                 }
+                PageLinks pageLinks = new PageLinks(link);
+                mUserinfoBinding.setPagelinks(pageLinks);
             }
 
             @Override
@@ -137,6 +141,33 @@ public class MineFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.mine_card_followers:
+                Intent followersIntent = new Intent(getActivity(), ContainerActivity.class);
+                followersIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_followers));
+                followersIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(followersIntent);
+                break;
+            case R.id.mine_card_followerings:
+                Intent followingIntent = new Intent(getActivity(), ContainerActivity.class);
+                followingIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_following));
+                followingIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(followingIntent);
+                break;
+            case R.id.mine_card_repos:
+                Intent repoIntent = new Intent(getActivity(), ContainerActivity.class);
+                repoIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_repos));
+                repoIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(repoIntent);
+                break;
+            case R.id.mine_card_stars:
+                Intent starIntent = new Intent(getActivity(), ContainerActivity.class);
+                starIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_stars));
+                starIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(starIntent);
+                break;
+            default:
+                break;
+        }
     }
 }

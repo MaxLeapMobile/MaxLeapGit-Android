@@ -24,4 +24,8 @@
         <item name="android:windowBackground">@color/bg_dialog</item>
     </style>
 
+    <style name="SearchTheme" parent="AppTheme.NoActionBar">
+        <item name="colorControlNormal">@color/color_radio_button</item>
+    </style>
+
 </resources>
