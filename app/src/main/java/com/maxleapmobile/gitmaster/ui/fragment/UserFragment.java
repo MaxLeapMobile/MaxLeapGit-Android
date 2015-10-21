@@ -9,6 +9,7 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -26,7 +28,9 @@ import com.maxleapmobile.gitmaster.model.OrderEnum;
 import com.maxleapmobile.gitmaster.model.SearchedUsers;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.ui.activity.UserInfoActivity;
 import com.maxleapmobile.gitmaster.ui.adapter.UserAdapter;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 
 import java.util.ArrayList;
@@ -85,6 +89,14 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mUserAdapter = new UserAdapter(mContext, mUsers);
         listView.setAdapter(mUserAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(mContext, UserInfoActivity.class);
+                intent.putExtra(Const.USERNAME, mUsers.get(position).getName());
+                mContext.startActivity(intent);
+            }
+        });
         if (mFlag == FLAG_SEARCH) {
             listView.setOnScrollListener(this);
         }

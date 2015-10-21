@@ -9,20 +9,16 @@
 package com.maxleapmobile.gitmaster.ui.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.User;
-import com.maxleapmobile.gitmaster.ui.activity.UserInfoActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
-import com.maxleapmobile.gitmaster.util.Const;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -60,7 +56,6 @@ public class UserAdapter extends BaseAdapter {
             holder.nameView = (TextView) convertView.findViewById(R.id.user_name);
             holder.updateView = (TextView) convertView.findViewById(R.id.user_update);
             holder.imageView = (ImageView) convertView.findViewById(R.id.user_photo);
-            holder.content = (RelativeLayout) convertView.findViewById(R.id.item_user_layout);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -71,15 +66,6 @@ public class UserAdapter extends BaseAdapter {
         holder.updateView.setText(item.getUpdateAt());
         Picasso.with(mContext).load(item.getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);
 
-        holder.content.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, UserInfoActivity.class);
-                intent.putExtra(Const.USERNAME, item.getName());
-                mContext.startActivity(intent);
-            }
-        });
-
         return convertView;
     }
 
@@ -87,6 +73,5 @@ public class UserAdapter extends BaseAdapter {
         TextView nameView;
         TextView updateView;
         ImageView imageView;
-        RelativeLayout content;
     }
 }

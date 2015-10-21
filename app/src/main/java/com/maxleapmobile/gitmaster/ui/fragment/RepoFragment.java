@@ -9,6 +9,7 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -27,6 +29,7 @@ import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.SearchedRepos;
 import com.maxleapmobile.gitmaster.model.SortEnumRepo;
+import com.maxleapmobile.gitmaster.ui.activity.RepoDetailActivity;
 import com.maxleapmobile.gitmaster.ui.adapter.RepoAdapter;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -91,6 +94,16 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         listView.setAdapter(mRepoAdapter);
         listView.setEmptyView(view.findViewById(R.id.search_empty));
         listView.setOnScrollListener(this);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(mContext, RepoDetailActivity.class);
+                intent.putExtra(RepoDetailActivity.REPONAME, mRepos.get(position).getName());
+                intent.putExtra(RepoDetailActivity.OWNER, mRepos.get(position).getOwner().getLogin());
+                intent.putExtra(RepoDetailActivity.REPOURL, mRepos.get(position).getHtmlUrl());
+                mContext.startActivity(intent);
+            }
+        });
         if (mFlag == FLAG_USER_REPO) {
             fetchUserRepoData(1);
         } else if (mFlag == FLAG_USER_STAR) {
