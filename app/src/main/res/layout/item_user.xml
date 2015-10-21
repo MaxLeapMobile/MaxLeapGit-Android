@@ -45,8 +45,8 @@
         android:background="@drawable/btn_unfollow"
         android:clickable="true"
         android:gravity="center"
-        android:text="@string/userinfo_unfollow"
-        android:textColor="@color/color_text_gray"
+        android:text="@string/activity_userinfo_unfollow"
+        android:textColor="@android:color/black"
         android:textSize="14sp" />
 
 </RelativeLayout>

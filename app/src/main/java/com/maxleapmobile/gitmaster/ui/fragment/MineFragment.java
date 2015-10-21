@@ -143,8 +143,16 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.mine_card_followers:
+                Intent followersIntent = new Intent(getActivity(), ContainerActivity.class);
+                followersIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_followers));
+                followersIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(followersIntent);
                 break;
             case R.id.mine_card_followerings:
+                Intent followingIntent = new Intent(getActivity(), ContainerActivity.class);
+                followingIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_following));
+                followingIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(followingIntent);
                 break;
             case R.id.mine_card_repos:
                 Intent repoIntent = new Intent(getActivity(), ContainerActivity.class);

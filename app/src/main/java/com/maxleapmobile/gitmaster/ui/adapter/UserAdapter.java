@@ -8,7 +8,9 @@
  */
 package com.maxleapmobile.gitmaster.ui.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,30 +78,51 @@ public class UserAdapter extends BaseAdapter {
         Picasso.with(mContext).load(item.getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);
         if (mFromFollowing) {
             holder.unfollowView.setVisibility(View.VISIBLE);
-            holder.unfollowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ApiManager.getInstance().unfollow(item.getLogin(), new ApiCallback<Object>() {
-                        @Override
-                        public void success(Object o, Response response) {
-                            if (response.getStatus() == 204) {
-                                Logger.toast(mContext, R.string.toast_unfollow_success);
-                                mUsers.remove(item);
-                                notifyDataSetChanged();
-                            }
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            super.failure(error);
-                        }
-                    });
-                }
-            });
+            addListener(holder.unfollowView, item);
         } else {
             holder.unfollowView.setVisibility(View.GONE);
         }
         return convertView;
+    }
+
+    private void addListener(View view, final Owner item) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle(R.string.dialog_unfollow_title);
+                builder.setMessage(String.format(mContext.getString(R.string.dialog_unfollow), item.getLogin()));
+                builder.setPositiveButton(R.string.dialog_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ApiManager.getInstance().unfollow(item.getLogin(), new ApiCallback<Object>() {
+                            @Override
+                            public void success(Object o, Response response) {
+                                if (response.getStatus() == 204) {
+                                    Logger.toast(mContext, R.string.toast_unfollow_success);
+                                    mUsers.remove(item);
+                                    notifyDataSetChanged();
+                                }
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                super.failure(error);
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.create().show();
+
+            }
+        });
     }
 
     static class ViewHolder {
