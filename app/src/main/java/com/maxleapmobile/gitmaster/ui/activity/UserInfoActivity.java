@@ -38,8 +38,8 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_userinfo);
-        initView();
         initFragment();
+        initView();
         followStatus();
         mBinding.setStatus(mFollowStatus);
     }
@@ -59,6 +59,16 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 finish();
             }
         });
+    }
+
+    private void initFragment() {
+        Bundle bundle = getIntent().getExtras();
+        mUsername = bundle.getString(Const.USERNAME);
+        MineFragment mineFragment = new MineFragment();
+        mineFragment.setArguments(bundle);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.userinfo_content_main, mineFragment);
+        transaction.commit();
     }
 
     private void followStatus() {
@@ -82,16 +92,6 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         });
 
         mFollow.setOnClickListener(this);
-    }
-
-    private void initFragment() {
-        Bundle bundle = getIntent().getExtras();
-        mUsername = bundle.getString(Const.USERNAME);
-        MineFragment mineFragment = new MineFragment();
-        mineFragment.setArguments(bundle);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.userinfo_content_main, mineFragment);
-        transaction.commit();
     }
 
     @Override

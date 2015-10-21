@@ -11,10 +11,13 @@ package com.maxleapmobile.gitmaster.ui.activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
@@ -43,6 +46,8 @@ public class LoginActivity extends BaseActivity {
 
     private Context mContext;
     private ProgressWebView mWebView;
+    private Toolbar mToolbar;
+    private TextView mTitleTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,17 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void initViews() {
+        mToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        mTitleTv = (TextView) findViewById(R.id.title);
+        mTitleTv.setText(R.string.activity_login_title);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         mWebView = (ProgressWebView) findViewById(R.id.login_webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new OauthWebViewClient());

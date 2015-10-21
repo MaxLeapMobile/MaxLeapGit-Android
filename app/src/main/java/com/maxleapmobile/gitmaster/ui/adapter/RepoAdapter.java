@@ -63,7 +63,7 @@ public class RepoAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Repo item = mRepos.get(position);
+        final Repo item = mRepos.get(position);
         holder.titleView.setText(item.getName());
         holder.infoView.setText(item.getDescription());
         holder.ownerView.setText(String.format(mContext.getString(R.string.frag_repo_owner), item.getOwner().getLogin()));
