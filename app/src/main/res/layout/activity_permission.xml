@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="87dp"
+        android:layout_height="87dp"
+        android:layout_marginTop="147dp"
+        android:scaleType="centerInside"
+        android:src="@mipmap/ic_logo_sign_in" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:text="@string/activity_permission_notice"
+        android:textColor="#808080"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:clickable="true"
+        android:gravity="center"
+        android:onClick="toLoginActivity"
+        android:text="@string/activity_permission_sign_in"
+        android:textColor="#0076FF"
+        android:textSize="24sp" />
+
+</LinearLayout>
