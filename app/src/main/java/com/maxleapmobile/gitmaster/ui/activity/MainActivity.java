@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.maxleap.MLUser;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
@@ -114,7 +115,12 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_recommend) {
 
         } else if (id == R.id.nav_mine) {
-            transaction.replace(R.id.content_main, new MineFragment());
+            Bundle bundle = new Bundle();
+            bundle.putString(Const.USERNAME, MLUser.getCurrentUser().getUserName());
+            MineFragment mineFragment = new MineFragment();
+            mineFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.content_main, mineFragment);
             transaction.commit();
         }
 

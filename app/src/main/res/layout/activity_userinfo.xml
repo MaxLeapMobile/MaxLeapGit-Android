@@ -1,20 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
 
-    <include
-        android:id="@+id/userinfo_toolbar"
-        layout="@layout/view_toolbar_follow"/>
+        <variable
+            name="status"
+            type="Boolean"/>
 
-    <RelativeLayout
-        android:id="@+id/userinfo_content_main"
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </RelativeLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/userinfo_toolbar"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/userinfo_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/userinfo_follow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@{status ? @string/userinfo_unfollow : @string/userinfo_follow }"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+        <RelativeLayout
+            android:id="@+id/userinfo_content_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </RelativeLayout>
 
 
-</LinearLayout>
+    </LinearLayout>
+
+</layout>

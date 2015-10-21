@@ -42,7 +42,6 @@ public abstract class ApiCallback<T> implements Callback<T> {
                 GithubError githubError = (GithubError) error.getBodyAs(GithubError.class);
                 Logger.e("------> Error Message: " + githubError.getMessage() +
                         ", Refer to: " + githubError.getDocumentUrl() + " <------");
-                Logger.toast(mContext, githubError.getMessage());
             }
         }
     }
