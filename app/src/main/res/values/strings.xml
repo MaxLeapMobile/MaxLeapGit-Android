@@ -8,6 +8,12 @@
 
     <string name="toast_network_error">Nerwork error.</string>
     <string name="toast_request_unexpected_error">Unexpected error</string>
+    <string name="toast_fork_success">"Forked repo "</string>
+    <string name="toast_fork_failed">Fork failed</string>
+    <string name="toast_star_success">Starred</string>
+    <string name="toast_star_failed">Star failed</string>
+    <string name="toast_unstar_success">Unstar</string>
+    <string name="toast_unstar_failed">Unstar failed</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
     <string name="activity_main_item_recommend">Recommend</string>
@@ -18,6 +24,10 @@
     <string name="activity_search_repo">Repo</string>
     <string name="activity_search_user">User</string>
     <string name="activity_search_empty">No Results</string>
+
+    <string name="activity_userinfo_follow">Follow</string>
+    <string name="activity_userinfo_unfollow">Unfollow</string>
+    <string name="activity_login_title">Github Authorization</string>
 
     <string name="frag_repo_owner">Built by %1$s</string>
     <string name="dialog_sort_best_match">Best Match(Default)</string>
@@ -40,7 +50,8 @@
     <string name="mine_label_joinin">Join In</string>
     <string name="mine_label_organzation">Organzation</string>
 
-    <string name="userinfo_follow">Follow</string>
-    <string name="userinfo_unfollow">Unfollow</string>
+    <string name="bottom_label_star">Star</string>
+    <string name="bottom_label_unstar">Unstar</string>
+    <string name="bottom_label_fork">Fork</string>
 
 </resources>

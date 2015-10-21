@@ -61,7 +61,7 @@ public class UserAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        User item = mUsers.get(position);
+        final User item = mUsers.get(position);
         holder.nameView.setText(item.getName());
         holder.updateView.setText(item.getUpdateAt());
         Picasso.with(mContext).load(item.getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);

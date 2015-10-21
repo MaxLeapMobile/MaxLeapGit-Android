@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <include
+        android:id="@+id/repo_toolbar"
+        layout="@layout/view_toolbar"/>
+
+    <com.maxleapmobile.gitmaster.ui.widget.ProgressWebView
+        android:id="@+id/repo_webview"
+        android:layout_below="@+id/repo_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.maxleapmobile.gitmaster.ui.widget.ProgressWebView>
+
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:background="@color/bottom_label_normal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <TextView
+            android:id="@+id/repo_star"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:text="@string/bottom_label_star"/>
+
+        <include
+            layout="@layout/item_divider"/>
+
+
+        <TextView
+            android:id="@+id/repo_fork"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:text="@string/bottom_label_fork"/>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

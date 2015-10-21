@@ -121,7 +121,7 @@ public class MainActivity extends BaseActivity
             mineFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.content_main, mineFragment);
-            transaction.commit();
+            transaction.commitAllowingStateLoss();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

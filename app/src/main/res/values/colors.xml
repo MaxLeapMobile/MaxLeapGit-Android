@@ -23,4 +23,6 @@
     <color name="color_dialog_cancel">#009688</color>
     <color name="color_radio_button">#010101</color>
 
+    <color name="bottom_label_normal">#0076FF</color>
+
 </resources>
