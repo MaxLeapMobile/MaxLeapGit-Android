@@ -107,17 +107,17 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         ApiManager.getInstance().listReposByPage(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
             public void success(List<Repo> repos, Response response) {
-                if (repos != null) {
+                if (!repos.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
                     if (mPage == 1) {
                         mRepos.clear();
                     }
                     mRepos.addAll(repos);
-                    mProgressBar.setVisibility(View.GONE);
                     mRepoAdapter.notifyDataSetChanged();
                 }
-                if (mIsGettingMore) {
-                    mIsGettingMore = false;
-                }
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -131,17 +131,17 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         ApiManager.getInstance().listStarRepoByUser(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
             public void success(List<Repo> repos, Response response) {
-                if (repos != null) {
+                if (!repos.isEmpty()) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
                     if (mPage == 1) {
                         mRepos.clear();
                     }
                     mRepos.addAll(repos);
-                    mProgressBar.setVisibility(View.GONE);
                     mRepoAdapter.notifyDataSetChanged();
                 }
-                if (mIsGettingMore) {
-                    mIsGettingMore = false;
-                }
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -158,6 +158,9 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
             @Override
             public void success(SearchedRepos searchedRepos, Response response) {
                 if (searchedRepos != null) {
+                    if (mIsGettingMore) {
+                        mIsGettingMore = false;
+                    }
                     if (mPage == 1) {
                         mRepos.clear();
                     }
@@ -172,12 +175,9 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                         repo.setOwner(owner);
                         mRepos.add(repo);
                     }
-                    mProgressBar.setVisibility(View.GONE);
                     mRepoAdapter.notifyDataSetChanged();
                 }
-                if (mIsGettingMore) {
-                    mIsGettingMore = false;
-                }
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }

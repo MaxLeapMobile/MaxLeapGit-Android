@@ -24,7 +24,7 @@ public class PageLinks {
     private String last;
     private String next;
     private String prev;
-    private String page = "";
+    private String page;
 
     public PageLinks(String linkHeader) {
         String[] links = linkHeader.split(DELIM_LINKS);
@@ -96,6 +96,8 @@ public class PageLinks {
         if (!TextUtils.isEmpty(last)) {
             Uri uri = Uri.parse(last);
             page = uri.getQueryParameter("page");
+        } else {
+            page = "0";
         }
         return page;
     }

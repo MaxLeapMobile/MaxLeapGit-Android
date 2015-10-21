@@ -9,15 +9,18 @@
 package com.maxleapmobile.gitmaster.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.Repo;
+import com.maxleapmobile.gitmaster.ui.activity.RepoActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -58,16 +61,29 @@ public class RepoAdapter extends BaseAdapter {
             holder.infoView = (TextView) convertView.findViewById(R.id.repo_info);
             holder.ownerView = (TextView) convertView.findViewById(R.id.repo_owner);
             holder.imageView = (ImageView) convertView.findViewById(R.id.repo_photo);
+            holder.repoLayout = (RelativeLayout) convertView.findViewById(R.id.item_repo_layout);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Repo item = mRepos.get(position);
+        final Repo item = mRepos.get(position);
         holder.titleView.setText(item.getName());
         holder.infoView.setText(item.getDescription());
         holder.ownerView.setText(String.format(mContext.getString(R.string.frag_repo_owner), item.getOwner().getLogin()));
         Picasso.with(mContext).load(item.getOwner().getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);
+
+        holder.repoLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, RepoActivity.class);
+                intent.putExtra(RepoActivity.REPONAME, item.getName());
+                intent.putExtra(RepoActivity.OWNER, item.getOwner().getLogin());
+                intent.putExtra(RepoActivity.REPOURL, item.getHtmlUrl());
+                mContext.startActivity(intent);
+
+            }
+        });
 
         return convertView;
     }
@@ -77,5 +93,6 @@ public class RepoAdapter extends BaseAdapter {
         TextView infoView;
         TextView ownerView;
         ImageView imageView;
+        RelativeLayout repoLayout;
     }
 }
