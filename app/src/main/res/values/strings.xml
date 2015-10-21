@@ -39,4 +39,8 @@
     <string name="mine_label_company">Company</string>
     <string name="mine_label_joinin">Join In</string>
     <string name="mine_label_organzation">Organzation</string>
+
+    <string name="userinfo_follow">Follow</string>
+    <string name="userinfo_unfollow">Unfollow</string>
+
 </resources>
