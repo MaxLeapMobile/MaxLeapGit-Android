@@ -29,9 +29,11 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
     public static final String INTENT_KEY_TITLE = "title";
     public static final String INTENT_KEY_LANGUAGE = "language";
     public static final String INTENT_KEY_SKILL = "skill";
+    public static final String INTENT_KEY_ID = "objectid";
     private String mTitle;
     private String mLanguage;
     private String mSkill;
+    private String mObjectId;
     private TextView mLanguageView;
     private TextView mSkillView;
     private ArrayList<Radio> mLanguageList;
@@ -50,6 +52,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
         mTitle = data.getStringExtra(INTENT_KEY_TITLE);
         mLanguage = data.getStringExtra(INTENT_KEY_LANGUAGE);
         mSkill = data.getStringExtra(INTENT_KEY_SKILL);
+        mObjectId = data.getStringExtra(INTENT_KEY_ID);
 
         initToolbar();
         initUI();
@@ -103,6 +106,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                 Intent intent = new Intent(AddGeneActivity.this, GeneActivity.class);
                 intent.putExtra(INTENT_KEY_LANGUAGE, mLanguage);
                 intent.putExtra(INTENT_KEY_SKILL, mSkill);
+                intent.putExtra(INTENT_KEY_ID, mObjectId);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

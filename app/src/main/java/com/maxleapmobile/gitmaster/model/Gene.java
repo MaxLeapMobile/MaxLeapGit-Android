@@ -18,6 +18,12 @@ public class Gene {
         this.skill = skill;
     }
 
+    public Gene(String objectId, String language, String skill) {
+        this.objectId = objectId;
+        this.language = language;
+        this.skill = skill;
+    }
+
     public String getObjectId() {
         return objectId;
     }
@@ -41,4 +47,17 @@ public class Gene {
     public void setSkill(String skill) {
         this.skill = skill;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Gene gene = (Gene) o;
+
+        if (!language.equals(gene.language)) return false;
+        return skill.equals(gene.skill);
+
+    }
+
 }
