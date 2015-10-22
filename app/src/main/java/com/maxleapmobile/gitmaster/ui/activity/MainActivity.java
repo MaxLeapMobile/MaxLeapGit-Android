@@ -1,21 +1,21 @@
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.maxleap.MLUser;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
@@ -34,6 +34,8 @@ public class MainActivity extends BaseActivity
     private ImageView mAvatarView;
     private TextView mNavHeaderUser;
     private FragmentTransaction transaction;
+    private TimelineFragment timelineFragment;
+    private MineFragment mineFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,6 @@ public class MainActivity extends BaseActivity
     private void init() {
         initToolBar();
         checkAccessToken();
-        initUI();
     }
 
 
@@ -94,7 +95,9 @@ public class MainActivity extends BaseActivity
     }
 
     private void checkAccessToken() {
-        if (null == PreferenceUtil.getString(this, Const.ACCESS_TOKEN_KEY, null)) {
+        timelineFragment = new TimelineFragment();
+        if (TextUtils.isEmpty(PreferenceUtil.getString(this, Const.ACCESS_TOKEN_KEY, null))
+                || TextUtils.isEmpty(PreferenceUtil.getString(this, Const.USERNAME, null))) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, REQUEST_OAUTH);
         } else {
@@ -103,9 +106,8 @@ public class MainActivity extends BaseActivity
     }
 
     private void initUI() {
-        transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_main, new TimelineFragment());
-        transaction.commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().
+                replace(R.id.content_main, timelineFragment).commitAllowingStateLoss();
     }
 
     @Override
@@ -133,17 +135,19 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_timeline) {
-
+            getSupportFragmentManager().beginTransaction().
+                    replace(R.id.content_main, timelineFragment).commit();
         } else if (id == R.id.nav_recommend) {
 
         } else if (id == R.id.nav_mine) {
-            Bundle bundle = new Bundle();
-            bundle.putString(Const.USERNAME, MLUser.getCurrentUser().getUserName());
-            MineFragment mineFragment = new MineFragment();
-            mineFragment.setArguments(bundle);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.content_main, mineFragment);
-            transaction.commitAllowingStateLoss();
+            if (mineFragment == null) {
+                Bundle bundle = new Bundle();
+                bundle.putString(Const.USERNAME, PreferenceUtil.getString(this, Const.USERNAME, null));
+                mineFragment = new MineFragment();
+                mineFragment.setArguments(bundle);
+            }
+            getSupportFragmentManager().beginTransaction().
+                    replace(R.id.content_main, mineFragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -151,7 +155,4 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-    private void itemSelect(int position) {
-
-    }
 }
