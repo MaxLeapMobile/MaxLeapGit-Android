@@ -12,6 +12,8 @@
         android:id="@+id/gene_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="48dp"
+        android:scrollbars="vertical"
         android:layout_below="@+id/gene_toolbar"
         />
 
@@ -25,5 +27,9 @@
         android:text="@string/activity_add_new_gene"
         android:gravity="center"
         android:textColor="@color/white"/>
+
+    <include
+        layout="@layout/view_progressbar"
+        android:id="@+id/gene_progressbar"/>
 
 </RelativeLayout>

@@ -8,6 +8,8 @@
  */
 package com.maxleapmobile.gitmaster.ui.adapter;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.Gene;
+import com.maxleapmobile.gitmaster.ui.activity.AddGeneActivity;
+import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 
 import java.util.List;
 
@@ -36,9 +40,11 @@ public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
 
     }
 
+    private Activity mContext;
     private List<Gene> mGeneList;
 
-    public GeneAdapter(List<Gene> list) {
+    public GeneAdapter(Activity context, List<Gene> list) {
+        this.mContext = context;
         this.mGeneList = list;
     }
 
@@ -53,9 +59,22 @@ public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Gene item = mGeneList.get(position);
+        final Gene item = mGeneList.get(position);
         holder.mSkill.setText(item.getSkill());
         holder.mLanguage.setText(item.getLanguage());
+
+        holder.mModify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, AddGeneActivity.class);
+                intent.putExtra(AddGeneActivity.INTENT_KEY_TITLE,
+                        mContext.getString(R.string.activity_add_edit_gene));
+                intent.putExtra(AddGeneActivity.INTENT_KEY_LANGUAGE, item.getLanguage());
+                intent.putExtra(AddGeneActivity.INTENT_KEY_SKILL, item.getSkill());
+                intent.putExtra(AddGeneActivity.INTENT_KEY_ID, item.getObjectId());
+                mContext.startActivityForResult(intent, GeneActivity.EDIT_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
