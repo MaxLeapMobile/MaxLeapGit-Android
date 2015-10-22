@@ -99,18 +99,30 @@ public class GeneActivity extends BaseActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         MLRelation mlRelation = UserManager.getInstance().getCurrentUser().getGenes();
         mlRelation.setTargetClass("Gene");
-        MLQuery<MLObject> query = mlRelation.getQuery();
-        MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
+        final MLQuery<MLObject> query = mlRelation.getQuery();
+        UserManager.getInstance().checkIsLogin(new OperationCallback() {
             @Override
-            public void done(List<MLObject> list, MLException e) {
-                if (e == null) {
-                    mGenes.clear();
-                    for (MLObject object : list) {
-                        mGenes.add(Gene.from(object));
-                        mGeneAdapter.notifyDataSetChanged();
-                        mProgressBar.setVisibility(View.GONE);
+            public void success() {
+                MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
+                    @Override
+                    public void done(List<MLObject> list, MLException e) {
+                        if (e == null) {
+                            mGenes.clear();
+                            for (MLObject object : list) {
+                                mGenes.add(Gene.from(object));
+                                mGeneAdapter.notifyDataSetChanged();
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        } else {
+                            
+                        }
                     }
-                }
+                });
+            }
+
+            @Override
+            public void failed(String error) {
+
             }
         });
     }

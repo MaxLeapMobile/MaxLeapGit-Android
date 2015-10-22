@@ -244,7 +244,7 @@ public class UserManager {
     }
 
     /**
-     * get all genes from an user
+     * check the user is login
      *
      * @param callback
      */

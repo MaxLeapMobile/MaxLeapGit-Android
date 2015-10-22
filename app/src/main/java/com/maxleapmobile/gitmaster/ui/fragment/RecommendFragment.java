@@ -27,10 +27,10 @@ import com.maxleap.exception.MLException;
 import com.maxleap.utils.FileHandle;
 import com.maxleap.utils.FileHandles;
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.RecommendRepo;
-import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -101,54 +101,63 @@ public class RecommendFragment extends Fragment {
     }
 
     private void fetchGeneDate() {
-        final User user = UserManager.getInstance().getCurrentUser();
-        MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
+        UserManager.getInstance().checkIsLogin(new OperationCallback() {
             @Override
-            public void done(List<MLObject> list, MLException e) {
-                genes = new ArrayList<>();
-                if (e == null) {
-                    for (MLObject o : list) {
-                        genes.add(Gene.from(o));
-                    }
-                    mParmasMap.put("userid", "bullda");
-                    JSONArray jsonArray = new JSONArray();
-                    for (int i = 0; i < genes.size(); i++) {
-                        JSONObject jsonObject = new JSONObject();
-                        try {
-                            jsonObject.put("language", genes.get(i).getLanguage());
-                            jsonObject.put("keyword", genes.get(i).getSkill());
-                            jsonArray.put(i, jsonObject);
-                        } catch (Exception jsonException) {
+            public void success() {
+                MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
+                    @Override
+                    public void done(List<MLObject> list, MLException e) {
+                        genes = new ArrayList<>();
+                        if (e == null) {
+                            for (MLObject o : list) {
+                                genes.add(Gene.from(o));
+                            }
+                            mParmasMap.put("userid", "bullda");
+                            JSONArray jsonArray = new JSONArray();
+                            for (int i = 0; i < genes.size(); i++) {
+                                JSONObject jsonObject = new JSONObject();
+                                try {
+                                    jsonObject.put("language", genes.get(i).getLanguage());
+                                    jsonObject.put("keyword", genes.get(i).getSkill());
+                                    jsonArray.put(i, jsonObject);
+                                } catch (Exception jsonException) {
 
-                        }
-                    }
-                    mParmasMap.put("genes", jsonArray);
-                    mParmasMap.put("page", 1);
-                    mParmasMap.put("per_page", 10);
-                    mParmasMap.put("type", "search");
-                    MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<JSONArray>() {
-                        @Override
-                        public void done(JSONArray jsonArray, MLException e) {
-                            if (e == null) {
-                                if (recommendRepos == null) {
-                                    recommendRepos = new ArrayList<>();
                                 }
-                                int length = jsonArray.length();
-                                for (int i = 0; i < length; i++) {
-                                    try {
-                                        recommendRepos.add(RecommendRepo.from(jsonArray.getJSONObject(i)));
-                                    } catch (Exception jsonException) {
-                                        continue;
+                            }
+                            mParmasMap.put("genes", jsonArray);
+                            mParmasMap.put("page", 1);
+                            mParmasMap.put("per_page", 10);
+                            mParmasMap.put("type", "search");
+                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<JSONArray>() {
+                                @Override
+                                public void done(JSONArray jsonArray, MLException e) {
+                                    if (e == null) {
+                                        if (recommendRepos == null) {
+                                            recommendRepos = new ArrayList<>();
+                                        }
+                                        int length = jsonArray.length();
+                                        for (int i = 0; i < length; i++) {
+                                            try {
+                                                recommendRepos.add(RecommendRepo.from(jsonArray.getJSONObject(i)));
+                                            } catch (Exception jsonException) {
+                                                continue;
+                                            }
+                                        }
+                                    } else {
+                                        Logger.toast(mContext, R.string.toast_get_recommend_failed);
                                     }
                                 }
-                            } else {
-                                Logger.toast(mContext, R.string.toast_get_recommend_failed);
-                            }
+                            });
+                        } else {
+                            Logger.toast(mContext, R.string.toast_get_recommend_failed);
                         }
-                    });
-                } else {
-                    Logger.toast(mContext, R.string.toast_get_recommend_failed);
-                }
+                    }
+                });
+            }
+
+            @Override
+            public void failed(String error) {
+                Logger.toast(mContext, R.string.toast_get_recommend_failed);
             }
         });
     }
