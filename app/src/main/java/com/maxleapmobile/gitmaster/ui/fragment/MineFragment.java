@@ -28,7 +28,10 @@ import com.maxleapmobile.gitmaster.model.PageLinks;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.activity.ContainerActivity;
+import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
+import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -95,6 +98,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 Picasso.with(getContext())
                         .load(user.getAvatarUrl())
                         .centerCrop().fit()
+                        .transform(new CircleTransform())
                         .into(mAvatar);
             }
 
@@ -132,6 +136,10 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mRepos = (CardView) view.findViewById(R.id.mine_card_repos);
         mStars = (CardView) view.findViewById(R.id.mine_card_stars);
 
+        if (!mUsername.equals(PreferenceUtil.getString(getContext(), Const.USERNAME, ""))) {
+            mGene.setVisibility(View.GONE);
+        }
+
         mGene.setOnClickListener(this);
         mFollowers.setOnClickListener(this);
         mFollowings.setOnClickListener(this);
@@ -142,6 +150,10 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.mine_card_gene:
+                Intent geneIntent = new Intent(getActivity(), GeneActivity.class);
+                startActivity(geneIntent);
+                break;
             case R.id.mine_card_followers:
                 Intent followersIntent = new Intent(getActivity(), ContainerActivity.class);
                 followersIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_followers));

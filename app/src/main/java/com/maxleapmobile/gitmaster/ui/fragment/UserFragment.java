@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
+import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.SearchedUsers;
@@ -90,7 +91,8 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         if (mUsers == null) {
             mUsers = new ArrayList<>();
         }
-        if (mFlag == FLAG_USER_FOLLOWING) {
+        if (mFlag == FLAG_USER_FOLLOWING &&
+                mUsername.equals(UserManager.getInstance().getCurrentUser().getLogin())) {
             mUserAdapter = new UserAdapter(mContext, mUsers, true);
         } else {
             mUserAdapter = new UserAdapter(mContext, mUsers, false);

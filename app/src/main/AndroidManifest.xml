@@ -31,6 +31,7 @@
         <activity android:name=".ui.activity.UserInfoActivity"/>
         <activity android:name=".ui.activity.ContainerActivity"/>
         <activity android:name=".ui.activity.RepoDetailActivity"/>
+        <activity android:name=".ui.activity.GeneActivity"/>
     </application>
 
 </manifest>
