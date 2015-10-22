@@ -46,6 +46,8 @@ public class ContainerActivity extends BaseActivity {
                 fragment = UserFragment.newInstance(UserFragment.FLAG_USER_FOLLOWER, username);
             } else if (title.equals(getString(R.string.mine_label_following))) {
                 fragment = UserFragment.newInstance(UserFragment.FLAG_USER_FOLLOWING, username);
+            } else if (title.equals(getString(R.string.mine_label_organzation))) {
+                fragment = UserFragment.newInstance(UserFragment.FLAG_ORG, username);
             }
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
         }

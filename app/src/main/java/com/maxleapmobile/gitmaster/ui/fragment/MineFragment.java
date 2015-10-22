@@ -46,6 +46,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private CardView mFollowings;
     private CardView mRepos;
     private CardView mStars;
+    private CardView mOrgs;
 
     private FragmentUserinfoBinding mUserinfoBinding;
     private String mUsername;
@@ -131,12 +132,14 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mFollowings = (CardView) view.findViewById(R.id.mine_card_followerings);
         mRepos = (CardView) view.findViewById(R.id.mine_card_repos);
         mStars = (CardView) view.findViewById(R.id.mine_card_stars);
+        mOrgs = (CardView) view.findViewById(R.id.mine_card_orgs);
 
         mGene.setOnClickListener(this);
         mFollowers.setOnClickListener(this);
         mFollowings.setOnClickListener(this);
         mRepos.setOnClickListener(this);
         mStars.setOnClickListener(this);
+        mOrgs.setOnClickListener(this);
     }
 
     @Override
@@ -165,6 +168,12 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 starIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_stars));
                 starIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
                 startActivity(starIntent);
+                break;
+            case R.id.mine_card_orgs:
+                Intent orgIntent = new Intent(getActivity(), ContainerActivity.class);
+                orgIntent.putExtra(ContainerActivity.INTENT_KEY_TITLE, getActivity().getString(R.string.mine_label_organzation));
+                orgIntent.putExtra(ContainerActivity.INTENT_KEY_USERNAME, mUsername);
+                startActivity(orgIntent);
                 break;
             default:
                 break;
