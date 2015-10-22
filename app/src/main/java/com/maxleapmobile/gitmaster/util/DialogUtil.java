@@ -11,14 +11,20 @@ package com.maxleapmobile.gitmaster.util;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.model.Radio;
 import com.maxleapmobile.gitmaster.model.SortEnumRepo;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
+import com.maxleapmobile.gitmaster.ui.adapter.RadioAdapter;
 import com.maxleapmobile.gitmaster.ui.widget.BaseDialog;
+
+import java.util.ArrayList;
 
 public class DialogUtil {
 
@@ -99,6 +105,24 @@ public class DialogUtil {
                 dialog.dismiss();
             }
         });
+        dialog.show();
+    }
+
+    public static void showGeneDialog(Context context, ArrayList<Radio> radios, final CheckListener listener) {
+        final Dialog dialog = new BaseDialog(context, R.style.CustomizeDialog);
+        dialog.setContentView(R.layout.dialog_gene);
+
+        ListView listView = (ListView) dialog.findViewById(R.id.list_view);
+        listView.setAdapter(new RadioAdapter(context, radios, new RadioAdapter.SelectListener() {
+            @Override
+            public void onSelect(int position) {
+                if (listener != null) {
+                    listener.onCheck(position);
+                }
+                dialog.dismiss();
+            }
+        }));
+
         dialog.show();
     }
 

@@ -46,4 +46,17 @@ public class Gene {
         gene.setObjectId(object.getObjectId());
         return gene;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Gene gene = (Gene) o;
+
+        if (!language.equals(gene.language)) return false;
+        return skill.equals(gene.skill);
+
+    }
+
 }

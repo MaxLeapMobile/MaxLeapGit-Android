@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">GitMaster</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_main2">Main2Activity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -17,6 +16,14 @@
     <string name="toast_unstar_success">Unstar</string>
     <string name="toast_unstar_failed">Unstar failed</string>
     <string name="toast_get_recommend_failed">Failed to get Recommend repo</string>
+    <string name="toast_gene_select">Please select language first.</string>
+    <string name="toast_gene_not_select_language">You have not select language yet.</string>
+    <string name="toast_gene_not_select_skill">You have not select skill yet.</string>
+    <string name="toast_save_gene_success">Save gene success</string>
+    <string name="toast_save_gene_failed">Save gene failed</string>
+    <string name="toast_already_have_gene">Already have this gene.</string>
+    <string name="toast_update_gene_success">Update gene success.</string>
+    <string name="toast_update_gene_failed">Update gene failed.</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
     <string name="activity_main_item_recommend">Recommend</string>
@@ -30,6 +37,8 @@
 
     <string name="activity_userinfo_follow">Follow</string>
     <string name="activity_userinfo_unfollow">Unfollow</string>
+    <string name="activity_gene_title">Gene</string>
+
 
     <string name="frag_repo_owner">Built by %1$s</string>
     <string name="dialog_sort_best_match">Best Match(Default)</string>
@@ -53,7 +62,7 @@
     <string name="mine_label_location">Location</string>
     <string name="mine_label_company">Company</string>
     <string name="mine_label_joinin">Join In</string>
-    <string name="mine_label_organzation">Organzation</string>
+    <string name="mine_label_organzation">Organization</string>
 
     <!-- timeline fragment -->
     <string name="time_line_less_than_one_minute">less than one minute</string>
@@ -86,5 +95,10 @@
     <string name="recommend_bottom_label_fork">Fork</string>
     <string name="recommend_bottom_label_unfork">Unfork</string>
     <string name="recommend_bottom_label_skip">Skip</string>
+
+    <string name="activity_add_gene_language">Language</string>
+    <string name="activity_add_gene_skill">Skill</string>
+    <string name="activity_add_new_gene">Add new gene</string>
+    <string name="activity_add_edit_gene">Edit gene</string>
 
 </resources>
