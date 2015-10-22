@@ -17,26 +17,29 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.maxleap.MLUser;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
+import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.ui.adapter.TimeLineAdapter;
+import com.maxleapmobile.gitmaster.util.Const;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
 
     private static final String TAG = TimelineFragment.class.getSimpleName();
-    private static final int perPageCount = 30;
 
     private Context mContext;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -45,6 +48,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private Handler mHandler;
     private List<TimeLineEvent> mEvents;
     private int initPageCount = 0;
+    private boolean isGettingMore;
 
     private Runnable mProgressRunnable = new Runnable() {
         @Override
@@ -53,9 +57,16 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     };
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mContext = getActivity();
         mHandler = new Handler();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_timeline, container, false);
         initUI(view);
         return view;
@@ -68,21 +79,25 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         listview = (ListView) view.findViewById(R.id.timeline_event_list);
         if (mEvents == null) {
             mEvents = new ArrayList<>();
-            mHandler.postDelayed(mProgressRunnable, 100);
         }
-        fetchEvents();
+        if (mAdapter == null) {
+            mAdapter = new TimeLineAdapter(mContext, mEvents);
+        }
+        listview.setAdapter(mAdapter);
+        if (mEvents.size() < Const.PER_PAGE_COUNT) {
+            mHandler.postDelayed(mProgressRunnable, 500);
+            fetchEvents();
+        }
     }
 
     private void initData() {
-        mAdapter = new TimeLineAdapter(mContext, mEvents);
-        listview.setAdapter(mAdapter);
+        if (mEvents.size() < Const.PER_PAGE_COUNT) {
+            fetchEvents();
+            return;
+        }
+        mAdapter.notifyDataSetChanged();
         mHandler.removeCallbacks(mProgressRunnable);
         mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void onRefresh() {
-        fetchEvents();
     }
 
     private void fetchEvents() {
@@ -91,23 +106,49 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
             mSwipeRefreshLayout.setRefreshing(false);
             return;
         }
-        ApiManager.getInstance().getReceivedEvents(MLUser.getCurrentUser().getUserName(),
-                initPageCount, perPageCount, new ApiCallback<List<TimeLineEvent>>() {
+        isGettingMore = true;
+        ApiManager.getInstance().getReceivedEvents(PreferenceUtil.getString(mContext, Const.USERNAME, null),
+                initPageCount, Const.PER_PAGE_COUNT, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
                     public void success(List<TimeLineEvent> timeLineEvents, Response response) {
-                        mEvents = timeLineEvents;
-//                        for (int i = 0; i < mEvents.size(); ) {
-//                            if (mEvents.get(i).getType() == ActionType.ForkEvent ||
-//                                    mEvents.get(i).getType() == ActionType.WatchEvent) {
-//                                i++;
-//                            } else {
-//                                mEvents.remove(i);
-//                            }
-//                        }
+                        mEvents.addAll(timeLineEvents);
+                        for (int i = 0; i < mEvents.size(); ) {
+                            if (mEvents.get(i).getType() == ActionType.ForkEvent ||
+                                    mEvents.get(i).getType() == ActionType.WatchEvent) {
+                                i++;
+                            } else {
+                                mEvents.remove(i);
+                            }
+                        }
+                        initPageCount++;
+                        isGettingMore = false;
                         initData();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        super.failure(error);
+                        isGettingMore = false;
                     }
                 });
     }
 
+    @Override
+    public void onRefresh() {
+        fetchEvents();
+    }
 
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if ((firstVisibleItem + visibleItemCount) == totalItemCount && !isGettingMore
+                && totalItemCount >= Const.PER_PAGE_COUNT && totalItemCount % Const.PER_PAGE_COUNT == 0) {
+            fetchEvents();
+            mHandler.post(mProgressRunnable);
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
 }

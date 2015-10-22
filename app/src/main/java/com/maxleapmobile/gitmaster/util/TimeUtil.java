@@ -11,10 +11,11 @@ package com.maxleapmobile.gitmaster.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class TimeUtil {
 
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD'T'HH:mm:ss'Z'");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public static Date getDateFromString(String formatedDate) {
         try {

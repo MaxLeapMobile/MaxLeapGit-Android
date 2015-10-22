@@ -8,6 +8,7 @@
 
     <string name="toast_network_error">Nerwork error.</string>
     <string name="toast_request_unexpected_error">Unexpected error</string>
+    <string name="toast_login_failed">Login failed! Please try again!</string>
     <string name="toast_unfollow_success">Unfollow success</string>
     <string name="toast_fork_success">"Forked repo "</string>
     <string name="toast_fork_failed">Fork failed</string>
@@ -28,7 +29,6 @@
 
     <string name="activity_userinfo_follow">Follow</string>
     <string name="activity_userinfo_unfollow">Unfollow</string>
-    <string name="activity_login_title">Github Authorization</string>
 
     <string name="frag_repo_owner">Built by %1$s</string>
     <string name="dialog_sort_best_match">Best Match(Default)</string>
@@ -53,6 +53,24 @@
     <string name="mine_label_company">Company</string>
     <string name="mine_label_joinin">Join In</string>
     <string name="mine_label_organzation">Organzation</string>
+
+    <!-- timeline fragment -->
+    <string name="time_line_less_than_one_minute">less than one minute</string>
+    <string name="time_line_minute_ago">a minute ago</string>
+    <string name="time_line_minutes_ago">%1$d minutes ago</string>
+    <string name="time_line_hour_ago">an hour ago</string>
+    <string name="time_line_hours_ago">%1$d hours ago</string>
+    <string name="time_line_day_ago">a day ago</string>
+    <string name="time_line_days_ago">%1$d days ago</string>
+    <string name="time_line_month_ago">a month ago</string>
+    <string name="time_line_months_ago">%1$d months ago</string>
+    <string name="time_line_year_ago">a year ago</string>
+    <string name="time_line_years_ago">%1$d years ago</string>
+
+    <!-- login activity -->
+    <string name="activity_permission_notice">GitMaster needs permission\nto access your account</string>
+    <string name="activity_permission_sign_in">Sign in with Github</string>
+    <string name="activity_login_title">Github Authorization</string>
 
     <string name="bottom_label_star">Star</string>
     <string name="bottom_label_unstar">Unstar</string>
