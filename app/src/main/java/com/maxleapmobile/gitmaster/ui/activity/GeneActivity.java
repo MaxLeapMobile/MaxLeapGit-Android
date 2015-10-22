@@ -15,7 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.maxleap.FindCallback;
+import com.maxleap.MLObject;
+import com.maxleap.MLQuery;
+import com.maxleap.MLQueryManager;
+import com.maxleap.MLRelation;
+import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.ui.adapter.GeneAdapter;
 
@@ -28,6 +35,7 @@ public class GeneActivity extends BaseActivity {
     private TextView mTitle;
     private TextView mAddGene;
     private RecyclerView mRecyclerView;
+    private GeneAdapter mGeneAdapter;
     private List<Gene> mGenes;
 
 
@@ -38,13 +46,10 @@ public class GeneActivity extends BaseActivity {
         initViews();
 
         mGenes = new ArrayList<>();
-        Gene gene = new Gene();
-        gene.setLanguage("Java");
-        gene.setSkill("Android");
-        mGenes.add(gene);
+        mGeneAdapter = new GeneAdapter(mGenes);
+        mRecyclerView.setAdapter(mGeneAdapter);
 
-        GeneAdapter geneAdapter = new GeneAdapter(mGenes);
-        mRecyclerView.setAdapter(geneAdapter);
+        updateGene();
     }
 
     private void initViews() {
@@ -65,5 +70,25 @@ public class GeneActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+    }
+
+    private void updateGene() {
+        MLRelation mlRelation = UserManager.getInstance().getCurrentUser().getGenes();
+        mlRelation.setTargetClass("Gene");
+        MLQuery<MLObject> query = mlRelation.getQuery();
+        MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
+            @Override
+            public void done(List<MLObject> list, MLException e) {
+                if (e == null) {
+                    for (MLObject object : list) {
+                        String language = (String) object.get("language");
+                        String skill = (String) object.get("skill");
+                        Gene gene = new Gene(language, skill);
+                        mGenes.add(gene);
+                        mGeneAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
     }
 }

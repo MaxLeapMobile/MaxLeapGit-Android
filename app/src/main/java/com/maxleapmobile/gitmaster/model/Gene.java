@@ -13,6 +13,11 @@ public class Gene {
     private String skill;
     private String objectId;
 
+    public Gene(String language, String skill) {
+        this.language = language;
+        this.skill = skill;
+    }
+
     public String getObjectId() {
         return objectId;
     }
