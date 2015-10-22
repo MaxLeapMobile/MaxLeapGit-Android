@@ -20,12 +20,15 @@ import com.maxleap.SaveCallback;
 import com.maxleap.SignUpCallback;
 import com.maxleap.ValidateUsernameCallback;
 import com.maxleap.exception.MLException;
+import com.maxleapmobile.gitmaster.api.ApiManager;
+import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.util.TimeUtil;
 
-import java.util.Date;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class UserManager {
     private static UserManager instance;
@@ -79,48 +82,24 @@ public class UserManager {
      *
      * @param user
      */
-    public void login(final User user, final OperationCallback callback) {
-        final MLUser mlUser = new MLUser();
-        mlUser.setUserName(user.getLogin());
-        mlUser.setPassword(user.getLogin());
-        mlUser.put("accessToken", user.getAccessToken());
-        mlUser.put("nickName", TextUtils.isEmpty(user.getName()) ? "" : user.getName());
-        mlUser.put("avatarUrl", user.getAvatarUrl());
-        mlUser.put("email", TextUtils.isEmpty(user.getEmail()) ? "" : user.getEmail());
-        mlUser.put("blog", TextUtils.isEmpty(user.getBlog()) ? "" : user.getBlog());
-        mlUser.put("company", TextUtils.isEmpty(user.getCompany()) ? "" : user.getCompany());
-        mlUser.put("location", TextUtils.isEmpty(user.getLocation()) ? "" : user.getLocation());
-        mlUser.put("hireable", user.isHireable());
-        mlUser.put("followerCount", user.getFollowers());
-        mlUser.put("followingCount", user.getFollowing());
-        mlUser.put("publicRepoCount", user.getPublicRepos());
-        mlUser.put("githubCreateTime", TimeUtil.getDateFromString(user.getCreateAt()));
-        mlUser.put("githubUpdateTime", TimeUtil.getDateFromString(user.getUpdateAt()));
-
+    public void SaveUserInfo(final User user, final OperationCallback callback) {
         MLUserManager.checkUsernameExistInBackground(user.getLogin(), new ValidateUsernameCallback() {
             @Override
             public void done(MLException e) {
                 if (e == null) {
-                    MLUserManager.logInInBackground(mlUser.getUserName(), mlUser.getUserName(), new LogInCallback<MLUser>() {
+                    MLUserManager.logInInBackground(user.getLogin(), user.getLogin(), new LogInCallback<MLUser>() {
                         @Override
-                        public void done(MLUser mlUser, MLException e) {
+                        public void done(MLUser cloudMLUser, MLException e) {
                             if (e == null) {
-                                MLUserManager.saveInBackground(mlUser, new SaveCallback() {
-                                    @Override
-                                    public void done(MLException e) {
-                                        if (e == null) {
-                                            callback.success();
-                                        } else {
-                                            callback.failed(e.getMessage());
-                                        }
-                                    }
-                                });
+                                updateUserInfo(user, callback);
                             } else {
                                 callback.failed(e.getMessage());
                             }
                         }
                     });
                 } else {
+                    MLUser mlUser = new MLUser();
+                    castUserToMLUser(user, mlUser);
                     MLUserManager.signUpInBackground(mlUser, new SignUpCallback() {
                         @Override
                         public void done(MLException e) {
@@ -139,31 +118,11 @@ public class UserManager {
     /**
      * fill user information into MaxLeap cloud data using full user data from github
      *
-     * @param user
+     * @param user,mlUser
      */
     public void updateUserInfo(User user, final OperationCallback callback) {
-        if (TextUtils.isEmpty(user.getObjectId())) {
-            callback.failed("User object id cannot be empty");
-        }
-
         MLUser mlUser = MLUser.getCurrentUser();
-        mlUser.setObjectId(user.getObjectId());
-
-        mlUser.put("githubId", user.getId());
-        mlUser.put("nickName", user.getName());
-        mlUser.put("avatarUrl", user.getAvatarUrl());
-        mlUser.setEmail(user.getEmail());
-        mlUser.put("blog", user.getBlog());
-        mlUser.put("company", user.getCompany());
-        mlUser.put("location", user.getLocation());
-        mlUser.put("genes", user.getGenes());
-        mlUser.put("hireable", user.isHireable());
-        mlUser.put("followers", user.getFollowers());
-        mlUser.put("following", user.getFollowing());
-        mlUser.put("publicRepos", user.getPublicRepos());
-        mlUser.put("githubCreateAt", new Date(user.getCreateAt()));
-        mlUser.put("githubUpdateAt", new Date(user.getUpdateAt()));
-
+        castUserToMLUser(user, mlUser);
         MLUserManager.saveInBackground(mlUser, new SaveCallback() {
             @Override
             public void done(MLException e) {
@@ -174,6 +133,24 @@ public class UserManager {
                 }
             }
         });
+    }
+
+    public void castUserToMLUser(User user, MLUser mlUser) {
+        mlUser.setUserName(user.getLogin());
+        mlUser.setPassword(user.getLogin());
+        mlUser.put("accessToken", user.getAccessToken());
+        mlUser.put("nickName", TextUtils.isEmpty(user.getName()) ? "" : user.getName());
+        mlUser.put("avatarUrl", user.getAvatarUrl());
+        mlUser.put("email", TextUtils.isEmpty(user.getEmail()) ? "" : user.getEmail());
+        mlUser.put("blog", TextUtils.isEmpty(user.getBlog()) ? "" : user.getBlog());
+        mlUser.put("company", TextUtils.isEmpty(user.getCompany()) ? "" : user.getCompany());
+        mlUser.put("location", TextUtils.isEmpty(user.getLocation()) ? "" : user.getLocation());
+        mlUser.put("hireable", user.isHireable());
+        mlUser.put("followerCount", user.getFollowers());
+        mlUser.put("followingCount", user.getFollowing());
+        mlUser.put("publicRepoCount", user.getPublicRepos());
+        mlUser.put("githubCreateTime", TimeUtil.getDateFromString(user.getCreateAt()));
+        mlUser.put("githubUpdateTime", TimeUtil.getDateFromString(user.getUpdateAt()));
     }
 
     /**
@@ -265,4 +242,39 @@ public class UserManager {
             }
         });
     }
+
+    /**
+     * get all genes from an user
+     *
+     * @param callback
+     */
+    public void checkIsLogin(final OperationCallback callback) {
+        MLUser mlUser = MLUser.getCurrentUser();
+        if (mlUser == null) {
+            ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
+                @Override
+                public void success(User user, Response response) {
+                    SaveUserInfo(user, new OperationCallback() {
+                        @Override
+                        public void success() {
+                            callback.success();
+                        }
+
+                        @Override
+                        public void failed(String error) {
+                            callback.failed(error);
+                        }
+                    });
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    super.failure(error);
+                }
+            });
+        } else {
+            callback.success();
+        }
+    }
+
 }

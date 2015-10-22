@@ -15,10 +15,19 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.api.ApiManager;
+import com.maxleapmobile.gitmaster.calllback.ApiCallback;
+import com.maxleapmobile.gitmaster.calllback.OperationCallback;
+import com.maxleapmobile.gitmaster.manage.UserManager;
+import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
+import com.maxleapmobile.gitmaster.ui.fragment.RecommendFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
+
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,6 +37,7 @@ public class MainActivity extends BaseActivity
     private TextView titleView;
     private TimelineFragment timelineFragment;
     private MineFragment mineFragment;
+    private RecommendFragment recommendFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +92,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void initUI() {
+        getGithubUserInfo();
         getSupportFragmentManager().beginTransaction().
                 replace(R.id.content_main, timelineFragment).commitAllowingStateLoss();
     }
@@ -114,6 +125,11 @@ public class MainActivity extends BaseActivity
             getSupportFragmentManager().beginTransaction().
                     replace(R.id.content_main, timelineFragment).commit();
         } else if (id == R.id.nav_recommend) {
+            if (recommendFragment == null) {
+                recommendFragment = new RecommendFragment();
+            }
+            getSupportFragmentManager().beginTransaction().
+                    replace(R.id.content_main, recommendFragment).commit();
 
         } else if (id == R.id.nav_mine) {
             if (mineFragment == null) {
@@ -129,6 +145,32 @@ public class MainActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void getGithubUserInfo() {
+        ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                user.setAccessToken(PreferenceUtil.getString(MainActivity.this,
+                        Const.ACCESS_TOKEN_KEY, null));
+                UserManager.getInstance().SaveUserInfo(user, new OperationCallback() {
+                    @Override
+                    public void success() {
+                        System.currentTimeMillis();
+                    }
+
+                    @Override
+                    public void failed(String error) {
+                        System.currentTimeMillis();
+                    }
+                });
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                super.failure(error);
+            }
+        });
     }
 
 }

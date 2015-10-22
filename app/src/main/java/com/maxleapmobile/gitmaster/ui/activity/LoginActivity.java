@@ -24,8 +24,6 @@ import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.api.GithubApi;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.calllback.OperationCallback;
-import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.AccessToken;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
@@ -148,26 +146,11 @@ public class LoginActivity extends BaseActivity {
             public void success(User user, Response response) {
                 Logger.d(TAG, user.getEmail() + " " + user.getName());
                 PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
-                user.setAccessToken(PreferenceUtil.getString(mContext, Const.ACCESS_TOKEN_KEY, null));
-                UserManager.getInstance().login(user, new OperationCallback() {
-                    @Override
-                    public void success() {
-                        if (isFromPermission) {
-                            toMainActivity();
-                        }
-                        setResult(RESULT_OK);
-                        finish();
-                    }
-
-                    @Override
-                    public void failed(String error) {
-                        if (isFromPermission) {
-                            toMainActivity();
-                        }
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    }
-                });
+                if (isFromPermission) {
+                    toMainActivity();
+                }
+                setResult(RESULT_OK);
+                finish();
             }
 
             @Override
