@@ -8,6 +8,8 @@
  */
 package com.maxleapmobile.gitmaster.model;
 
+import com.maxleap.MLObject;
+
 public class Gene {
     private String language;
     private String skill;
@@ -35,5 +37,13 @@ public class Gene {
 
     public void setSkill(String skill) {
         this.skill = skill;
+    }
+
+    public static Gene from(MLObject object) {
+        Gene gene = new Gene();
+        gene.setLanguage(object.getString("language"));
+        gene.setSkill(object.getString("skill"));
+        gene.setObjectId(object.getObjectId());
+        return gene;
     }
 }
