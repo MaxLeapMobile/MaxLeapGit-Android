@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="language">
+        <item>Html</item>
+        <item>Java</item>
+        <item>Javascript</item>
+        <item>Objective-C</item>
+        <item>PHP</item>
+        <item>Python</item>
+        <item>Swift</item>
+        <item>C#</item>
+    </string-array>
+
+    <string-array name="html">
+        <item>html5</item>
+        <item>bootstrap</item>
+    </string-array>
+
+    <string-array name="java">
+        <item>Android</item>
+        <item>spring</item>
+    </string-array>
+
+    <string-array name="javascript">
+        <item>angularjs</item>
+        <item>bootstrap</item>
+        <item>jquery</item>
+        <item>node</item>
+    </string-array>
+
+    <string-array name="objective">
+        <item>iOS</item>
+    </string-array>
+
+    <string-array name="php">
+        <item>Codeigniter</item>
+    </string-array>
+
+    <string-array name="python">
+        <item>web framework</item>
+    </string-array>
+
+    <string-array name="swift">
+        <item>iOS</item>
+    </string-array>
+
+    <string-array name="c11">
+        <item>asp</item>
+        <item>xamarin</item>
+    </string-array>
+
+</resources>
