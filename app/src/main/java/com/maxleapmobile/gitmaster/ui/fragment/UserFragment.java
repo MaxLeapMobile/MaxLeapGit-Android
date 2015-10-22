@@ -26,6 +26,7 @@ import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
+import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.SearchedUsers;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
@@ -51,6 +52,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
     public static final int FLAG_SEARCH = 11;
     public static final int FLAG_USER_FOLLOWING = 22;
     public static final int FLAG_USER_FOLLOWER = 33;
+    public static final int FLAG_ORG = 44;
     private int mFlag;
     private String mUsername;
     private SortEnumUser mSortEnumUser;
@@ -105,6 +107,8 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
             fetchFollowingData(1);
         } else if (mFlag == FLAG_USER_FOLLOWER) {
             fetchFollowerData(1);
+        } else if (mFlag == FLAG_ORG) {
+            fetchOrgData();
         }
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -112,6 +116,27 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                 Intent intent = new Intent(mContext, UserInfoActivity.class);
                 intent.putExtra(Const.USERNAME, mUsers.get(position).getLogin());
                 mContext.startActivity(intent);
+            }
+        });
+    }
+
+    private void fetchOrgData() {
+        Logger.d("=======>> call fetchOrgData");
+        mProgressBar.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
+            @Override
+            public void success(List<Organzation> organzations, Response response) {
+                if (organzations != null) {
+                    for (Organzation item : organzations) {
+                        Owner user = new Owner();
+                        user.setAvatarUrl(item.getAvatarUrl());
+                        user.setLogin(item.getLogin());
+                        user.setHtmlUrl(item.getReposUrl());
+                        mUsers.add(user);
+                    }
+                    mUserAdapter.notifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
