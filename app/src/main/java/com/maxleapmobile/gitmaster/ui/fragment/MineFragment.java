@@ -28,6 +28,7 @@ import com.maxleapmobile.gitmaster.model.PageLinks;
 import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.activity.ContainerActivity;
+import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.squareup.picasso.Picasso;
@@ -144,6 +145,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.mine_card_gene:
+                Intent geneIntent = new Intent(getActivity(), GeneActivity.class);
+                startActivity(geneIntent);
             case R.id.mine_card_followers:
                 break;
             case R.id.mine_card_followerings:

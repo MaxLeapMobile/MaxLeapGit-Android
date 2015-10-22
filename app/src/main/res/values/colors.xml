@@ -24,5 +24,7 @@
     <color name="color_radio_button">#010101</color>
 
     <color name="bottom_label_normal">#0076FF</color>
+    <color name="gene_language_color">#8c000000</color>
+    <color name="gene_skill_color">#D9000000</color>
 
 </resources>
