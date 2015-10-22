@@ -113,16 +113,15 @@ public class DialogUtil {
         dialog.setContentView(R.layout.dialog_gene);
 
         ListView listView = (ListView) dialog.findViewById(R.id.list_view);
-        listView.setAdapter(new RadioAdapter(context, radios));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setAdapter(new RadioAdapter(context, radios, new RadioAdapter.SelectListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onSelect(int position) {
                 if (listener != null) {
                     listener.onCheck(position);
                 }
                 dialog.dismiss();
             }
-        });
+        }));
 
         dialog.show();
     }

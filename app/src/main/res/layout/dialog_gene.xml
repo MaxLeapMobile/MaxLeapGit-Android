@@ -14,6 +14,8 @@
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="1px"
             android:layout_height="340dp" />
 
     </RelativeLayout>

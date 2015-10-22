@@ -16,6 +16,8 @@
     <string name="toast_unstar_success">Unstar</string>
     <string name="toast_unstar_failed">Unstar failed</string>
     <string name="toast_gene_select">Please select language first.</string>
+    <string name="toast_gene_not_select_language">You have not select language yet.</string>
+    <string name="toast_gene_not_select_skill">You have not select skill yet.</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
     <string name="activity_main_item_recommend">Recommend</string>
@@ -80,5 +82,7 @@
 
     <string name="activity_add_gene_language">Language</string>
     <string name="activity_add_gene_skill">Skill</string>
+    <string name="activity_add_new_gene">Add new gene</string>
+    <string name="activity_add_edit_gene">Edit gene</string>
 
 </resources>

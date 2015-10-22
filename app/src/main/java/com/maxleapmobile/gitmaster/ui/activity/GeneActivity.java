@@ -8,6 +8,7 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,14 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GeneActivity extends BaseActivity {
-
+    private static final int REQUEST_CODE = 100;
     private Toolbar mToolbar;
     private TextView mTitle;
     private TextView mAddGene;
     private RecyclerView mRecyclerView;
     private GeneAdapter mGeneAdapter;
     private List<Gene> mGenes;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +70,15 @@ public class GeneActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        mAddGene = (TextView) findViewById(R.id.gene_add);
+        mAddGene.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GeneActivity.this, AddGeneActivity.class);
+                intent.putExtra(AddGeneActivity.INTENT_KEY_TITLE, getString(R.string.activity_add_new_gene));
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
     }
 
     private void updateGene() {
@@ -90,5 +99,10 @@ public class GeneActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -10,6 +10,8 @@ package com.maxleapmobile.gitmaster.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -58,7 +60,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
         mSkillView = (TextView) findViewById(R.id.gene_skill);
         mLanguageView.setOnClickListener(this);
         mSkillView.setOnClickListener(this);
-        if (mTitle != null && mTitle.equals("Edit gene")) {// TODO
+        if (mTitle != null && mTitle.equals(getString(R.string.activity_add_edit_gene))) {// TODO
             mLanguageView.setText(mLanguage);
             mSkillView.setText(mSkill);
             mLanguageView.setTextColor(Color.BLACK);
@@ -73,6 +75,9 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
         titleView.setText(mTitle);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +92,19 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.check:
+                if (mLanguage == null) {
+                    Logger.toast(this, R.string.toast_gene_not_select_language);
+                    return;
+                }
+                if (mSkill == null) {
+                    Logger.toast(this, R.string.toast_gene_not_select_skill);
+                    return;
+                }
+                Intent intent = new Intent(AddGeneActivity.this, GeneActivity.class);
+                intent.putExtra(INTENT_KEY_LANGUAGE, mLanguage);
+                intent.putExtra(INTENT_KEY_SKILL, mSkill);
+                setResult(RESULT_OK, intent);
+                finish();
                 break;
             case R.id.gene_language:
                 DialogUtil.showGeneDialog(this, mLanguageList, new DialogUtil.CheckListener() {
@@ -102,6 +120,9 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                                 mLanguageList.get(i).setChecked(false);
                             }
                         }
+                        mSkill = null;
+                        mSkillView.setText(R.string.activity_add_gene_skill);
+                        mSkillView.setTextColor(getResources().getColor(R.color.color_text_gene));
                     }
                 });
                 break;

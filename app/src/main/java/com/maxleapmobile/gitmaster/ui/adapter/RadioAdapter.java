@@ -24,10 +24,12 @@ import java.util.ArrayList;
 public class RadioAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<Radio> mList;
+    private SelectListener mListener;
 
-    public RadioAdapter(Context context, ArrayList<Radio> list) {
+    public RadioAdapter(Context context, ArrayList<Radio> list, SelectListener listener) {
         mContext = context;
         mList = list;
+        mListener = listener;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class RadioAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.item_language, parent, false);
@@ -60,6 +62,14 @@ public class RadioAdapter extends BaseAdapter {
 
         holder.titleView.setText(mList.get(position).getTitle());
         holder.radioView.setChecked(mList.get(position).isChecked());
+        holder.radioView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onSelect(position);
+                }
+            }
+        });
 
         return convertView;
     }
@@ -67,5 +77,9 @@ public class RadioAdapter extends BaseAdapter {
     static class ViewHolder {
         TextView titleView;
         RadioButton radioView;
+    }
+
+    public interface SelectListener {
+        void onSelect(int position);
     }
 }
