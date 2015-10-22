@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/gene_toolbar"
+        layout="@layout/view_toolbar" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gene_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/gene_toolbar"
+        />
+
+    <TextView
+        android:id="@+id/gene_add"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bottom_label_normal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:text="Add new gene"
+        android:gravity="center"
+        android:textColor="@color/white"/>
+
+</RelativeLayout>

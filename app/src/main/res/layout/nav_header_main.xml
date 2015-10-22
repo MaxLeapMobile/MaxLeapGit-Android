@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="114dp"
-    android:background="@drawable/side_nav_bar"
+    android:layout_height="120dp"
+    android:background="@color/white"
     android:gravity="bottom"
     android:orientation="horizontal"
     android:paddingBottom="16dp"
@@ -11,17 +11,19 @@
     android:paddingTop="16dp">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@mipmap/ic_logo_drawer" />
+        android:id="@+id/nav_header_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/sym_def_app_icon" />
 
     <TextView
+        android:id="@+id/nav_header_user"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_marginLeft="16dp"
         android:gravity="center_vertical"
-        android:text="@string/app_name"
         android:textColor="#000000"
         android:textSize="24sp" />
 

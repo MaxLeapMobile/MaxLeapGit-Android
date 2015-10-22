@@ -36,6 +36,7 @@
         <activity
             android:name=".ui.activity.AddGeneActivity"
             android:theme="@style/SearchTheme" />
+        <activity android:name=".ui.activity.GeneActivity" />
     </application>
 
 </manifest>
