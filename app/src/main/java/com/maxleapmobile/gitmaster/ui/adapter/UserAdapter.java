@@ -75,7 +75,8 @@ public class UserAdapter extends BaseAdapter {
         final Owner item = mUsers.get(position);
         holder.nameView.setText(item.getLogin());
         holder.updateView.setText(item.getHtmlUrl());
-        Picasso.with(mContext).load(item.getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);
+        Picasso.with(mContext).load(item.getAvatarUrl()).transform(new CircleTransform())
+                .placeholder(R.mipmap.ic_user_portrait_small).into(holder.imageView);
         if (mFromFollowing) {
             holder.unfollowView.setVisibility(View.VISIBLE);
             addListener(holder.unfollowView, item);
