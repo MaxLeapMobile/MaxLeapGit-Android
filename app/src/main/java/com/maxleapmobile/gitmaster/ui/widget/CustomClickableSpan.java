@@ -10,11 +10,20 @@ package com.maxleapmobile.gitmaster.ui.widget;
 
 import android.graphics.Color;
 import android.text.TextPaint;
-import android.text.style.URLSpan;
+import android.text.style.ClickableSpan;
+import android.view.View;
 
-public class URLSpanNoUnderline extends URLSpan {
-    public URLSpanNoUnderline(String url) {
-        super(url);
+public class CustomClickableSpan extends ClickableSpan {
+
+    private TextClickListener textClickListener;
+
+    public CustomClickableSpan(TextClickListener textClickListener) {
+        this.textClickListener = textClickListener;
+    }
+
+    @Override
+    public void onClick(View widget) {
+        textClickListener.onClick();
     }
 
     @Override
@@ -23,4 +32,9 @@ public class URLSpanNoUnderline extends URLSpan {
         ds.setUnderlineText(false);
         ds.setColor(Color.argb(255, 0, 118, 255));
     }
+
+    public interface TextClickListener {
+        void onClick();
+    }
+
 }
