@@ -52,6 +52,8 @@
     <string name="dialog_sure">Sure</string>
     <string name="dialog_unfollow">Are you sure to unfollow %1$s</string>
     <string name="dialog_unfollow_title">Notice</string>
+    <string name="dialog_delete_gene_message">Are you sure to delete this item?</string>
+
 
     <!-- mine fragment -->
     <string name="mine_label_followers">Followers</string>
@@ -100,5 +102,8 @@
     <string name="activity_add_gene_skill">Skill</string>
     <string name="activity_add_new_gene">Add new gene</string>
     <string name="activity_add_edit_gene">Edit gene</string>
+    <string name="toast_gene_delete_failed">Delete gene failed.</string>
+    <string name="toast_gene_delete_success">Delete gene success</string>
+    <string name="toast_gene_fetch_fail">Get gene data failed.</string>
 
 </resources>
