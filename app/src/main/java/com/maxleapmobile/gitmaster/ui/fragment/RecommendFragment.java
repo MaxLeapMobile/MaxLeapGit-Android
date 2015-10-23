@@ -30,7 +30,8 @@ import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
-import com.maxleapmobile.gitmaster.model.RecommendRepo;
+import com.maxleapmobile.gitmaster.model.Owner;
+import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -57,7 +58,7 @@ public class RecommendFragment extends Fragment {
     private Set<String> mSkipRepo;
     private FileHandle mFileHandle;
     private JSONObject mJsonObject;
-    private List<RecommendRepo> recommendRepos;
+    private List<Repo> Repos;
     private List<Gene> genes;
     private Map<String, Object> mParmasMap;
 
@@ -118,7 +119,7 @@ public class RecommendFragment extends Fragment {
                                 JSONObject jsonObject = new JSONObject();
                                 try {
                                     jsonObject.put("language", genes.get(i).getLanguage());
-                                    jsonObject.put("keyword", genes.get(i).getSkill());
+                                    jsonObject.put("skill", genes.get(i).getSkill());
                                     jsonArray.put(i, jsonObject);
                                 } catch (Exception jsonException) {
 
@@ -128,17 +129,17 @@ public class RecommendFragment extends Fragment {
                             mParmasMap.put("page", 1);
                             mParmasMap.put("per_page", 10);
                             mParmasMap.put("type", "search");
-                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<JSONArray>() {
+                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
                                 @Override
-                                public void done(JSONArray jsonArray, MLException e) {
+                                public void done(List<HashMap<String, Object>> list, MLException e) {
                                     if (e == null) {
-                                        if (recommendRepos == null) {
-                                            recommendRepos = new ArrayList<>();
+                                        if (Repos == null) {
+                                            Repos = new ArrayList<>();
                                         }
-                                        int length = jsonArray.length();
+                                        int length = list.size();
                                         for (int i = 0; i < length; i++) {
                                             try {
-                                                recommendRepos.add(RecommendRepo.from(jsonArray.getJSONObject(i)));
+                                                Repos.add(from(list.get(i)));
                                             } catch (Exception jsonException) {
                                                 continue;
                                             }
@@ -161,4 +162,29 @@ public class RecommendFragment extends Fragment {
             }
         });
     }
+
+    public static Repo from(HashMap<String, Object> object) throws Exception {
+        Repo repo = new Repo();
+
+        repo.setDescription(object.get("description").toString());
+        repo.setForksCount(Long.valueOf(object.get("forksCount").toString()));
+        repo.setHtmlUrl(object.get("htmlUrl").toString());
+        repo.setId(Long.valueOf(object.get("id").toString()));
+        repo.setPrivateRepo(Boolean.valueOf(object.get("isPrivate").toString()));
+        repo.setLanguage(object.get("language").toString());
+        repo.setName(object.get("name").toString());
+        Owner owner = new Owner();
+        owner.setAvatarUrl(object.get("ownerAvatarUrl").toString());
+        owner.setFollowersUrl(object.get("ownerFollowersUrl").toString());
+        owner.setFollowingUrl(object.get("ownerFollowingUrl").toString());
+        owner.setHtmlUrl(object.get("ownerHtmlUrl").toString());
+        owner.setId(Integer.valueOf(object.get("ownerId").toString()));
+        owner.setLogin(object.get("ownerLogin").toString());
+        owner.setReposUrl(object.get("ownerReposUrl").toString());
+        repo.setOwner(owner);
+        repo.setStargazersCount(Long.valueOf(object.get("stargazersCount").toString()));
+
+        return repo;
+    }
+
 }
