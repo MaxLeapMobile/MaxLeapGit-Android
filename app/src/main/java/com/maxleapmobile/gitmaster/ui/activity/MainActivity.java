@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity
                         .load(UserManager.getInstance().getCurrentUser().getAvatarUrl())
                         .centerInside().fit()
                         .transform(new CircleTransform())
+                        .placeholder(R.mipmap.ic_user_portrait_big)
                         .into(mAvatarView);
                 mNavHeaderUser.setText(UserManager.getInstance().getCurrentUser().getLogin());
             }

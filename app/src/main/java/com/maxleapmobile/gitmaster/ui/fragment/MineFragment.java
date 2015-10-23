@@ -100,6 +100,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                         .load(user.getAvatarUrl())
                         .centerCrop().fit()
                         .transform(new CircleTransform())
+                        .placeholder(R.mipmap.ic_user_portrait_big)
                         .into(mAvatar);
             }
 

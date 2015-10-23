@@ -9,8 +9,6 @@
 package com.maxleapmobile.gitmaster.ui.activity;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -89,9 +87,6 @@ public class SearchActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +151,7 @@ public class SearchActivity extends BaseActivity {
                         default:
                             break;
                     }
-                    if(mKeyWord != null){
+                    if (mKeyWord != null) {
                         performSearch();
                     }
                 }
@@ -181,7 +176,7 @@ public class SearchActivity extends BaseActivity {
                         default:
                             break;
                     }
-                    if(mKeyWord != null){
+                    if (mKeyWord != null) {
                         performSearch();
                     }
                 }

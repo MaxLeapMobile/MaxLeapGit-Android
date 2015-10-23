@@ -22,9 +22,10 @@
     <style name="CustomizeDialog">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/bg_dialog</item>
+        <item name="colorControlNormal">@color/color_radio_button</item>
     </style>
 
-    <style name="SearchTheme" parent="AppTheme.NoActionBar">
+    <style name="RadioTheme" parent="AppTheme.NoActionBar">
         <item name="colorControlNormal">@color/color_radio_button</item>
     </style>
 
