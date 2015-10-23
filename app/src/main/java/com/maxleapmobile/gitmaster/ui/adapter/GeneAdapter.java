@@ -14,7 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
@@ -29,13 +29,13 @@ public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView mSkill;
         private TextView mLanguage;
-        private ImageView mModify;
+        private RelativeLayout mModify;
 
         public ViewHolder(View view) {
             super(view);
             mSkill = (TextView) view.findViewById(R.id.gene_skill);
             mLanguage = (TextView) view.findViewById(R.id.gene_language);
-            mModify = (ImageView) view.findViewById(R.id.gene_modify);
+            mModify = (RelativeLayout) view.findViewById(R.id.gene_modify);
         }
 
     }

@@ -23,13 +23,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-
-    <ImageView
+    <RelativeLayout
         android:id="@+id/gene_modify"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp">
+
+
+    <ImageView
         android:layout_centerInParent="true"
         android:background="@mipmap/ic_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 </RelativeLayout>

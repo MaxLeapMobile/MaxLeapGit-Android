@@ -301,6 +301,8 @@
                             android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="@{user.location}"/>
 
                     </RelativeLayout>
@@ -336,6 +338,8 @@
                             android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="@{user.company}"/>
 
                     </RelativeLayout>
@@ -406,6 +410,8 @@
                             android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="@{orgs}"
                             />
 
