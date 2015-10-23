@@ -60,6 +60,11 @@ public interface GithubApi {
                    @Query("per_page") String perPageCount,
                    ApiCallback<List<Repo>> callback);
 
+    @GET("/repos/{username}/{repo}")
+    void getRepo(@Path("username") String username,
+                 @Path("repo") String repo,
+                 ApiCallback<Repo> callback);
+
     @GET("/user/starred/{owner}/{repo}")
     void starStatus(@Path("owner") String owner,
                     @Path("repo") String repo,

@@ -52,5 +52,8 @@
     </LinearLayout>
 
 
+    <include
+        android:id="@+id/repo_progressbar"
+        layout="@layout/view_progressbar"/>
 
 </RelativeLayout>

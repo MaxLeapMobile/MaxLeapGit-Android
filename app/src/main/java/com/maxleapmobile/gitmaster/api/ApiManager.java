@@ -85,6 +85,10 @@ public class ApiManager {
         mGithubApi.getUser(username, callback);
     }
 
+    public void getRepo(String username, String repoName, ApiCallback<Repo> callback) {
+        mGithubApi.getRepo(username, repoName, callback);
+    }
+
     /**
      * List user's repos
      * @param username

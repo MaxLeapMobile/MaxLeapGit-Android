@@ -11,12 +11,14 @@ package com.maxleapmobile.gitmaster.ui.activity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.ForkRepo;
+import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -27,17 +29,16 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
     public static final String OWNER = "owner";
     public static final String REPONAME = "reponame";
-    public static final String REPOURL = "url";
 
     private Toolbar mToolbar;
     private TextView mTitle;
     private ProgressWebView mWebView;
     private TextView mStar;
     private TextView mFork;
+    private ProgressBar mProgressBar;
 
     private String mRepoOwner;
     private String mRepoName;
-    private String mRepoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +46,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
         setContentView(R.layout.activity_repo);
         mRepoOwner = getIntent().getStringExtra(OWNER);
         mRepoName = getIntent().getStringExtra(REPONAME);
-        mRepoUrl = getIntent().getStringExtra(REPOURL);
         initView();
-
     }
 
     private void initView() {
@@ -63,9 +62,24 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
         mTitle = (TextView) findViewById(R.id.title);
         mTitle.setText(mRepoName);
         mWebView = (ProgressWebView) findViewById(R.id.repo_webview);
-        mWebView.loadUrl(mRepoUrl);
         mStar = (TextView) findViewById(R.id.repo_star);
         mFork = (TextView) findViewById(R.id.repo_fork);
+        mProgressBar = (ProgressBar) findViewById(R.id.repo_progressbar);
+        mProgressBar.setVisibility(View.VISIBLE);
+
+        ApiManager.getInstance().getRepo(mRepoOwner, mRepoName, new ApiCallback<Repo>() {
+            @Override
+            public void success(Repo repo, Response response) {
+                mProgressBar.setVisibility(View.GONE);
+                mWebView.loadUrl(repo.getHtmlUrl());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                super.failure(error);
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
 
         ApiManager.getInstance().isStarred(mRepoOwner, mRepoName, new ApiCallback<Object>() {
             @Override

@@ -100,7 +100,6 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                 Intent intent = new Intent(mContext, RepoDetailActivity.class);
                 intent.putExtra(RepoDetailActivity.REPONAME, mRepos.get(position).getName());
                 intent.putExtra(RepoDetailActivity.OWNER, mRepos.get(position).getOwner().getLogin());
-                intent.putExtra(RepoDetailActivity.REPOURL, mRepos.get(position).getHtmlUrl());
                 mContext.startActivity(intent);
             }
         });
