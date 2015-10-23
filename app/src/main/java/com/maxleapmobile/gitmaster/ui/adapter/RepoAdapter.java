@@ -67,7 +67,8 @@ public class RepoAdapter extends BaseAdapter {
         holder.titleView.setText(item.getName());
         holder.infoView.setText(item.getDescription());
         holder.ownerView.setText(String.format(mContext.getString(R.string.frag_repo_owner), item.getOwner().getLogin()));
-        Picasso.with(mContext).load(item.getOwner().getAvatarUrl()).transform(new CircleTransform()).into(holder.imageView);
+        Picasso.with(mContext).load(item.getOwner().getAvatarUrl()).transform(new CircleTransform())
+                .placeholder(R.mipmap.ic_user_portrait_small).into(holder.imageView);
 
         return convertView;
     }
