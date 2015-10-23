@@ -70,6 +70,14 @@ public class RadioAdapter extends BaseAdapter {
                 }
             }
         });
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onSelect(position);
+                }
+            }
+        });
 
         return convertView;
     }
