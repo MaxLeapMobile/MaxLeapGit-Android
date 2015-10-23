@@ -20,23 +20,26 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/recommend_notice1"
             android:textColor="#808080"
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/recommend_notice2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/recommend_notice2"
+            android:gravity="center"
             android:textColor="#808080"
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/recommend_notice3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/recommend_notice3"
+            android:gravity="center"
             android:textColor="#808080"
             android:textSize="16sp" />
 

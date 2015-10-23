@@ -9,13 +9,17 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.maxleap.FindCallback;
 import com.maxleap.FunctionCallback;
@@ -32,7 +36,9 @@ import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
+import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
+import com.maxleapmobile.gitmaster.ui.widget.CustomClickableSpan;
 import com.maxleapmobile.gitmaster.util.Logger;
 
 import org.json.JSONArray;
@@ -58,7 +64,7 @@ public class RecommendFragment extends Fragment {
     private Set<String> mSkipRepo;
     private FileHandle mFileHandle;
     private JSONObject mJsonObject;
-    private List<Repo> Repos;
+    private List<Repo> repos;
     private List<Gene> genes;
     private Map<String, Object> mParmasMap;
 
@@ -77,6 +83,29 @@ public class RecommendFragment extends Fragment {
     }
 
     private void initUI(View view) {
+        TextView notice2 = (TextView) view.findViewById(R.id.recommend_notice2);
+        SpannableString notice2SS = new SpannableString(mContext.getString(R.string.recommend_notice2_part1)
+                + mContext.getString(R.string.recommend_notice2_part2));
+        notice2SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                Intent intent = new Intent(mContext, GeneActivity.class);
+                startActivity(intent);
+            }
+        }), 0, mContext.getString(R.string.recommend_notice2_part1).length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice2.setText(notice2SS.toString());
+        TextView notice3 = (TextView) view.findViewById(R.id.recommend_notice3);
+        SpannableString notice3SS = new SpannableString(mContext.getString(R.string.recommend_notice3_part1)
+                + mContext.getString(R.string.recommend_notice3_part2));
+        notice3SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                mEmptyView.setVisibility(View.GONE);
+                mWebView.loadUrl(repos.get(0).getHtmlUrl());
+            }
+        }), mContext.getString(R.string.recommend_notice3_part1).length(), notice3SS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice3.setText(notice3SS.toString());
+
         mWebView = (ProgressWebView) view.findViewById(R.id.recommend_webview);
         mEmptyView = (LinearLayout) view.findViewById(R.id.recommend_empty);
         if (mParmasMap == null) {
@@ -133,17 +162,19 @@ public class RecommendFragment extends Fragment {
                                 @Override
                                 public void done(List<HashMap<String, Object>> list, MLException e) {
                                     if (e == null) {
-                                        if (Repos == null) {
-                                            Repos = new ArrayList<>();
+                                        if (repos == null) {
+                                            repos = new ArrayList<>();
                                         }
                                         int length = list.size();
                                         for (int i = 0; i < length; i++) {
                                             try {
-                                                Repos.add(from(list.get(i)));
+                                                repos.add(from(list.get(i)));
                                             } catch (Exception jsonException) {
                                                 continue;
                                             }
                                         }
+                                        mEmptyView.setVisibility(View.GONE);
+                                        mWebView.loadUrl(repos.get(0).getHtmlUrl());
                                     } else {
                                         Logger.toast(mContext, R.string.toast_get_recommend_failed);
                                     }
