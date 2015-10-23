@@ -8,7 +8,6 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.databinding.ActivityUserinfoBinding;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.util.Const;
 
@@ -30,18 +28,16 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     private Toolbar mToolbar;
     private TextView mTitle;
     private TextView mFollow;
-    private ActivityUserinfoBinding mBinding;
     private Boolean mFollowStatus = false;
     private String mUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_userinfo);
+        setContentView(R.layout.activity_userinfo);
         initFragment();
         initView();
         followStatus();
-        mBinding.setStatus(mFollowStatus);
     }
 
     private void initView() {
@@ -77,7 +73,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
             public void success(Object o, Response response) {
                 if (response.getStatus() == 204) {
                     mFollowStatus = true;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_unfollow));
                 }
             }
 
@@ -86,7 +82,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 super.failure(error);
                 if (error.getResponse().getStatus() == 404) {
                     mFollowStatus = false;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }
             }
         });
@@ -101,14 +97,14 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 @Override
                 public void success(Object o, Response response) {
                     mFollowStatus = false;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
                     super.failure(error);
                     mFollowStatus = true;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_unfollow));
                 }
             });
         } else {
@@ -116,14 +112,14 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 @Override
                 public void success(Object o, Response response) {
                     mFollowStatus = true;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_unfollow));
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
                     super.failure(error);
                     mFollowStatus = false;
-                    mBinding.setStatus(mFollowStatus);
+                    mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }
             });
         }

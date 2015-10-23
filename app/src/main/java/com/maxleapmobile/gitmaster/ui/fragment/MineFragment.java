@@ -111,21 +111,39 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getOrgs() {
-        ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
-            @Override
-            public void success(List<Organzation> organzations, Response response) {
-                String orgs = "";
-                for (Organzation organzation : organzations) {
-                    orgs += organzation.getLogin() + " ";
+        if (mUsername.equals(PreferenceUtil.getString(getContext(), Const.USERNAME, ""))) {
+            ApiManager.getInstance().getOrg(new ApiCallback<List<Organzation>>() {
+                @Override
+                public void success(List<Organzation> organzations, Response response) {
+                    String orgs = "";
+                    for (Organzation organzation : organzations) {
+                        orgs += organzation.getLogin() + " ";
+                    }
+                    mUserinfoBinding.setOrgs(orgs);
                 }
-                mUserinfoBinding.setOrgs(orgs);
-            }
 
-            @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    super.failure(error);
+                }
+            });
+        } else {
+            ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
+                @Override
+                public void success(List<Organzation> organzations, Response response) {
+                    String orgs = "";
+                    for (Organzation organzation : organzations) {
+                        orgs += organzation.getLogin() + " ";
+                    }
+                    mUserinfoBinding.setOrgs(orgs);
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    super.failure(error);
+                }
+            });
+        }
     }
 
     private void initViews(View view) {

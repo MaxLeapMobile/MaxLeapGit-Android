@@ -8,8 +8,10 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +27,7 @@ import com.maxleap.MLRelation;
 import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
+import com.maxleapmobile.gitmaster.calllback.RecyclerItemClickListener;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.ui.adapter.GeneAdapter;
@@ -83,6 +86,51 @@ public class GeneActivity extends BaseActivity {
                         .marginResId(R.dimen.gene_item_margin,
                                 R.dimen.gene_item_margin).build()
         );
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplication(),
+                mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                final Gene item = mGenes.get(position);
+                AlertDialog.Builder builder = new AlertDialog.Builder(GeneActivity.this,
+                        R.style.AppCompatAlertDialogStyle);
+                builder.setMessage(getString(R.string.dialog_delete_gene_message));
+                builder.setPositiveButton(getString(R.string.dialog_sure),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                mProgressBar.setVisibility(View.VISIBLE);
+                                UserManager.getInstance().removeGene(item, new OperationCallback() {
+                                    @Override
+                                    public void success() {
+                                        Logger.toast(getApplicationContext(),
+                                                getString(R.string.toast_gene_delete_success));
+                                        fetchGeneData();
+                                    }
+
+                                    @Override
+                                    public void failed(String error) {
+                                        Logger.toast(getApplicationContext(),
+                                                getString(R.string.toast_gene_delete_failed));
+                                    }
+                                });
+                            }
+                        });
+                builder.setNegativeButton(R.string.dialog_cancel,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+            }
+        }));
         mAddGene = (TextView) findViewById(R.id.gene_add);
         mAddGene.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +151,7 @@ public class GeneActivity extends BaseActivity {
         MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
             @Override
             public void done(List<MLObject> list, MLException e) {
+                mProgressBar.setVisibility(View.GONE);
                 if (e == null) {
                     mGenes.clear();
                     for (MLObject object : list) {
@@ -112,7 +161,6 @@ public class GeneActivity extends BaseActivity {
                         Gene gene = new Gene(id, language, skill);
                         mGenes.add(gene);
                         mGeneAdapter.notifyDataSetChanged();
-                        mProgressBar.setVisibility(View.GONE);
                     }
                 }
             }
