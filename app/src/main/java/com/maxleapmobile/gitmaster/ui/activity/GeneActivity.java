@@ -99,22 +99,30 @@ public class GeneActivity extends BaseActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         MLRelation mlRelation = UserManager.getInstance().getCurrentUser().getGenes();
         mlRelation.setTargetClass("Gene");
-        MLQuery<MLObject> query = mlRelation.getQuery();
-        MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
+        final MLQuery<MLObject> query = mlRelation.getQuery();
+        UserManager.getInstance().checkIsLogin(new OperationCallback() {
             @Override
-            public void done(List<MLObject> list, MLException e) {
-                if (e == null) {
-                    mGenes.clear();
-                    for (MLObject object : list) {
-                        String language = (String) object.get("language");
-                        String skill = (String) object.get("skill");
-                        String id = object.getObjectId();
-                        Gene gene = new Gene(id, language, skill);
-                        mGenes.add(gene);
-                        mGeneAdapter.notifyDataSetChanged();
-                        mProgressBar.setVisibility(View.GONE);
+            public void success() {
+                MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
+                    @Override
+                    public void done(List<MLObject> list, MLException e) {
+                        if (e == null) {
+                            mGenes.clear();
+                            for (MLObject object : list) {
+                                mGenes.add(Gene.from(object));
+                                mGeneAdapter.notifyDataSetChanged();
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        } else {
+                            
+                        }
                     }
-                }
+                });
+            }
+
+            @Override
+            public void failed(String error) {
+
             }
         });
     }
@@ -125,51 +133,53 @@ public class GeneActivity extends BaseActivity {
         if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             String language = data.getStringExtra(AddGeneActivity.INTENT_KEY_LANGUAGE);
             String skill = data.getStringExtra(AddGeneActivity.INTENT_KEY_SKILL);
-            Gene gene = new Gene(language, skill);
-            if (!mGenes.contains(gene)) {
-                UserManager.getInstance().addGene(new Gene(language, skill),
-                        new OperationCallback() {
-                    @Override
-                    public void success() {
-                        Logger.toast(getApplicationContext(),
-                                getString(R.string.toast_save_gene_success));
-                        fetchGeneData();
-                    }
+            Gene gene = new Gene();
+            gene.setLanguage(language);
+            gene.setSkill(skill);
+            UserManager.getInstance().addGene(gene,
+                    new OperationCallback() {
+                        @Override
+                        public void success() {
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_save_gene_success));
+                            fetchGeneData();
+                        }
 
-                    @Override
-                    public void failed(String error) {
-                        Logger.toast(getApplicationContext(),
-                                getString(R.string.toast_save_gene_failed));
-                    }
-                });
-            } else {
-                Logger.toast(getApplicationContext(),
-                        getString(R.string.toast_already_have_gene));
-            }
+                        @Override
+                        public void failed(String error) {
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_save_gene_failed));
+                        }
+                    });
         } else if (requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
             String language = data.getStringExtra(AddGeneActivity.INTENT_KEY_LANGUAGE);
             String skill = data.getStringExtra(AddGeneActivity.INTENT_KEY_SKILL);
             String id = data.getStringExtra(AddGeneActivity.INTENT_KEY_ID);
-            Gene gene = new Gene(id, language, skill);
-            if (!mGenes.contains(gene)) {
-                UserManager.getInstance().updateGene(gene, new OperationCallback() {
-                    @Override
-                    public void success() {
-                        Logger.toast(getApplicationContext(),
-                                getString(R.string.toast_update_gene_success));
-                        fetchGeneData();
-                    }
-
-                    @Override
-                    public void failed(String error) {
-                        Logger.toast(getApplicationContext(),
-                                getString(R.string.toast_update_gene_failed));
-                    }
-                });
-            } else {
-                Logger.toast(getApplicationContext(),
-                        getString(R.string.toast_already_have_gene));
+            Gene gene = new Gene();
+            gene.setObjectId(id);
+            gene.setLanguage(language);
+            gene.setSkill(skill);
+            for (int i = 0; i < mGenes.size(); i++) {
+                if (mGenes.get(i).getObjectId().equals(id)) {
+                    mGenes.remove(i);
+                    mGenes.add(i, gene);
+                    break;
+                }
             }
+            UserManager.getInstance().updateGene(gene, new OperationCallback() {
+                @Override
+                public void success() {
+                    Logger.toast(getApplicationContext(),
+                            getString(R.string.toast_update_gene_success));
+                    fetchGeneData();
+                }
+
+                @Override
+                public void failed(String error) {
+                    Logger.toast(getApplicationContext(),
+                            getString(R.string.toast_update_gene_failed));
+                }
+            });
         }
     }
 }

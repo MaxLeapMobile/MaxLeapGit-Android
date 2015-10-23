@@ -15,6 +15,7 @@
     <string name="toast_star_failed">Star failed</string>
     <string name="toast_unstar_success">Unstar</string>
     <string name="toast_unstar_failed">Unstar failed</string>
+    <string name="toast_get_recommend_failed">Failed to get Recommend repo</string>
     <string name="toast_gene_select">Please select language first.</string>
     <string name="toast_gene_not_select_language">You have not select language yet.</string>
     <string name="toast_gene_not_select_skill">You have not select skill yet.</string>
@@ -84,6 +85,16 @@
     <string name="bottom_label_star">Star</string>
     <string name="bottom_label_unstar">Unstar</string>
     <string name="bottom_label_fork">Fork</string>
+
+    <!-- recommend fragment -->
+    <string name="recommend_notice1">That\'s all about it!</string>
+    <string name="recommend_notice2">Edit genes to find more repo\n worth recommending.</string>
+    <string name="recommend_notice3">Or you can view this recommend list again.</string>
+    <string name="recommend_bottom_label_star">Star</string>
+    <string name="recommend_bottom_label_unstar">Unstar</string>
+    <string name="recommend_bottom_label_fork">Fork</string>
+    <string name="recommend_bottom_label_unfork">Unfork</string>
+    <string name="recommend_bottom_label_skip">Skip</string>
 
     <string name="activity_add_gene_language">Language</string>
     <string name="activity_add_gene_skill">Skill</string>
