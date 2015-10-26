@@ -28,6 +28,7 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -50,11 +51,14 @@ public class ApiManager {
         mContext = GithubApplication.getInstance();
         mAccessToken = PreferenceUtil.getString(mContext,
                 Const.ACCESS_TOKEN_KEY, null);
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
+        okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
         mRestAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setRequestInterceptor(mRequestInterceptor)
                 .setEndpoint(API_URL)
-                .setClient(new OkClient(new OkHttpClient()))
+                .setClient(new OkClient(okHttpClient))
                 .build();
 
         mGithubApi = mRestAdapter.create(GithubApi.class);
