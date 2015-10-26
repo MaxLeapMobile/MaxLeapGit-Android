@@ -286,15 +286,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     public void success(Object o, Response response) {
                         if (response.getStatus() == 204) {
                             checkRepo.setIsStar(true);
-                        } else {
-                            checkRepo.setIsStar(false);
                         }
                         if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
-                            if (checkRepo.isStar()) {
-                                starText.setText(R.string.recommend_bottom_label_unstar);
-                            } else {
-                                starText.setText(R.string.recommend_bottom_label_star);
-                            }
+                            starText.setText(R.string.recommend_bottom_label_unstar);
                         } else {
                             dbHelper.updateRepo(checkRepo);
                         }
@@ -303,6 +297,14 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
 
                     @Override
                     public void failure(RetrofitError error) {
+                        if (error.getResponse().getStatus() == 404) {
+                            checkRepo.setIsStar(false);
+                        }
+                        if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
+                            starText.setText(R.string.recommend_bottom_label_star);
+                        } else {
+                            dbHelper.updateRepo(checkRepo);
+                        }
                         starProgressBar.setVisibility(View.GONE);
                         super.failure(error);
                     }
@@ -314,18 +316,36 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         Repo repo = repos.get(nowPosition);
         switch (v.getId()) {
             case R.id.recommend_star:
-                ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
-                        new ApiCallback<Object>() {
-                            @Override
-                            public void success(Object o, Response response) {
+                starProgressBar.setVisibility(View.VISIBLE);
+                if (starText.getText().toString().equals(mContext.getString(R.string.recommend_bottom_label_star))) {
+                    ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
+                            new ApiCallback<Object>() {
+                                @Override
+                                public void success(Object o, Response response) {
+                                    showStarResult(R.string.toast_star_recommend_success);
+                                    starText.setText(R.string.recommend_bottom_label_unstar);
+                                }
 
-                            }
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    showStarResult(R.string.toast_star_recommend_failed);
+                                }
+                            });
+                } else {
+                    ApiManager.getInstance().unstart(repo.getOwner().getLogin(), repo.getName(),
+                            new ApiCallback<Object>() {
+                                @Override
+                                public void success(Object o, Response response) {
+                                    showStarResult(R.string.toast_unstar_recommend_success);
+                                    starText.setText(R.string.recommend_bottom_label_star);
+                                }
 
-                            @Override
-                            public void failure(RetrofitError error) {
-                                super.failure(error);
-                            }
-                        });
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    showStarResult(R.string.toast_unstar_recommend_failed);
+                                }
+                            });
+                }
                 break;
             case R.id.recommend_fork:
                 ApiManager.getInstance().fork(repo.getOwner().getLogin(), repo.getName(),
@@ -368,4 +388,11 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                 break;
         }
     }
+
+    private void showStarResult(int res) {
+        starProgressBar.setVisibility(View.GONE);
+        Logger.toast(mContext, res);
+        mWebView.reload();
+    }
+
 }
