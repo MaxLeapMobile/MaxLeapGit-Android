@@ -30,6 +30,7 @@ import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.TimeUtil;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.List;
 
 public class TimeLineAdapter extends BaseAdapter {
@@ -87,8 +88,9 @@ public class TimeLineAdapter extends BaseAdapter {
             @Override
             public void onClick() {
                 Intent intent = new Intent(mContext, RepoDetailActivity.class);
-                intent.putExtra(RepoDetailActivity.REPONAME, event.getRepo().getName());
-                intent.putExtra(RepoDetailActivity.OWNER, event.getActor().getLogin());
+                String fullName = event.getRepo().getName();
+                intent.putExtra(RepoDetailActivity.REPONAME, fullName.substring(fullName.lastIndexOf(File.separator) + 1));
+                intent.putExtra(RepoDetailActivity.OWNER, fullName.substring(0, fullName.lastIndexOf(File.separator)));
                 mContext.startActivity(intent);
             }
         };

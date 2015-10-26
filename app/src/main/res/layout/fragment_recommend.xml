@@ -53,15 +53,30 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:gravity="center"
-            android:text="@string/recommend_bottom_label_star"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/recommend_star"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:gravity="center"
+                android:text="@string/recommend_bottom_label_star"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <ProgressBar
+                android:id="@+id/recommend_star_progressbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#0076FF"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <View
             android:layout_width="1px"
@@ -69,6 +84,7 @@
             android:background="#FFFFFF" />
 
         <TextView
+            android:id="@+id/recommend_fork"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -84,6 +100,7 @@
             android:background="#FFFFFF" />
 
         <TextView
+            android:id="@+id/recommend_skip"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -94,5 +111,10 @@
             android:textSize="16sp" />
 
     </LinearLayout>
+
+
+    <include
+        android:id="@+id/repo_progressbar"
+        layout="@layout/view_progressbar" />
 
 </RelativeLayout>

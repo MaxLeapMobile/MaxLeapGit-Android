@@ -24,6 +24,9 @@
     <string name="toast_already_have_gene">Already have this gene.</string>
     <string name="toast_update_gene_success">Update gene success.</string>
     <string name="toast_update_gene_failed">Update gene failed.</string>
+    <string name="toast_star_recommend_success">Star Success!</string>
+    <string name="toast_unstar_recommend_success">Unstar Success!</string>
+    <string name="toast_fork_recommend_success">Fork Success!</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
     <string name="activity_main_item_recommend">Recommend</string>
@@ -97,7 +100,6 @@
     <string name="recommend_bottom_label_star">Star</string>
     <string name="recommend_bottom_label_unstar">Unstar</string>
     <string name="recommend_bottom_label_fork">Fork</string>
-    <string name="recommend_bottom_label_unfork">Unfork</string>
     <string name="recommend_bottom_label_skip">Skip</string>
 
     <string name="activity_add_gene_language">Language</string>
