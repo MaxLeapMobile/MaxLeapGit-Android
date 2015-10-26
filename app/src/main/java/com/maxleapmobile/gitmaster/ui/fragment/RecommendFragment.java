@@ -274,12 +274,12 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         mEmptyView.setVisibility(View.GONE);
         mWebView.loadUrl(repo.getHtmlUrl());
         mProgressBar.setVisibility(View.GONE);
-        checkIsStar(repo, dbRecRepo);
+        checkIsStar(repo);
     }
 
-    private void checkIsStar(Repo repo, final DBRecRepo dbRecRepo) {
+    private void checkIsStar(Repo repo) {
         starProgressBar.setVisibility(View.VISIBLE);
-        final DBRecRepo checkRepo = dbRecRepo;
+        final DBRecRepo checkRepo = dbRecRepo.clone();
         ApiManager.getInstance().isStarred(repo.getOwner().getLogin(),
                 repo.getName(), new ApiCallback<Object>() {
                     @Override
@@ -290,7 +290,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                             checkRepo.setIsStar(false);
                         }
                         if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
-                            starProgressBar.setVisibility(View.GONE);
                             if (checkRepo.isStar()) {
                                 starText.setText(R.string.recommend_bottom_label_unstar);
                             } else {
@@ -299,6 +298,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         } else {
                             dbHelper.updateRepo(checkRepo);
                         }
+                        starProgressBar.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -362,7 +362,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     int id = dbHelper.insertRepo(dbRecRepo);
                     dbRecRepo.setId(id);
                 }
-                dbHelper.updateRepo(dbRecRepo);
                 loadUrl();
                 break;
             default:

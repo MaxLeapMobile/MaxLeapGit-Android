@@ -25,10 +25,8 @@ import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.RecommendFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
-import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
-import com.squareup.picasso.Picasso;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -83,24 +81,8 @@ public class MainActivity extends BaseActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right,
-                                       int bottom, int oldLeft,
-                                       int oldTop, int oldRight, int oldBottom) {
-                mAvatarView = (ImageView) navigationView.findViewById(R.id.nav_header_avatar);
-                mNavHeaderUser = (TextView) navigationView.findViewById(R.id.nav_header_user);
-                Picasso.with(getApplicationContext())
-                        .load(UserManager.getInstance().getCurrentUser().getAvatarUrl())
-                        .centerInside().fit()
-                        .transform(new CircleTransform())
-                        .placeholder(R.mipmap.ic_user_portrait_big)
-                        .into(mAvatarView);
-                mNavHeaderUser.setText(UserManager.getInstance().getCurrentUser().getLogin());
-            }
-        });
 
     }
 
