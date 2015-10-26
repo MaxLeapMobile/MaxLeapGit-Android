@@ -20,6 +20,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.maxleapmobile.gitmaster.ApiKey;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.api.GithubApi;
@@ -80,7 +81,7 @@ public class LoginActivity extends BaseActivity {
         mWebView.setWebViewClient(new OauthWebViewClient());
 
         sb = new StringBuilder(AUTH_URL);
-        sb.append("client_id=" + Const.CLIENT_ID);
+        sb.append("client_id=" + ApiKey.GITHUB_ID);
         sb.append("&redirect_uri=" + CALLBACK_URL);
         sb.append("&scope=user,repo");
         mWebView.loadUrl(sb.toString());
@@ -93,7 +94,7 @@ public class LoginActivity extends BaseActivity {
                 .build();
         GithubApi githubApi = restAdapter.create(GithubApi.class);
 
-        githubApi.getAccessToken(Const.CLIENT_ID, Const.CLIENT_SECRET, Const.CALLBACK_URL,
+        githubApi.getAccessToken(ApiKey.GITHUB_ID, ApiKey.GITHUB_SECRET, Const.CALLBACK_URL,
                 code, new ApiCallback<AccessToken>() {
                     @Override
                     public void success(AccessToken accessToken, Response response) {

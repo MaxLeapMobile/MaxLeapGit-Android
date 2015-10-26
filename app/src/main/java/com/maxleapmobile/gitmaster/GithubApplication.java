@@ -18,7 +18,6 @@ import com.maxleapmobile.gitmaster.util.Logger;
 public class GithubApplication extends Application {
 
     private static GithubApplication mInstance;
-    private static final String FlurryKey = "";
 
     @Override
     public void onCreate() {
@@ -26,8 +25,8 @@ public class GithubApplication extends Application {
         mInstance = this;
         Logger.setLogOpen(true);
 
-        MaxLeap.initialize(this, "560894ff60b2c290e2ce88eb", "OW16QzA4VTRjcGtpRXgyeGxoVVl4QQ");
-        FlurryAgent.init(this, FlurryKey);
+        MaxLeap.initialize(this, ApiKey.MAXLEAP_APP_ID, ApiKey.MAXLEAP_CLIENT_KEY);
+        FlurryAgent.init(this, ApiKey.FLURRY_KEY);
         DBHelper.getInstance(this).delExpiredRepo();
     }
 
