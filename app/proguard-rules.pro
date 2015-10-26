@@ -37,6 +37,9 @@
 -keep class com.maxleapmobile.gitmaster.model.** { *; }
 -dontwarn com.maxleapmobile.gitmaster.model.**
 
+-dontwarn com.flurry.**
+-keep class com.flurry.** { *; }
+
 
 
 
