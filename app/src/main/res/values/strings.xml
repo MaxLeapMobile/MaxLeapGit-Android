@@ -100,7 +100,6 @@
     <string name="recommend_notice3_part1">Or you can </string>
     <string name="recommend_notice3_part2">view this recommend list again.</string>
     <string name="recommend_bottom_label_star">Star</string>
-    <string name="recommend_bottom_label_unstar">Unstar</string>
     <string name="recommend_bottom_label_fork">Fork</string>
     <string name="recommend_bottom_label_skip">Skip</string>
 

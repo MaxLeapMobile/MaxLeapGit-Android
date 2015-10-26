@@ -72,6 +72,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private LinearLayout mEmptyView;
     private TextView starText;
     private ProgressBar starProgressBar;
+    private View skipBtn;
 
     private List<Repo> repos;
     private List<Gene> genes;
@@ -101,7 +102,8 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         starText = (TextView) view.findViewById(R.id.recommend_star);
         starText.setOnClickListener(this);
         view.findViewById(R.id.recommend_fork).setOnClickListener(this);
-        view.findViewById(R.id.recommend_skip).setOnClickListener(this);
+        skipBtn = view.findViewById(R.id.recommend_skip);
+        skipBtn.setOnClickListener(this);
         mProgressBar = (ProgressBar) view.findViewById(R.id.repo_progressbar);
         mProgressBar.setVisibility(View.VISIBLE);
         TextView notice2 = (TextView) view.findViewById(R.id.recommend_notice2);
@@ -338,7 +340,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void checkIsStar(Repo repo) {
-        starProgressBar.setVisibility(View.VISIBLE);
         final DBRecRepo checkRepo = dbRecRepo.clone();
         ApiManager.getInstance().isStarred(repo.getOwner().getLogin(),
                 repo.getName(), new ApiCallback<Object>() {
@@ -347,28 +348,18 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         if (response.getStatus() == 204) {
                             checkRepo.setIsStar(true);
                         }
-                        if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
-                            starText.setText(R.string.recommend_bottom_label_unstar);
-                        } else {
-                            dbHelper.updateRepo(checkRepo);
-                        }
-                        starProgressBar.setVisibility(View.GONE);
+                        dbHelper.updateRepo(checkRepo);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        if (error.getResponse().getStatus() == 404) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
                             checkRepo.setIsStar(false);
                         } else {
                             super.failure(error);
                             return;
                         }
-                        if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
-                            starText.setText(R.string.recommend_bottom_label_star);
-                        } else {
-                            dbHelper.updateRepo(checkRepo);
-                        }
-                        starProgressBar.setVisibility(View.GONE);
+                        dbHelper.updateRepo(checkRepo);
                     }
                 });
     }
@@ -379,35 +370,19 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.recommend_star:
                 starProgressBar.setVisibility(View.VISIBLE);
-                if (starText.getText().toString().equals(mContext.getString(R.string.recommend_bottom_label_star))) {
-                    ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
-                            new ApiCallback<Object>() {
-                                @Override
-                                public void success(Object o, Response response) {
-                                    showStarResult(R.string.toast_star_recommend_success);
-                                    starText.setText(R.string.recommend_bottom_label_unstar);
-                                }
+                ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
+                        new ApiCallback<Object>() {
+                            @Override
+                            public void success(Object o, Response response) {
+                                showStarResult(R.string.toast_star_recommend_success);
+                                skipBtn.performClick();
+                            }
 
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    showStarResult(R.string.toast_star_recommend_failed);
-                                }
-                            });
-                } else {
-                    ApiManager.getInstance().unstart(repo.getOwner().getLogin(), repo.getName(),
-                            new ApiCallback<Object>() {
-                                @Override
-                                public void success(Object o, Response response) {
-                                    showStarResult(R.string.toast_unstar_recommend_success);
-                                    starText.setText(R.string.recommend_bottom_label_star);
-                                }
-
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    showStarResult(R.string.toast_unstar_recommend_failed);
-                                }
-                            });
-                }
+                            @Override
+                            public void failure(RetrofitError error) {
+                                showStarResult(R.string.toast_star_recommend_failed);
+                            }
+                        });
                 break;
             case R.id.recommend_fork:
                 ApiManager.getInstance().fork(repo.getOwner().getLogin(), repo.getName(),
@@ -423,6 +398,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                                     dbRecRepo.setId(id);
                                 }
                                 Logger.toast(mContext, R.string.toast_fork_recommend_success);
+                                skipBtn.performClick();
                             }
 
                             @Override
@@ -454,7 +430,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private void showStarResult(int res) {
         starProgressBar.setVisibility(View.GONE);
         Logger.toast(mContext, res);
-        mWebView.reload();
     }
 
 }
