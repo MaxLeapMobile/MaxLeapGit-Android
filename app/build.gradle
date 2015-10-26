@@ -12,10 +12,34 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("gitmaster-keystore.jks")
+            storePassword "maxleapmobile"
+            keyAlias "gitmaster"
+            keyPassword "maxleapmobile"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        applicationVariants.all { variant ->
+            def apk = variant.outputs[0].outputFile;
+            def versionName = android.defaultConfig.versionName;
+            def newName = apk.name.replace(".apk", "-v" + versionName + ".apk");
+            newName = newName.replace("app", "maxleapgit");
+            variant.outputs[0].outputFile = new File(apk.parentFile, newName);
+        }
+    }
+
+    productFlavors {
+        google {
+            applicationId 'com.maxleapmobile.gitmaster'
         }
     }
 
