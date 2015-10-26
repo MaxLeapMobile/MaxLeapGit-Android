@@ -12,6 +12,10 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.maxleapmobile.gitmaster.ApiKey;
+
+import net.hockeyapp.android.CrashManager;
+
 public class BaseActivity extends AppCompatActivity {
 
     @Override
@@ -27,6 +31,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        CrashManager.register(this, ApiKey.HOCKEY_APP_ID);
     }
 
     @Override
