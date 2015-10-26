@@ -32,6 +32,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
+import java.util.TimeZone;
 
 public class TimeLineAdapter extends BaseAdapter {
 
@@ -42,7 +43,7 @@ public class TimeLineAdapter extends BaseAdapter {
     public TimeLineAdapter(Context context, List<TimeLineEvent> events) {
         this.mContext = context;
         this.mEvents = events;
-        now = System.currentTimeMillis();
+        now = getUTCNow();
     }
 
     @Override
@@ -118,7 +119,7 @@ public class TimeLineAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        now = System.currentTimeMillis();
+        now = getUTCNow();
         super.notifyDataSetChanged();
     }
 
@@ -126,6 +127,13 @@ public class TimeLineAdapter extends BaseAdapter {
         ImageView userIcon;
         TextView content;
         TextView time;
+    }
+
+    private long getUTCNow() {
+        long time = System.currentTimeMillis();
+        TimeZone timeZone = TimeZone.getDefault();
+        int offset = timeZone.getOffset(time);
+        return time - offset;
     }
 
     private String getTime(String formatedTime) {

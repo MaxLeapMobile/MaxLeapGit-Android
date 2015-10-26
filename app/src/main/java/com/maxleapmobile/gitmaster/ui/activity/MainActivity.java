@@ -1,6 +1,5 @@
 package com.maxleapmobile.gitmaster.ui.activity;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -13,7 +12,6 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
@@ -37,9 +35,6 @@ public class MainActivity extends BaseActivity
     public static final int REQUEST_OAUTH = 1;
 
     private TextView titleView;
-    private ImageView mAvatarView;
-    private TextView mNavHeaderUser;
-    private FragmentTransaction transaction;
     private TimelineFragment timelineFragment;
     private MineFragment mineFragment;
     private RecommendFragment recommendFragment;
@@ -165,7 +160,6 @@ public class MainActivity extends BaseActivity
                 UserManager.getInstance().SaveUserInfo(user, new OperationCallback() {
                     @Override
                     public void success() {
-                        System.currentTimeMillis();
                     }
 
                     @Override
