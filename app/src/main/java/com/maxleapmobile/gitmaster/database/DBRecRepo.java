@@ -64,4 +64,15 @@ public class DBRecRepo {
     public void setRepo_id(long repo_id) {
         this.repo_id = repo_id;
     }
+
+    public DBRecRepo clone() {
+        DBRecRepo dbRecRepo = new DBRecRepo();
+        dbRecRepo.setId(id);
+        dbRecRepo.setIsSkip(isSkip);
+        dbRecRepo.setIsStar(isStar);
+        dbRecRepo.setRepo_id(repo_id);
+        dbRecRepo.setIsFork(isFork);
+        dbRecRepo.setCreateTime(createTime);
+        return dbRecRepo;
+    }
 }
