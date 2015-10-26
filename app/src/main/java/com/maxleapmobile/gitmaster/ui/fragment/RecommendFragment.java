@@ -9,13 +9,18 @@
 package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.maxleap.FindCallback;
 import com.maxleap.FunctionCallback;
@@ -24,13 +29,19 @@ import com.maxleap.MLObject;
 import com.maxleap.MLQueryManager;
 import com.maxleap.MLUser;
 import com.maxleap.exception.MLException;
-import com.maxleap.utils.FileHandle;
-import com.maxleap.utils.FileHandles;
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.api.ApiManager;
+import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
+import com.maxleapmobile.gitmaster.database.DBHelper;
+import com.maxleapmobile.gitmaster.database.DBRecRepo;
 import com.maxleapmobile.gitmaster.manage.UserManager;
+import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.Gene;
-import com.maxleapmobile.gitmaster.model.RecommendRepo;
+import com.maxleapmobile.gitmaster.model.Owner;
+import com.maxleapmobile.gitmaster.model.Repo;
+import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
+import com.maxleapmobile.gitmaster.ui.widget.CustomClickableSpan;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
@@ -38,28 +49,32 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public class RecommendFragment extends Fragment {
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
-    private static final String SKIPPED_REPO_FILE_NAME = "skipped_repo_file_name";
-    private static final String SKIPPED_REPOES = "skipped_repoes";
-    private static final String SKIPPED_REPO = "skipped_repo_url";
+public class RecommendFragment extends Fragment implements View.OnClickListener {
+
+    private static final int PER_PAGE = 10;
+    private int page = 1;
 
     private Context mContext;
     private ProgressWebView mWebView;
+    private ProgressBar mProgressBar;
     private LinearLayout mEmptyView;
-    private Set<String> mSkipRepo;
-    private FileHandle mFileHandle;
-    private JSONObject mJsonObject;
-    private List<RecommendRepo> recommendRepos;
+    private TextView starText;
+    private ProgressBar starProgressBar;
+
+    private List<Repo> repos;
     private List<Gene> genes;
     private Map<String, Object> mParmasMap;
+    private int nowPosition;
+    private DBRecRepo dbRecRepo;
+    private DBHelper dbHelper;
+    private boolean isEnd;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,31 +91,51 @@ public class RecommendFragment extends Fragment {
     }
 
     private void initUI(View view) {
+        starProgressBar = (ProgressBar) view.findViewById(R.id.recommend_star_progressbar);
+        starText = (TextView) view.findViewById(R.id.recommend_star);
+        starText.setOnClickListener(this);
+        view.findViewById(R.id.recommend_fork).setOnClickListener(this);
+        view.findViewById(R.id.recommend_skip).setOnClickListener(this);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.repo_progressbar);
+        mProgressBar.setVisibility(View.VISIBLE);
+        TextView notice2 = (TextView) view.findViewById(R.id.recommend_notice2);
+        SpannableString notice2SS = new SpannableString(mContext.getString(R.string.recommend_notice2_part1)
+                + mContext.getString(R.string.recommend_notice2_part2));
+        notice2SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                Intent intent = new Intent(mContext, GeneActivity.class);
+                startActivity(intent);
+            }
+        }), 0, mContext.getString(R.string.recommend_notice2_part1).length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice2.setText(notice2SS.toString());
+        TextView notice3 = (TextView) view.findViewById(R.id.recommend_notice3);
+        SpannableString notice3SS = new SpannableString(mContext.getString(R.string.recommend_notice3_part1)
+                + mContext.getString(R.string.recommend_notice3_part2));
+        notice3SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                mEmptyView.setVisibility(View.GONE);
+                mWebView.loadUrl(repos.get(0).getHtmlUrl());
+            }
+        }), mContext.getString(R.string.recommend_notice3_part1).length(), notice3SS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice3.setText(notice3SS.toString());
+
         mWebView = (ProgressWebView) view.findViewById(R.id.recommend_webview);
         mEmptyView = (LinearLayout) view.findViewById(R.id.recommend_empty);
+        mEmptyView.setVisibility(View.GONE);
         if (mParmasMap == null) {
             mParmasMap = new HashMap();
         }
-        if (mSkipRepo == null) {
-            mSkipRepo = Collections.synchronizedSet(new LinkedHashSet<String>());
-            mFileHandle = FileHandles.files(SKIPPED_REPO_FILE_NAME);
-            try {
-                mJsonObject = mFileHandle.readJSONObject();
-                if (mJsonObject != null) {
-                    JSONArray jsonArray = mJsonObject.getJSONArray(SKIPPED_REPOES);
-                    int length = jsonArray.length();
-                    for (int i = 0; i < length; i++) {
-                        mSkipRepo.add(jsonArray.getJSONObject(i).getString(SKIPPED_REPO));
-                    }
-                }
-            } catch (Exception e) {
-
-            }
+        if (repos == null) {
+            fetchTrendingGeneDate();
         }
-        fetchGeneDate();
+        if (dbHelper == null) {
+            dbHelper = DBHelper.getInstance(mContext);
+        }
     }
 
-    private void fetchGeneDate() {
+    private void fetchTrendingGeneDate() {
         UserManager.getInstance().checkIsLogin(new OperationCallback() {
             @Override
             public void success() {
@@ -112,37 +147,43 @@ public class RecommendFragment extends Fragment {
                             for (MLObject o : list) {
                                 genes.add(Gene.from(o));
                             }
-                            mParmasMap.put("userid", "bullda");
+                            mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
                             JSONArray jsonArray = new JSONArray();
                             for (int i = 0; i < genes.size(); i++) {
                                 JSONObject jsonObject = new JSONObject();
                                 try {
                                     jsonObject.put("language", genes.get(i).getLanguage());
-                                    jsonObject.put("keyword", genes.get(i).getSkill());
+                                    jsonObject.put("skill", genes.get(i).getSkill());
                                     jsonArray.put(i, jsonObject);
                                 } catch (Exception jsonException) {
 
                                 }
                             }
                             mParmasMap.put("genes", jsonArray);
-                            mParmasMap.put("page", 1);
-                            mParmasMap.put("per_page", 10);
-                            mParmasMap.put("type", "search");
-                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<JSONArray>() {
+                            mParmasMap.put("page", page);
+                            mParmasMap.put("per_page", PER_PAGE);
+                            mParmasMap.put("type", "trending");
+                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
                                 @Override
-                                public void done(JSONArray jsonArray, MLException e) {
+                                public void done(List<HashMap<String, Object>> list, MLException e) {
                                     if (e == null) {
-                                        if (recommendRepos == null) {
-                                            recommendRepos = new ArrayList<>();
+                                        if (repos == null) {
+                                            repos = new ArrayList<>();
                                         }
-                                        int length = jsonArray.length();
+                                        int length = list.size();
+                                        if (length == 0) {
+                                            fetchSearchGeneDate();
+                                            return;
+                                        }
                                         for (int i = 0; i < length; i++) {
                                             try {
-                                                recommendRepos.add(RecommendRepo.from(jsonArray.getJSONObject(i)));
+                                                repos.add(from(list.get(i)));
                                             } catch (Exception jsonException) {
                                                 continue;
                                             }
                                         }
+                                        nowPosition = 0;
+                                        loadUrl();
                                     } else {
                                         Logger.toast(mContext, R.string.toast_get_recommend_failed);
                                     }
@@ -160,5 +201,172 @@ public class RecommendFragment extends Fragment {
                 Logger.toast(mContext, R.string.toast_get_recommend_failed);
             }
         });
+    }
+
+    private void fetchSearchGeneDate() {
+        if (isEnd) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+            return;
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+        mParmasMap.put("page", page++);
+        mParmasMap.put("type", "search");
+        MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
+            @Override
+            public void done(List<HashMap<String, Object>> list, MLException e) {
+                if (e == null) {
+                    int length = list.size();
+                    if (length < 10) {
+                        isEnd = true;
+                    }
+                    for (int i = 0; i < length; i++) {
+                        try {
+                            repos.add(from(list.get(i)));
+                        } catch (Exception jsonException) {
+                            continue;
+                        }
+                    }
+                    loadUrl();
+                } else {
+                    Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                }
+            }
+        });
+    }
+
+    public static Repo from(HashMap<String, Object> object) throws Exception {
+        Repo repo = new Repo();
+
+        repo.setDescription(object.get("description").toString());
+        repo.setForksCount(Long.valueOf(object.get("forksCount").toString()));
+        repo.setHtmlUrl(object.get("htmlUrl").toString());
+        repo.setId(Long.valueOf(object.get("id").toString()));
+        repo.setPrivateRepo(Boolean.valueOf(object.get("isPrivate").toString()));
+        repo.setLanguage(object.get("language").toString());
+        repo.setName(object.get("name").toString());
+        Owner owner = new Owner();
+        owner.setAvatarUrl(object.get("ownerAvatarUrl").toString());
+        owner.setFollowersUrl(object.get("ownerFollowersUrl").toString());
+        owner.setFollowingUrl(object.get("ownerFollowingUrl").toString());
+        owner.setHtmlUrl(object.get("ownerHtmlUrl").toString());
+        owner.setId(Integer.valueOf(object.get("ownerId").toString()));
+        owner.setLogin(object.get("ownerLogin").toString());
+        owner.setReposUrl(object.get("ownerReposUrl").toString());
+        repo.setOwner(owner);
+        repo.setStargazersCount(Long.valueOf(object.get("stargazersCount").toString()));
+
+        return repo;
+    }
+
+    private void loadUrl() {
+        Repo repo = repos.get(nowPosition);
+        dbRecRepo = dbHelper.getRepoById(repo.getId());
+        if (dbRecRepo == null) {
+            dbRecRepo = new DBRecRepo();
+            dbRecRepo.setRepo_id(repo.getId());
+        }
+        if (dbRecRepo.isStar() || dbRecRepo.isSkip() || dbRecRepo.isFork()) {
+            nowPosition++;
+            loadUrl();
+            return;
+        }
+        mEmptyView.setVisibility(View.GONE);
+        mWebView.loadUrl(repo.getHtmlUrl());
+        mProgressBar.setVisibility(View.GONE);
+        checkIsStar(repo, dbRecRepo);
+    }
+
+    private void checkIsStar(Repo repo, final DBRecRepo dbRecRepo) {
+        starProgressBar.setVisibility(View.VISIBLE);
+        final DBRecRepo checkRepo = dbRecRepo;
+        ApiManager.getInstance().isStarred(repo.getOwner().getLogin(),
+                repo.getName(), new ApiCallback<Object>() {
+                    @Override
+                    public void success(Object o, Response response) {
+                        if (response.getStatus() == 204) {
+                            checkRepo.setIsStar(true);
+                        } else {
+                            checkRepo.setIsStar(false);
+                        }
+                        if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
+                            starProgressBar.setVisibility(View.GONE);
+                            if (checkRepo.isStar()) {
+                                starText.setText(R.string.recommend_bottom_label_unstar);
+                            } else {
+                                starText.setText(R.string.recommend_bottom_label_star);
+                            }
+                        } else {
+                            dbHelper.updateRepo(checkRepo);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        starProgressBar.setVisibility(View.GONE);
+                        super.failure(error);
+                    }
+                });
+    }
+
+    @Override
+    public void onClick(View v) {
+        Repo repo = repos.get(nowPosition);
+        switch (v.getId()) {
+            case R.id.recommend_star:
+                ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
+                        new ApiCallback<Object>() {
+                            @Override
+                            public void success(Object o, Response response) {
+
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                super.failure(error);
+                            }
+                        });
+                break;
+            case R.id.recommend_fork:
+                ApiManager.getInstance().fork(repo.getOwner().getLogin(), repo.getName(),
+                        new ApiCallback<ForkRepo>() {
+                            @Override
+                            public void success(ForkRepo forkRepo, Response response) {
+                                if (dbRecRepo.getId() != 0) {
+                                    dbRecRepo.setIsFork(true);
+                                    dbHelper.updateRepo(dbRecRepo);
+                                } else {
+                                    dbRecRepo.setIsFork(true);
+                                    int id = dbHelper.insertRepo(dbRecRepo);
+                                    dbRecRepo.setId(id);
+                                }
+                                Logger.toast(mContext, R.string.toast_fork_recommend_success);
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                super.failure(error);
+                            }
+                        });
+                break;
+            case R.id.recommend_skip:
+                nowPosition++;
+                if (nowPosition == repos.size()) {
+                    fetchSearchGeneDate();
+                    return;
+                }
+                dbRecRepo.setIsSkip(true);
+                if (dbRecRepo.getId() != 0) {
+                    dbHelper.updateRepo(dbRecRepo);
+                } else {
+                    int id = dbHelper.insertRepo(dbRecRepo);
+                    dbRecRepo.setId(id);
+                }
+                dbHelper.updateRepo(dbRecRepo);
+                loadUrl();
+                break;
+            default:
+                break;
+        }
     }
 }

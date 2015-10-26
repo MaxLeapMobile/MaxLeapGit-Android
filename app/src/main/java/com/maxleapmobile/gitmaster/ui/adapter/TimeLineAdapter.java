@@ -9,6 +9,7 @@
 package com.maxleapmobile.gitmaster.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -22,11 +23,14 @@ import android.widget.TextView;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
-import com.maxleapmobile.gitmaster.ui.widget.URLSpanNoUnderline;
+import com.maxleapmobile.gitmaster.ui.activity.RepoDetailActivity;
+import com.maxleapmobile.gitmaster.ui.activity.UserInfoActivity;
+import com.maxleapmobile.gitmaster.ui.widget.CustomClickableSpan;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.TimeUtil;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.List;
 
 public class TimeLineAdapter extends BaseAdapter {
@@ -70,19 +74,38 @@ public class TimeLineAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        TimeLineEvent event = mEvents.get(position);
+        final TimeLineEvent event = mEvents.get(position);
+
+        CustomClickableSpan.TextClickListener nameClickListen = new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                Intent intent = new Intent(mContext, UserInfoActivity.class);
+                intent.putExtra(Const.USERNAME, event.getActor().getLogin());
+                mContext.startActivity(intent);
+            }
+        };
+        CustomClickableSpan.TextClickListener repoClickListen = new CustomClickableSpan.TextClickListener() {
+            @Override
+            public void onClick() {
+                Intent intent = new Intent(mContext, RepoDetailActivity.class);
+                String fullName = event.getRepo().getName();
+                intent.putExtra(RepoDetailActivity.REPONAME, fullName.substring(fullName.lastIndexOf(File.separator) + 1));
+                intent.putExtra(RepoDetailActivity.OWNER, fullName.substring(0, fullName.lastIndexOf(File.separator)));
+                mContext.startActivity(intent);
+            }
+        };
         SpannableString ss = null;
         if (event.getType() == ActionType.WatchEvent) {
             ss = new SpannableString(event.getActor().getLogin() +
                     " starred " + event.getRepo().getName());
-            ss.setSpan(new URLSpanNoUnderline(event.getActor().getUrl()), 0, event.getActor().getLogin().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            ss.setSpan(new URLSpanNoUnderline(event.getRepo().getUrl()),
+            ss.setSpan(new CustomClickableSpan(nameClickListen), 0, event.getActor().getLogin().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            ss.setSpan(new CustomClickableSpan(repoClickListen),
                     event.getActor().getLogin().length() + 9, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         } else if (event.getType() == ActionType.ForkEvent) {
             ss = new SpannableString(event.getActor().getLogin() +
                     " forked " + event.getRepo().getName());
-            ss.setSpan(new URLSpanNoUnderline(event.getActor().getUrl()), 0, event.getActor().getLogin().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            ss.setSpan(new URLSpanNoUnderline(event.getRepo().getUrl()),
+            ss.setSpan(new CustomClickableSpan(nameClickListen), 0, event.getActor().getLogin().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            ss.setSpan(new CustomClickableSpan(repoClickListen),
                     event.getActor().getLogin().length() + 8, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         holder.content.setText(ss);

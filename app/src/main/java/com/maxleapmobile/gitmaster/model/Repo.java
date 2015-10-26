@@ -167,10 +167,10 @@ public class Repo {
     private String sshUrl;
     @Expose
     @SerializedName("stargazers_count")
-    private long stagazersCount;
+    private long stargazersCount;
     @Expose
     @SerializedName("stargazers_url")
-    private String stagazersUrl;
+    private String stargazersUrl;
     @Expose
     @SerializedName("statuses_url")
     private String statusesUrl;
@@ -635,20 +635,20 @@ public class Repo {
         this.sshUrl = sshUrl;
     }
 
-    public long getStagazersCount() {
-        return stagazersCount;
+    public long getStargazersCount() {
+        return stargazersCount;
     }
 
-    public void setStagazersCount(long stagazersCount) {
-        this.stagazersCount = stagazersCount;
+    public void setStargazersCount(long stargazersCount) {
+        this.stargazersCount = stargazersCount;
     }
 
-    public String getStagazersUrl() {
-        return stagazersUrl;
+    public String getStargazersUrl() {
+        return stargazersUrl;
     }
 
-    public void setStagazersUrl(String stagazersUrl) {
-        this.stagazersUrl = stagazersUrl;
+    public void setStargazersUrl(String stargazersUrl) {
+        this.stargazersUrl = stargazersUrl;
     }
 
     public String getStatusesUrl() {
@@ -796,8 +796,8 @@ public class Repo {
                 ", releasesUrl='" + releasesUrl + '\'' +
                 ", size=" + size +
                 ", sshUrl='" + sshUrl + '\'' +
-                ", stagazersCount=" + stagazersCount +
-                ", stagazersUrl='" + stagazersUrl + '\'' +
+                ", stargazersCount=" + stargazersCount +
+                ", stargazersUrl='" + stargazersUrl + '\'' +
                 ", statusesUrl='" + statusesUrl + '\'' +
                 ", subscribersUrl='" + subscribersUrl + '\'' +
                 ", subscriptionUrl='" + subscriptionUrl + '\'' +

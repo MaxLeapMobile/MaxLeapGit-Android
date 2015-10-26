@@ -146,9 +146,11 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_timeline) {
+            titleView.setText(R.string.activity_main_item_timeline);
             getSupportFragmentManager().beginTransaction().
                     replace(R.id.content_main, timelineFragment).commit();
         } else if (id == R.id.nav_recommend) {
+            titleView.setText(R.string.activity_main_item_recommend);
             if (recommendFragment == null) {
                 recommendFragment = new RecommendFragment();
             }
@@ -156,6 +158,7 @@ public class MainActivity extends BaseActivity
                     replace(R.id.content_main, recommendFragment).commit();
 
         } else if (id == R.id.nav_mine) {
+            titleView.setText(R.string.activity_main_item_mine);
             if (mineFragment == null) {
                 Bundle bundle = new Bundle();
                 bundle.putString(Const.USERNAME, PreferenceUtil.getString(this, Const.USERNAME, null));
