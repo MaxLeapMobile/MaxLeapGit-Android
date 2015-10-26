@@ -10,9 +10,6 @@ package com.maxleapmobile.gitmaster.util;
 
 public class Const {
 
-    // app key
-    public static final String CLIENT_ID = "50dda6f9b0fb6df426b3";
-    public static final String CLIENT_SECRET = "d9d2ccc08b0aa44ee4069b51ea190f11086eedd1";
     public static final String CALLBACK_URL = "http://stackoverflow.com/";
 
     // Preference key
