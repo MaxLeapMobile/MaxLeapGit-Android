@@ -75,6 +75,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private DBRecRepo dbRecRepo;
     private DBHelper dbHelper;
     private boolean isEnd;
+    private boolean isReview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             @Override
             public void onClick() {
                 mEmptyView.setVisibility(View.GONE);
+                isReview = true;
                 mWebView.loadUrl(repos.get(0).getHtmlUrl());
             }
         }), mContext.getString(R.string.recommend_notice3_part1).length(), notice3SS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -128,67 +130,55 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             mParmasMap = new HashMap();
         }
         if (repos == null) {
-            fetchTrendingGeneDate();
+            getGenes();
         }
         if (dbHelper == null) {
             dbHelper = DBHelper.getInstance(mContext);
         }
     }
 
-    private void fetchTrendingGeneDate() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isEnd && nowPosition == repos.size() - 1) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            compareGenes();
+        }
+    }
+
+    private void getGenes() {
         UserManager.getInstance().checkIsLogin(new OperationCallback() {
             @Override
             public void success() {
                 MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
                     @Override
                     public void done(List<MLObject> list, MLException e) {
-                        genes = new ArrayList<>();
                         if (e == null) {
-                            for (MLObject o : list) {
-                                genes.add(Gene.from(o));
-                            }
-                            mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
-                            JSONArray jsonArray = new JSONArray();
-                            for (int i = 0; i < genes.size(); i++) {
-                                JSONObject jsonObject = new JSONObject();
-                                try {
-                                    jsonObject.put("language", genes.get(i).getLanguage());
-                                    jsonObject.put("skill", genes.get(i).getSkill());
-                                    jsonArray.put(i, jsonObject);
-                                } catch (Exception jsonException) {
-
+                            genes = new ArrayList<>();
+                            if (e == null) {
+                                for (MLObject o : list) {
+                                    genes.add(Gene.from(o));
                                 }
-                            }
-                            mParmasMap.put("genes", jsonArray);
-                            mParmasMap.put("page", page);
-                            mParmasMap.put("per_page", PER_PAGE);
-                            mParmasMap.put("type", "trending");
-                            MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
-                                @Override
-                                public void done(List<HashMap<String, Object>> list, MLException e) {
-                                    if (e == null) {
-                                        if (repos == null) {
-                                            repos = new ArrayList<>();
-                                        }
-                                        int length = list.size();
-                                        if (length == 0) {
-                                            fetchSearchGeneDate();
-                                            return;
-                                        }
-                                        for (int i = 0; i < length; i++) {
-                                            try {
-                                                repos.add(from(list.get(i)));
-                                            } catch (Exception jsonException) {
-                                                continue;
-                                            }
-                                        }
-                                        nowPosition = 0;
-                                        loadUrl();
-                                    } else {
-                                        Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                                mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
+                                JSONArray jsonArray = new JSONArray();
+                                for (int i = 0; i < genes.size(); i++) {
+                                    JSONObject jsonObject = new JSONObject();
+                                    try {
+                                        jsonObject.put("language", genes.get(i).getLanguage());
+                                        jsonObject.put("skill", genes.get(i).getSkill());
+                                        jsonArray.put(i, jsonObject);
+                                    } catch (Exception jsonException) {
+
                                     }
                                 }
-                            });
+                                mParmasMap.put("genes", jsonArray);
+                                mParmasMap.put("page", page);
+                                mParmasMap.put("per_page", PER_PAGE);
+                                mParmasMap.put("type", "trending");
+                                fetchTrendingGeneDate();
+                            } else {
+                                Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                            }
                         } else {
                             Logger.toast(mContext, R.string.toast_get_recommend_failed);
                         }
@@ -199,6 +189,62 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             @Override
             public void failed(String error) {
                 Logger.toast(mContext, R.string.toast_get_recommend_failed);
+            }
+        });
+    }
+
+    private void compareGenes() {
+        MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
+            @Override
+            public void done(List<MLObject> list, MLException e) {
+                if (e == null) {
+                    for (int i = 0; i < list.size(); i++) {
+                        Gene gene = Gene.from(list.get(i));
+                        if (genes.contains(gene)) {
+                            if (i == list.size() - 1) {
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                            continue;
+                        } else {
+                            isEnd = false;
+                            isReview = false;
+                            repos.clear();
+                            fetchTrendingGeneDate();
+                            break;
+                        }
+                    }
+                } else {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void fetchTrendingGeneDate() {
+        MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
+            @Override
+            public void done(List<HashMap<String, Object>> list, MLException e) {
+                if (e == null) {
+                    if (repos == null) {
+                        repos = new ArrayList<>();
+                    }
+                    int length = list.size();
+                    if (length == 0) {
+                        fetchSearchGeneDate();
+                        return;
+                    }
+                    for (int i = 0; i < length; i++) {
+                        try {
+                            repos.add(from(list.get(i)));
+                        } catch (Exception jsonException) {
+                            continue;
+                        }
+                    }
+                    nowPosition = 0;
+                    loadUrl();
+                } else {
+                    Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                }
             }
         });
     }
@@ -266,7 +312,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             dbRecRepo = new DBRecRepo();
             dbRecRepo.setRepo_id(repo.getId());
         }
-        if (dbRecRepo.isStar() || dbRecRepo.isSkip() || dbRecRepo.isFork()) {
+        if (dbRecRepo.isStar() || isReview ? false : dbRecRepo.isSkip() || dbRecRepo.isFork()) {
             nowPosition++;
             loadUrl();
             return;
