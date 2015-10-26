@@ -13,24 +13,24 @@
     </string-array>
 
     <string-array name="html">
-        <item>html5</item>
-        <item>bootstrap</item>
+        <item>Html5</item>
+        <item>Bootstrap</item>
     </string-array>
 
     <string-array name="java">
         <item>Android</item>
-        <item>spring</item>
+        <item>Spring</item>
     </string-array>
 
     <string-array name="javascript">
-        <item>angularjs</item>
-        <item>bootstrap</item>
-        <item>jquery</item>
-        <item>node</item>
+        <item>Angularjs</item>
+        <item>Bootstrap</item>
+        <item>Jquery</item>
+        <item>Node</item>
     </string-array>
 
     <string-array name="objective">
-        <item>iOS</item>
+        <item>IOS</item>
     </string-array>
 
     <string-array name="php">
@@ -38,16 +38,16 @@
     </string-array>
 
     <string-array name="python">
-        <item>web framework</item>
+        <item>Web Framework</item>
     </string-array>
 
     <string-array name="swift">
-        <item>iOS</item>
+        <item>IOS</item>
     </string-array>
 
     <string-array name="c11">
-        <item>asp</item>
-        <item>xamarin</item>
+        <item>Asp</item>
+        <item>Xamarin</item>
     </string-array>
 
 </resources>
