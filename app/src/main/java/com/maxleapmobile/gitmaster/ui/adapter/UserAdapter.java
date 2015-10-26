@@ -8,9 +8,9 @@
  */
 package com.maxleapmobile.gitmaster.ui.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +90,7 @@ public class UserAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
                 builder.setTitle(R.string.dialog_unfollow_title);
                 builder.setMessage(String.format(mContext.getString(R.string.dialog_unfollow), item.getLogin()));
                 builder.setPositiveButton(R.string.dialog_sure, new DialogInterface.OnClickListener() {
