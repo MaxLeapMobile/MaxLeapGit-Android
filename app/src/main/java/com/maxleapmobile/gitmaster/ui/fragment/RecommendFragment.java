@@ -18,6 +18,10 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -59,6 +63,7 @@ import retrofit.client.Response;
 public class RecommendFragment extends Fragment implements View.OnClickListener {
 
     private static final int PER_PAGE = 10;
+    private static final String READ_ME_SUFFIX = "/blob/master/README.md";
     private int page = 1;
 
     private Context mContext;
@@ -124,6 +129,15 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         notice3.setText(notice3SS.toString());
 
         mWebView = (ProgressWebView) view.findViewById(R.id.recommend_webview);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (view.getUrl().equals(repos.get(nowPosition).getHtmlUrl() + READ_ME_SUFFIX)) {
+                    mWebView.loadUrl(repos.get(nowPosition).getHtmlUrl());
+                }
+            }
+        });
         mEmptyView = (LinearLayout) view.findViewById(R.id.recommend_empty);
         mEmptyView.setVisibility(View.GONE);
         if (mParmasMap == null) {
@@ -318,7 +332,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             return;
         }
         mEmptyView.setVisibility(View.GONE);
-        mWebView.loadUrl(repo.getHtmlUrl());
+        mWebView.loadUrl(repo.getHtmlUrl() + READ_ME_SUFFIX);
         mProgressBar.setVisibility(View.GONE);
         checkIsStar(repo);
     }
@@ -345,6 +359,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     public void failure(RetrofitError error) {
                         if (error.getResponse().getStatus() == 404) {
                             checkRepo.setIsStar(false);
+                        } else {
+                            super.failure(error);
+                            return;
                         }
                         if (checkRepo.getRepo_id() == dbRecRepo.getRepo_id()) {
                             starText.setText(R.string.recommend_bottom_label_star);
@@ -352,7 +369,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                             dbHelper.updateRepo(checkRepo);
                         }
                         starProgressBar.setVisibility(View.GONE);
-                        super.failure(error);
                     }
                 });
     }
