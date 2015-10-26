@@ -23,7 +23,6 @@ import android.widget.ListView;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.ui.adapter.TimeLineAdapter;
@@ -42,6 +41,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private static final String TAG = TimelineFragment.class.getSimpleName();
 
     private Context mContext;
+    private String username;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listview;
     private TimeLineAdapter mAdapter;
@@ -61,6 +61,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
+        username = PreferenceUtil.getString(mContext, Const.USERNAME, null);
         mHandler = new Handler();
     }
 
@@ -85,7 +86,6 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         listview.setAdapter(mAdapter);
         if (mEvents.size() < Const.PER_PAGE_COUNT) {
-            mHandler.postDelayed(mProgressRunnable, 500);
             fetchEvents();
         }
     }
@@ -101,13 +101,17 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void fetchEvents() {
-        if (UserManager.getInstance().getCurrentUser() == null) {
+        if (username == null) {
             mHandler.removeCallbacks(mProgressRunnable);
             mSwipeRefreshLayout.setRefreshing(false);
             return;
+        } else {
+            if (mEvents.size() < Const.PER_PAGE_COUNT) {
+                mHandler.postDelayed(mProgressRunnable, 500);
+            }
         }
         isGettingMore = true;
-        ApiManager.getInstance().getReceivedEvents(PreferenceUtil.getString(mContext, Const.USERNAME, null),
+        ApiManager.getInstance().getReceivedEvents(username,
                 initPageCount, Const.PER_PAGE_COUNT, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
                     public void success(List<TimeLineEvent> timeLineEvents, Response response) {

@@ -71,10 +71,11 @@
 
             <ProgressBar
                 android:id="@+id/recommend_star_progressbar"
+                style="?android:attr/progressBarStyleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#0076FF"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </FrameLayout>
 

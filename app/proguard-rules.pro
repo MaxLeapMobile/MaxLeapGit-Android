@@ -20,13 +20,15 @@
 -keep class com.maxleap.** { *; }
 
 -keep class com.squareup.okhttp.** { *; }
--keep class retrofit.** { *; }
 -keep interface com.squareup.okhttp.** { *; }
 
 -dontwarn com.squareup.okhttp.**
 -dontwarn okio.**
+
 -dontwarn retrofit.**
--dontwarn rx.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
 
 -keepclasseswithmembers class * {
     @retrofit.http.* <methods>;
@@ -34,5 +36,10 @@
 
 -keep class com.maxleapmobile.gitmaster.model.** { *; }
 -dontwarn com.maxleapmobile.gitmaster.model.**
+
+-dontwarn com.flurry.**
+-keep class com.flurry.** { *; }
+
+
 
 
