@@ -171,14 +171,12 @@ public class MainActivity extends BaseActivity
 
                     @Override
                     public void failed(String error) {
-                        System.currentTimeMillis();
                     }
                 });
             }
 
             @Override
             public void failure(RetrofitError error) {
-                super.failure(error);
             }
         });
     }
