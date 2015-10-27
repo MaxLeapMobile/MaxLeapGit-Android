@@ -42,4 +42,8 @@
         android:layout_marginRight="16dp"
         android:background="@color/color_divider" />
 
+    <include
+        android:id="@+id/add_gene_progressbar"
+        android:layout="@layout/view_progressbar"/>
+
 </LinearLayout>

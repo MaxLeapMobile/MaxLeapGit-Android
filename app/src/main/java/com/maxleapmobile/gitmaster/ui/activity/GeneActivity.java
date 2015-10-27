@@ -24,7 +24,6 @@ import com.maxleap.FindCallback;
 import com.maxleap.MLObject;
 import com.maxleap.MLQuery;
 import com.maxleap.MLQueryManager;
-import com.maxleap.MLRelation;
 import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
@@ -33,7 +32,9 @@ import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.ui.adapter.GeneAdapter;
 import com.maxleapmobile.gitmaster.ui.widget.HorizontalDividerItemDecoration;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,10 @@ public class GeneActivity extends BaseActivity {
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
     private GeneAdapter mGeneAdapter;
-    private List<Gene> mGenes;
+    private ArrayList<Gene> mGenes;
+
+    private String mUsername;
+    private MLQuery<MLObject> mQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,10 @@ public class GeneActivity extends BaseActivity {
         initViews();
 
         mContext = getApplicationContext();
+        mUsername = PreferenceUtil.getString(mContext, Const.USERNAME, null);
+        mQuery = MLQuery.getQuery("Gene");
+        mQuery.whereEqualTo("githubName", mUsername);
+
         mGenes = new ArrayList<>();
         mGeneAdapter = new GeneAdapter(this, mGenes);
         mRecyclerView.setAdapter(mGeneAdapter);
@@ -143,6 +151,7 @@ public class GeneActivity extends BaseActivity {
                 Intent intent = new Intent(GeneActivity.this, AddGeneActivity.class);
                 intent.putExtra(AddGeneActivity.INTENT_KEY_TITLE,
                         getString(R.string.activity_add_new_gene));
+                intent.putExtra("list", mGenes);
                 startActivityForResult(intent, ADD_REQUEST_CODE);
             }
         });
@@ -150,33 +159,21 @@ public class GeneActivity extends BaseActivity {
 
     private void fetchGeneData() {
         mProgressBar.setVisibility(View.VISIBLE);
-        MLRelation mlRelation = UserManager.getInstance().getCurrentUser().getGenes();
-        mlRelation.setTargetClass("Gene");
-        final MLQuery<MLObject> query = mlRelation.getQuery();
-        UserManager.getInstance().checkIsLogin(new OperationCallback() {
+        MLQueryManager.findAllInBackground(mQuery, new FindCallback<MLObject>() {
             @Override
-            public void success() {
-                MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
-                    @Override
-                    public void done(List<MLObject> list, MLException e) {
-                        mProgressBar.setVisibility(View.GONE);
-                        if (e == null) {
-                            mGenes.clear();
-                            for (MLObject object : list) {
-                                mGenes.add(Gene.from(object));
-                                mGeneAdapter.notifyDataSetChanged();
-                            }
-                        } else {
+            public void done(List<MLObject> list, MLException e) {
+                mProgressBar.setVisibility(View.GONE);
+                if (e == null) {
+                    mGenes.clear();
 
-                        }
-
+                    for (MLObject object : list) {
+                        mGenes.add(Gene.from(object));
                     }
-                });
-            }
+                    mGeneAdapter.notifyDataSetChanged();
 
-            @Override
-            public void failed(String error) {
-                Logger.toast(mContext, getString(R.string.toast_gene_fetch_fail));
+                } else {
+                    Logger.toast(mContext, getString(R.string.toast_gene_fetch_fail));
+                }
             }
         });
     }
@@ -184,60 +181,8 @@ public class GeneActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
-            String language = data.getStringExtra(AddGeneActivity.INTENT_KEY_LANGUAGE);
-            String skill = data.getStringExtra(AddGeneActivity.INTENT_KEY_SKILL);
-            Gene gene = new Gene();
-            gene.setLanguage(language);
-            gene.setSkill(skill);
-            if (mGenes.contains(gene)) {
-                Logger.toast(mContext, R.string.toast_already_have_gene);
-            } else {
-                UserManager.getInstance().addGene(gene,
-                        new OperationCallback() {
-                            @Override
-                            public void success() {
-                                Logger.toast(mContext,
-                                        getString(R.string.toast_save_gene_success));
-                                fetchGeneData();
-                            }
-
-                            @Override
-                            public void failed(String error) {
-                                Logger.toast(mContext,
-                                        getString(R.string.toast_save_gene_failed));
-                            }
-                        });
-            }
-        } else if (requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
-            String language = data.getStringExtra(AddGeneActivity.INTENT_KEY_LANGUAGE);
-            String skill = data.getStringExtra(AddGeneActivity.INTENT_KEY_SKILL);
-            String id = data.getStringExtra(AddGeneActivity.INTENT_KEY_ID);
-            Gene gene = new Gene();
-            gene.setObjectId(id);
-            gene.setLanguage(language);
-            gene.setSkill(skill);
-
-            if (mGenes.contains(gene)) {
-                Logger.toast(mContext, R.string.toast_already_have_gene);
-            } else {
-                mProgressBar.setVisibility(View.VISIBLE);
-                UserManager.getInstance().updateGene(gene, new OperationCallback() {
-                    @Override
-                    public void success() {
-                        Logger.toast(mContext,
-                                getString(R.string.toast_update_gene_success));
-                        fetchGeneData();
-                    }
-
-                    @Override
-                    public void failed(String error) {
-                        Logger.toast(mContext,
-                                getString(R.string.toast_update_gene_failed));
-                    }
-                });
-            }
-
+        if (resultCode == RESULT_OK) {
+            fetchGeneData();
         }
     }
 }

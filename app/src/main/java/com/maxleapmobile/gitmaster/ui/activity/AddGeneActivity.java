@@ -8,15 +8,21 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
+import com.maxleapmobile.gitmaster.calllback.OperationCallback;
+import com.maxleapmobile.gitmaster.manage.UserManager;
+import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.Radio;
 import com.maxleapmobile.gitmaster.util.DialogUtil;
 import com.maxleapmobile.gitmaster.util.Logger;
@@ -36,12 +42,15 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
     private TextView mSkillView;
     private ArrayList<Radio> mLanguageList;
     private ArrayList<Radio> mSkillList;
+    private ArrayList<Gene> mGenes;
+    private Context mContext;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_gene);
-
+        mContext = getApplicationContext();
         init();
     }
 
@@ -51,6 +60,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
         mLanguage = data.getStringExtra(INTENT_KEY_LANGUAGE);
         mSkill = data.getStringExtra(INTENT_KEY_SKILL);
         mObjectId = data.getStringExtra(INTENT_KEY_ID);
+        mGenes = (ArrayList<Gene>) data.getSerializableExtra("list");
 
         initToolbar();
         initUI();
@@ -68,6 +78,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
             mSkillView.setTextColor(Color.BLACK);
         }
         mLanguageList = getLanguageList();
+        mProgressBar = (ProgressBar) findViewById(R.id.add_gene_progressbar);
     }
 
     private void initToolbar() {
@@ -98,12 +109,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                     Logger.toast(this, R.string.toast_gene_not_select_skill);
                     return;
                 }
-                Intent intent = new Intent(AddGeneActivity.this, GeneActivity.class);
-                intent.putExtra(INTENT_KEY_LANGUAGE, mLanguage);
-                intent.putExtra(INTENT_KEY_SKILL, mSkill);
-                intent.putExtra(INTENT_KEY_ID, mObjectId);
-                setResult(RESULT_OK, intent);
-                finish();
+                saveGene(mObjectId, mLanguage, mSkill);
                 break;
             case R.id.gene_language:
                 DialogUtil.showGeneDialog(this, mLanguageList, new DialogUtil.CheckListener() {
@@ -220,6 +226,64 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                 radio.setChecked(true);
             }
             radios.add(radio);
+        }
+    }
+
+    private void saveGene(String objectId, String language, String skill) {
+        mProgressBar.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(objectId)) {
+            Gene gene = new Gene();
+            gene.setObjectId(objectId);
+            gene.setLanguage(language);
+            gene.setSkill(skill);
+            if (mGenes.contains(gene)) {
+                mProgressBar.setVisibility(View.GONE);
+                Logger.toast(mContext, R.string.toast_already_have_gene);
+                return;
+            }
+            UserManager.getInstance().updateGene(gene, new OperationCallback() {
+                @Override
+                public void success() {
+                    mProgressBar.setVisibility(View.GONE);
+                    Logger.toast(mContext,
+                            getString(R.string.toast_update_gene_success));
+                    setResult(RESULT_OK);
+                    finish();
+                }
+
+                @Override
+                public void failed(String error) {
+                    mProgressBar.setVisibility(View.GONE);
+                    Logger.toast(mContext,
+                            getString(R.string.toast_update_gene_failed));
+                }
+            });
+        } else {
+            Gene gene = new Gene();
+            gene.setLanguage(language);
+            gene.setSkill(skill);
+            if (mGenes.contains(gene)) {
+                mProgressBar.setVisibility(View.GONE);
+                Logger.toast(mContext, R.string.toast_already_have_gene);
+                return;
+            }
+            UserManager.getInstance().addGene(gene, new OperationCallback() {
+                @Override
+                public void success() {
+                    mProgressBar.setVisibility(View.GONE);
+                    Logger.toast(mContext,
+                            getString(R.string.toast_save_gene_success));
+                    setResult(RESULT_OK);
+                    finish();
+                }
+
+                @Override
+                public void failed(String error) {
+                    mProgressBar.setVisibility(View.GONE);
+                    Logger.toast(mContext,
+                            getString(R.string.toast_save_gene_failed));
+                }
+            });
         }
     }
 
