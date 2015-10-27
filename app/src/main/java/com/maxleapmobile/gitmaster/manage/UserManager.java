@@ -10,10 +10,10 @@ package com.maxleapmobile.gitmaster.manage;
 
 import android.text.TextUtils;
 
+import com.maxleap.DeleteCallback;
 import com.maxleap.LogInCallback;
 import com.maxleap.MLDataManager;
 import com.maxleap.MLObject;
-import com.maxleap.MLRelation;
 import com.maxleap.MLUser;
 import com.maxleap.MLUserManager;
 import com.maxleap.SaveCallback;
@@ -24,8 +24,15 @@ import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.model.Gene;
+import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.TimeUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -110,6 +117,7 @@ public class UserManager {
                             }
                         }
                     });
+                    createGenes(user);
                 }
             }
         });
@@ -153,13 +161,46 @@ public class UserManager {
         mlUser.put("githubUpdateTime", TimeUtil.getDateFromString(user.getUpdateAt()));
     }
 
+    public void createGenes(final User user) {
+        final HashMap<String, String> skills = new HashMap<>();
+        skills.put("Html", "Html5, Bootstrap");
+        skills.put("Java", "Android, Spring");
+        skills.put("Javascript", "AngularJS, Bootstrap, jQuery, Node");
+        skills.put("Objective-C", "iOS");
+        skills.put("PHP", "Laravel, CodeIgniter");
+        skills.put("Python", "Web Framework");
+        skills.put("Swift", "iOS");
+        ApiManager.getInstance().listReposByPage(user.getLogin(), 1, Const.PER_PAGE_COUNT, new ApiCallback<List<Repo>>() {
+            @Override
+            public void success(List<Repo> repos, Response response) {
+                if (repos != null && !repos.isEmpty()) {
+                    HashSet<String> geneSet = new HashSet<>();
+                    List<MLObject> genes = new ArrayList<>();
+                    for (Repo repo : repos) {
+                        if (geneSet.contains(repo.getLanguage())
+                                || skills.get(repo.getLanguage()) == null) {
+                            continue;
+                        }
+                        MLObject gene = new MLObject("Gene");
+                        gene.put("githubName", user.getLogin());
+                        gene.put("language", repo.getLanguage());
+                        gene.put("skill", skills.get(repo.getLanguage()));
+                        geneSet.add(repo.getLanguage());
+                    }
+                    MLDataManager.saveAllInBackground(genes);
+                }
+            }
+        });
+    }
+
     /**
      * add a gene to current user and push gene into cloud data
      *
      * @param gene
      */
-    public void addGene(Gene gene, final OperationCallback callback) {
+    public void addGene(String username, Gene gene, final OperationCallback callback) {
         final MLObject obj = new MLObject("Gene");
+        obj.put("githubName", username);
         obj.put("language", gene.getLanguage());
         obj.put("skill", gene.getSkill());
 
@@ -167,19 +208,7 @@ public class UserManager {
             @Override
             public void done(MLException e) {
                 if (e == null) {
-                    MLRelation relation = MLUser.getCurrentUser().getRelation("genes");
-                    relation.add(obj);
-                    getCurrentUser().setGenes(relation);
-                    MLUserManager.saveInBackground(MLUser.getCurrentUser(), new SaveCallback() {
-                        @Override
-                        public void done(MLException e) {
-                            if (e == null) {
-                                callback.success();
-                            } else {
-                                callback.failed(e.getMessage());
-                            }
-                        }
-                    });
+                    callback.success();
                 } else {
                     callback.failed(e.getMessage());
                 }
@@ -192,7 +221,7 @@ public class UserManager {
      *
      * @param gene
      */
-    public void updateGene(Gene gene, final OperationCallback callback) {
+    public void updateGene(String username, Gene gene, final OperationCallback callback) {
         if (TextUtils.isEmpty(gene.getObjectId())) {
             callback.failed("gene object id must be set");
         }
@@ -200,6 +229,7 @@ public class UserManager {
         MLObject obj = new MLObject("Gene");
         obj.setObjectId(gene.getObjectId());
 
+        obj.put("githubName", username);
         obj.put("language", gene.getLanguage());
         obj.put("skill", gene.getSkill());
 
@@ -228,10 +258,7 @@ public class UserManager {
         MLObject obj = new MLObject("Gene");
         obj.setObjectId(gene.getObjectId());
 
-        MLRelation relation = MLUser.getCurrentUser().getRelation("genes");
-        relation.remove(obj);
-        getCurrentUser().setGenes(relation);
-        MLUserManager.saveInBackground(MLUser.getCurrentUser(), new SaveCallback() {
+        MLDataManager.deleteInBackground(obj, new DeleteCallback() {
             @Override
             public void done(MLException e) {
                 if (e == null) {
