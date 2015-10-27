@@ -375,7 +375,7 @@
                             android:paddingLeft="@dimen/mine_card_padding"
                             android:textColor="@color/label_value_color"
                             android:textSize="14sp"
-                            android:text="@{user.createAt.substring(0, 9)}"/>
+                            android:text="@{user.createAt.substring(0, 10)}"/>
 
                     </RelativeLayout>
 
