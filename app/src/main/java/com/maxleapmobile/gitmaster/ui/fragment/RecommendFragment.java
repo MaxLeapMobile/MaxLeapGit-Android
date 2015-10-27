@@ -39,7 +39,7 @@ import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.Owner;
 import com.maxleapmobile.gitmaster.model.Repo;
-import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
+import com.maxleapmobile.gitmaster.ui.activity.AddGeneActivity;
 import com.maxleapmobile.gitmaster.ui.widget.CustomClickableSpan;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Const;
@@ -74,7 +74,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private String username;
     private MLQuery<MLObject> query;
     private List<Repo> repos;
-    private List<Gene> genes;
+    private ArrayList<Gene> genes;
     private Map<String, Object> mParmasMap;
     private int nowPosition;
     private DBRecRepo dbRecRepo;
@@ -128,6 +128,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         mEmptyView.setVisibility(View.GONE);
         if (mParmasMap == null) {
             mParmasMap = new HashMap();
+            mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
+            mParmasMap.put("page", page);
+            mParmasMap.put("per_page", PER_PAGE);
         }
         if (repos == null) {
             genes = new ArrayList<>();
@@ -154,7 +157,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     for (MLObject o : list) {
                         genes.add(Gene.from(o));
                     }
-                    mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
                     JSONArray jsonArray = new JSONArray();
                     for (int i = 0; i < genes.size(); i++) {
                         JSONObject jsonObject = new JSONObject();
@@ -167,16 +169,14 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         }
                     }
                     mParmasMap.put("genes", jsonArray);
-                    mParmasMap.put("page", page);
-                    mParmasMap.put("per_page", PER_PAGE);
-                    mParmasMap.put("type", "trending");
                     fetchTrendingGeneDate();
                 } else {
                     Logger.d("get genes failed");
                     if (e.getCode() == MLException.OBJECT_NOT_FOUND) {
                         isEnd = true;
                         fetchSearchGeneDate();
-                        return;
+                    } else {
+                        Logger.toast(mContext, R.string.toast_get_recommend_failed);
                     }
                 }
             }
@@ -202,12 +202,25 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     }
                     if (needRefresh) {
                         genes = newGenes;
+                        JSONArray jsonArray = new JSONArray();
+                        for (int i = 0; i < genes.size(); i++) {
+                            JSONObject jsonObject = new JSONObject();
+                            try {
+                                jsonObject.put("language", genes.get(i).getLanguage());
+                                jsonObject.put("skill", genes.get(i).getSkill());
+                                jsonArray.put(i, jsonObject);
+                            } catch (Exception jsonException) {
+
+                            }
+                        }
+                        mParmasMap.put("genes", jsonArray);
                         isEnd = false;
                         isReview = false;
                         repos.clear();
                         fetchTrendingGeneDate();
                     } else {
                         mProgressBar.setVisibility(View.GONE);
+                        mEmptyView.setVisibility(View.GONE);
                     }
                 } else {
                     Logger.d("compareGenes failed");
@@ -218,6 +231,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void fetchTrendingGeneDate() {
+        mParmasMap.put("type", "trending");
         Logger.d("fetchTrendingGeneDate start");
         MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
             @Override
@@ -357,7 +371,10 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.recommend_notice2:
-                Intent intent = new Intent(mContext, GeneActivity.class);
+                Intent intent = new Intent(mContext, AddGeneActivity.class);
+                intent.putExtra(AddGeneActivity.INTENT_KEY_TITLE,
+                        getString(R.string.activity_add_new_gene));
+                intent.putExtra(AddGeneActivity.INTENT_LIST, genes);
                 startActivity(intent);
                 break;
             case R.id.recommend_notice3:

@@ -95,7 +95,7 @@
 
     <!-- recommend fragment -->
     <string name="recommend_notice1">That\'s all about it!</string>
-    <string name="recommend_notice2_part1">Edit genes</string>
+    <string name="recommend_notice2_part1">Add new gene</string>
     <string name="recommend_notice2_part2"> to find more repo\n worth recommending.</string>
     <string name="recommend_notice3_part1">Or you can </string>
     <string name="recommend_notice3_part2">view this recommend list again.</string>
