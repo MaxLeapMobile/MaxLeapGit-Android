@@ -71,7 +71,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
             @Override
             public void success(Repo repo, Response response) {
                 mProgressBar.setVisibility(View.GONE);
-                mWebView.loadUrl(repo.getHtmlUrl());
+                mWebView.loadUrl(repo.getHtmlUrl(), true);
             }
 
             @Override
