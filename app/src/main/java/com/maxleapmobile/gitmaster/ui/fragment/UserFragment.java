@@ -123,7 +123,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
     private void fetchOrgData() {
         Logger.d("=======>> call fetchOrgData");
         mProgressBar.setVisibility(View.VISIBLE);
-        ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
+        ApiCallback<List<Organzation>> apiCallback = new ApiCallback<List<Organzation>>() {
             @Override
             public void success(List<Organzation> organzations, Response response) {
                 if (organzations != null) {
@@ -138,7 +138,13 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                 }
                 mProgressBar.setVisibility(View.GONE);
             }
-        });
+        };
+
+        if (mUsername.equals(UserManager.getInstance().getCurrentUser().getLogin())) {
+            ApiManager.getInstance().getOrg(apiCallback);
+        } else {
+            ApiManager.getInstance().getUserOrgs(mUsername, apiCallback);
+        }
     }
 
     private void fetchFollowerData(int page) {
