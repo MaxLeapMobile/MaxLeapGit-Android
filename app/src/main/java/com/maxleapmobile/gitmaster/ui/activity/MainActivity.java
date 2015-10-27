@@ -24,6 +24,7 @@ import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.RecommendFragment;
 import com.maxleapmobile.gitmaster.ui.fragment.TimelineFragment;
 import com.maxleapmobile.gitmaster.util.Const;
+import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import retrofit.RetrofitError;
@@ -38,6 +39,7 @@ public class MainActivity extends BaseActivity
     private TimelineFragment timelineFragment;
     private MineFragment mineFragment;
     private RecommendFragment recommendFragment;
+    private long mLastBackPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +114,12 @@ public class MainActivity extends BaseActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (System.currentTimeMillis() - mLastBackPressedTime < 2000) {
+                super.onBackPressed();
+            } else {
+                mLastBackPressedTime = System.currentTimeMillis();
+                Logger.toast(this, R.string.exit);
+            }
         }
     }
 
@@ -164,14 +171,12 @@ public class MainActivity extends BaseActivity
 
                     @Override
                     public void failed(String error) {
-                        System.currentTimeMillis();
                     }
                 });
             }
 
             @Override
             public void failure(RetrofitError error) {
-                super.failure(error);
             }
         });
     }

@@ -17,13 +17,18 @@ public class CustomClickableSpan extends ClickableSpan {
 
     private TextClickListener textClickListener;
 
+    public CustomClickableSpan() {
+    }
+
     public CustomClickableSpan(TextClickListener textClickListener) {
         this.textClickListener = textClickListener;
     }
 
     @Override
     public void onClick(View widget) {
-        textClickListener.onClick();
+        if (textClickListener != null) {
+            textClickListener.onClick();
+        }
     }
 
     @Override

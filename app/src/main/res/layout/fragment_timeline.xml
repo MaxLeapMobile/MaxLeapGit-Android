@@ -21,6 +21,16 @@
                 android:divider="#20000000"
                 android:dividerHeight="1px" />
 
+            <TextView
+                android:id="@+id/timeline_empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="@string/time_line_refresh_failed"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
         </android.support.v4.widget.SwipeRefreshLayout>
 
     </FrameLayout>

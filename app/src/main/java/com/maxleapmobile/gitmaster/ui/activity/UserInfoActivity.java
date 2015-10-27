@@ -80,7 +80,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void failure(RetrofitError error) {
                 super.failure(error);
-                if (error.getResponse().getStatus() == 404) {
+                if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
                     mFollowStatus = false;
                     mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }

@@ -18,10 +18,6 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,16 +26,15 @@ import com.maxleap.FindCallback;
 import com.maxleap.FunctionCallback;
 import com.maxleap.MLCloudManager;
 import com.maxleap.MLObject;
+import com.maxleap.MLQuery;
 import com.maxleap.MLQueryManager;
 import com.maxleap.MLUser;
 import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.database.DBHelper;
 import com.maxleapmobile.gitmaster.database.DBRecRepo;
-import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.Owner;
@@ -47,7 +42,9 @@ import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 import com.maxleapmobile.gitmaster.ui.widget.CustomClickableSpan;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,7 +60,6 @@ import retrofit.client.Response;
 public class RecommendFragment extends Fragment implements View.OnClickListener {
 
     private static final int PER_PAGE = 10;
-    private static final String READ_ME_SUFFIX = "/blob/master/README.md";
     private int page = 1;
 
     private Context mContext;
@@ -72,8 +68,11 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private LinearLayout mEmptyView;
     private TextView starText;
     private ProgressBar starProgressBar;
+    private TextView notice3;
     private View skipBtn;
 
+    private String username;
+    private MLQuery<MLObject> query;
     private List<Repo> repos;
     private List<Gene> genes;
     private Map<String, Object> mParmasMap;
@@ -87,6 +86,10 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
+        username = PreferenceUtil.getString(mContext, Const.USERNAME, null);
+        query = MLQuery.getQuery("Gene");
+        query.whereEqualTo("githubName", username);
+        dbHelper = DBHelper.getInstance(mContext);
     }
 
     @Override
@@ -108,128 +111,106 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         mProgressBar.setVisibility(View.VISIBLE);
         TextView notice2 = (TextView) view.findViewById(R.id.recommend_notice2);
         SpannableString notice2SS = new SpannableString(mContext.getString(R.string.recommend_notice2_part1)
-                + mContext.getString(R.string.recommend_notice2_part2));
-        notice2SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
-            @Override
-            public void onClick() {
-                Intent intent = new Intent(mContext, GeneActivity.class);
-                startActivity(intent);
-            }
-        }), 0, mContext.getString(R.string.recommend_notice2_part1).length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        notice2.setText(notice2SS.toString());
-        TextView notice3 = (TextView) view.findViewById(R.id.recommend_notice3);
-        SpannableString notice3SS = new SpannableString(mContext.getString(R.string.recommend_notice3_part1)
-                + mContext.getString(R.string.recommend_notice3_part2));
-        notice3SS.setSpan(new CustomClickableSpan(new CustomClickableSpan.TextClickListener() {
-            @Override
-            public void onClick() {
-                mEmptyView.setVisibility(View.GONE);
-                isReview = true;
-                mWebView.loadUrl(repos.get(0).getHtmlUrl());
-            }
-        }), mContext.getString(R.string.recommend_notice3_part1).length(), notice3SS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        notice3.setText(notice3SS.toString());
+                + " " + mContext.getString(R.string.recommend_notice2_part2));
+        notice2SS.setSpan(new CustomClickableSpan(), 0, mContext.getString(R.string.recommend_notice2_part1).length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice2.setText(notice2SS);
+        notice2.setOnClickListener(this);
+        notice3 = (TextView) view.findViewById(R.id.recommend_notice3);
+        final SpannableString notice3SS = new SpannableString(mContext.getString(R.string.recommend_notice3_part1)
+                + " " + mContext.getString(R.string.recommend_notice3_part2));
+        notice3SS.setSpan(new CustomClickableSpan(), mContext.getString(R.string.recommend_notice3_part1).length(), notice3SS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notice3.setText(notice3SS);
+        notice3.setOnClickListener(this);
 
         mWebView = (ProgressWebView) view.findViewById(R.id.recommend_webview);
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                super.onReceivedError(view, request, error);
-                if (view.getUrl().equals(repos.get(nowPosition).getHtmlUrl() + READ_ME_SUFFIX)) {
-                    mWebView.loadUrl(repos.get(nowPosition).getHtmlUrl());
-                }
-            }
-        });
+
         mEmptyView = (LinearLayout) view.findViewById(R.id.recommend_empty);
         mEmptyView.setVisibility(View.GONE);
         if (mParmasMap == null) {
             mParmasMap = new HashMap();
         }
         if (repos == null) {
+            genes = new ArrayList<>();
+            repos = new ArrayList<>();
             getGenes();
-        }
-        if (dbHelper == null) {
-            dbHelper = DBHelper.getInstance(mContext);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isEnd && nowPosition == repos.size() - 1) {
+        if (isEnd) {
             mProgressBar.setVisibility(View.VISIBLE);
             compareGenes();
         }
     }
 
     private void getGenes() {
-        UserManager.getInstance().checkIsLogin(new OperationCallback() {
+        MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
             @Override
-            public void success() {
-                MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
-                    @Override
-                    public void done(List<MLObject> list, MLException e) {
-                        if (e == null) {
-                            genes = new ArrayList<>();
-                            if (e == null) {
-                                for (MLObject o : list) {
-                                    genes.add(Gene.from(o));
-                                }
-                                mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
-                                JSONArray jsonArray = new JSONArray();
-                                for (int i = 0; i < genes.size(); i++) {
-                                    JSONObject jsonObject = new JSONObject();
-                                    try {
-                                        jsonObject.put("language", genes.get(i).getLanguage());
-                                        jsonObject.put("skill", genes.get(i).getSkill());
-                                        jsonArray.put(i, jsonObject);
-                                    } catch (Exception jsonException) {
+            public void done(List<MLObject> list, MLException e) {
+                if (e == null) {
+                    Logger.d("get genes success");
+                    for (MLObject o : list) {
+                        genes.add(Gene.from(o));
+                    }
+                    mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
+                    JSONArray jsonArray = new JSONArray();
+                    for (int i = 0; i < genes.size(); i++) {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("language", genes.get(i).getLanguage());
+                            jsonObject.put("skill", genes.get(i).getSkill());
+                            jsonArray.put(i, jsonObject);
+                        } catch (Exception jsonException) {
 
-                                    }
-                                }
-                                mParmasMap.put("genes", jsonArray);
-                                mParmasMap.put("page", page);
-                                mParmasMap.put("per_page", PER_PAGE);
-                                mParmasMap.put("type", "trending");
-                                fetchTrendingGeneDate();
-                            } else {
-                                Logger.toast(mContext, R.string.toast_get_recommend_failed);
-                            }
-                        } else {
-                            Logger.toast(mContext, R.string.toast_get_recommend_failed);
                         }
                     }
-                });
-            }
-
-            @Override
-            public void failed(String error) {
-                Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                    mParmasMap.put("genes", jsonArray);
+                    mParmasMap.put("page", page);
+                    mParmasMap.put("per_page", PER_PAGE);
+                    mParmasMap.put("type", "trending");
+                    fetchTrendingGeneDate();
+                } else {
+                    Logger.d("get genes failed");
+                    if (e.getCode() == MLException.OBJECT_NOT_FOUND) {
+                        isEnd = true;
+                        fetchSearchGeneDate();
+                        return;
+                    }
+                }
             }
         });
     }
 
     private void compareGenes() {
-        MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
+        Logger.d("compareGenes start");
+        MLQueryManager.findAllInBackground(query, new FindCallback<MLObject>() {
             @Override
             public void done(List<MLObject> list, MLException e) {
                 if (e == null) {
+                    Logger.d("compareGenes success");
+                    boolean needRefresh = false;
+                    ArrayList<Gene> newGenes = new ArrayList<>();
                     for (int i = 0; i < list.size(); i++) {
                         Gene gene = Gene.from(list.get(i));
-                        if (genes.contains(gene)) {
-                            if (i == list.size() - 1) {
-                                mProgressBar.setVisibility(View.GONE);
-                            }
-                            continue;
-                        } else {
-                            isEnd = false;
-                            isReview = false;
-                            repos.clear();
-                            fetchTrendingGeneDate();
-                            break;
+                        if (!needRefresh && !genes.contains(gene)) {
+                            genes.add(gene);
+                            needRefresh = true;
                         }
+                        newGenes.add(gene);
+                    }
+                    if (needRefresh) {
+                        genes = newGenes;
+                        isEnd = false;
+                        isReview = false;
+                        repos.clear();
+                        fetchTrendingGeneDate();
+                    } else {
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 } else {
+                    Logger.d("compareGenes failed");
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
@@ -237,13 +218,12 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void fetchTrendingGeneDate() {
+        Logger.d("fetchTrendingGeneDate start");
         MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
             @Override
             public void done(List<HashMap<String, Object>> list, MLException e) {
                 if (e == null) {
-                    if (repos == null) {
-                        repos = new ArrayList<>();
-                    }
+                    Logger.d("fetchTrendingGeneDate success");
                     int length = list.size();
                     if (length == 0) {
                         fetchSearchGeneDate();
@@ -259,6 +239,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     nowPosition = 0;
                     loadUrl();
                 } else {
+                    Logger.d("fetchTrendingGeneDate failed");
                     Logger.toast(mContext, R.string.toast_get_recommend_failed);
                 }
             }
@@ -268,16 +249,23 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private void fetchSearchGeneDate() {
         if (isEnd) {
             mEmptyView.setVisibility(View.VISIBLE);
+            if (repos.size() == 0) {
+                notice3.setVisibility(View.INVISIBLE);
+            } else {
+                notice3.setVisibility(View.VISIBLE);
+            }
             mProgressBar.setVisibility(View.GONE);
             return;
         }
         mProgressBar.setVisibility(View.VISIBLE);
         mParmasMap.put("page", page++);
         mParmasMap.put("type", "search");
+        Logger.d("fetchSearchGeneDate start");
         MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
             @Override
             public void done(List<HashMap<String, Object>> list, MLException e) {
                 if (e == null) {
+                    Logger.d("fetchSearchGeneDate succes");
                     int length = list.size();
                     if (length < 10) {
                         isEnd = true;
@@ -291,6 +279,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     }
                     loadUrl();
                 } else {
+                    Logger.d("fetchSearchGeneDate failed");
                     Logger.toast(mContext, R.string.toast_get_recommend_failed);
                 }
             }
@@ -334,7 +323,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             return;
         }
         mEmptyView.setVisibility(View.GONE);
-        mWebView.loadUrl(repo.getHtmlUrl() + READ_ME_SUFFIX);
+        mWebView.loadUrl(repo.getHtmlUrl(), true);
         mProgressBar.setVisibility(View.GONE);
         checkIsStar(repo);
     }
@@ -366,11 +355,19 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        Repo repo = repos.get(nowPosition);
         switch (v.getId()) {
+            case R.id.recommend_notice2:
+                Intent intent = new Intent(mContext, GeneActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.recommend_notice3:
+                mEmptyView.setVisibility(View.GONE);
+                isReview = true;
+                mWebView.loadUrl(repos.get(0).getHtmlUrl());
+                break;
             case R.id.recommend_star:
                 starProgressBar.setVisibility(View.VISIBLE);
-                ApiManager.getInstance().star(repo.getOwner().getLogin(), repo.getName(),
+                ApiManager.getInstance().star(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<Object>() {
                             @Override
                             public void success(Object o, Response response) {
@@ -385,7 +382,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         });
                 break;
             case R.id.recommend_fork:
-                ApiManager.getInstance().fork(repo.getOwner().getLogin(), repo.getName(),
+                ApiManager.getInstance().fork(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<ForkRepo>() {
                             @Override
                             public void success(ForkRepo forkRepo, Response response) {

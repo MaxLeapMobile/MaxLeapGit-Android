@@ -48,7 +48,7 @@ public class TimeLineAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mEvents.size() / Const.PER_PAGE_COUNT * Const.PER_PAGE_COUNT;
+        return mEvents.size();
     }
 
     @Override

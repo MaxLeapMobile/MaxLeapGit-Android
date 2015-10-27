@@ -26,8 +26,6 @@
     <string name="toast_update_gene_failed">Update gene failed.</string>
     <string name="toast_star_recommend_success">Star Success!</string>
     <string name="toast_star_recommend_failed">Star failed! Try again!</string>
-    <string name="toast_unstar_recommend_success">Unstar Success!</string>
-    <string name="toast_unstar_recommend_failed">Unstar failed! Try again!</string>
     <string name="toast_fork_recommend_success">Fork Success!</string>
 
     <string name="activity_main_item_timeline">Timeline</string>
@@ -83,6 +81,8 @@
     <string name="time_line_months_ago">%1$d months ago</string>
     <string name="time_line_year_ago">a year ago</string>
     <string name="time_line_years_ago">%1$d years ago</string>
+    <string name="time_line_refresh_failed">Failed to get Timeline Event!</string>
+    <string name="time_line_no_date">No Timeline Event!</string>
 
     <!-- login activity -->
     <string name="activity_permission_notice">GitMaster needs permission\nto access your account</string>
@@ -110,5 +110,7 @@
     <string name="toast_gene_delete_failed">Delete gene failed.</string>
     <string name="toast_gene_delete_success">Delete gene success</string>
     <string name="toast_gene_fetch_fail">Get gene data failed.</string>
+
+    <string name="exit">Press back again to exit</string>
 
 </resources>

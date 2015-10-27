@@ -20,21 +20,39 @@
             android:value="wandoujia" />
 
 
-        <activity android:name=".ui.activity.PermissionActivity">
+        <activity
+            android:name=".ui.activity.PermissionActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity" />
-        <activity android:name=".ui.activity.LoginActivity" />
-        <activity android:name=".ui.activity.SearchActivity" />
-        <activity android:name=".ui.activity.UserInfoActivity" />
-        <activity android:name=".ui.activity.ContainerActivity" />
-        <activity android:name=".ui.activity.RepoDetailActivity" />
-        <activity android:name=".ui.activity.GeneActivity" />
-        <activity android:name=".ui.activity.AddGeneActivity" />
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.SearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.UserInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ContainerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.RepoDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.GeneActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.AddGeneActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
