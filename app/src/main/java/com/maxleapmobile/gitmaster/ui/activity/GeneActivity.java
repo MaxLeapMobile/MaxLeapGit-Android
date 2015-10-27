@@ -151,7 +151,7 @@ public class GeneActivity extends BaseActivity {
                 Intent intent = new Intent(GeneActivity.this, AddGeneActivity.class);
                 intent.putExtra(AddGeneActivity.INTENT_KEY_TITLE,
                         getString(R.string.activity_add_new_gene));
-                intent.putExtra("list", mGenes);
+                intent.putExtra(AddGeneActivity.INTENT_LIST, mGenes);
                 startActivityForResult(intent, ADD_REQUEST_CODE);
             }
         });

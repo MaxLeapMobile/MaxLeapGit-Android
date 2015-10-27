@@ -22,7 +22,7 @@ import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.ui.activity.AddGeneActivity;
 import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
 
@@ -41,9 +41,9 @@ public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
     }
 
     private Activity mContext;
-    private List<Gene> mGeneList;
+    private ArrayList<Gene> mGeneList;
 
-    public GeneAdapter(Activity context, List<Gene> list) {
+    public GeneAdapter(Activity context, ArrayList<Gene> list) {
         this.mContext = context;
         this.mGeneList = list;
     }
@@ -72,6 +72,7 @@ public class GeneAdapter extends RecyclerView.Adapter<GeneAdapter.ViewHolder> {
                 intent.putExtra(AddGeneActivity.INTENT_KEY_LANGUAGE, item.getLanguage());
                 intent.putExtra(AddGeneActivity.INTENT_KEY_SKILL, item.getSkill());
                 intent.putExtra(AddGeneActivity.INTENT_KEY_ID, item.getObjectId());
+                intent.putExtra(AddGeneActivity.INTENT_LIST, mGeneList);
                 mContext.startActivityForResult(intent, GeneActivity.EDIT_REQUEST_CODE);
             }
         });

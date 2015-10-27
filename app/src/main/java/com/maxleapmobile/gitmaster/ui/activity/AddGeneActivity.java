@@ -24,8 +24,10 @@ import com.maxleapmobile.gitmaster.calllback.OperationCallback;
 import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.Gene;
 import com.maxleapmobile.gitmaster.model.Radio;
+import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.DialogUtil;
 import com.maxleapmobile.gitmaster.util.Logger;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
     public static final String INTENT_KEY_LANGUAGE = "language";
     public static final String INTENT_KEY_SKILL = "skill";
     public static final String INTENT_KEY_ID = "objectid";
+    public static final String INTENT_LIST = "list";
     private String mTitle;
     private String mLanguage;
     private String mSkill;
@@ -45,12 +48,14 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
     private ArrayList<Gene> mGenes;
     private Context mContext;
     private ProgressBar mProgressBar;
+    private String mUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_gene);
         mContext = getApplicationContext();
+        mUsername = PreferenceUtil.getString(mContext, Const.USERNAME, null);
         init();
     }
 
@@ -60,7 +65,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
         mLanguage = data.getStringExtra(INTENT_KEY_LANGUAGE);
         mSkill = data.getStringExtra(INTENT_KEY_SKILL);
         mObjectId = data.getStringExtra(INTENT_KEY_ID);
-        mGenes = (ArrayList<Gene>) data.getSerializableExtra("list");
+        mGenes = (ArrayList<Gene>) data.getSerializableExtra(INTENT_LIST);
 
         initToolbar();
         initUI();
@@ -241,7 +246,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                 Logger.toast(mContext, R.string.toast_already_have_gene);
                 return;
             }
-            UserManager.getInstance().updateGene(gene, new OperationCallback() {
+            UserManager.getInstance().updateGene(mUsername, gene, new OperationCallback() {
                 @Override
                 public void success() {
                     mProgressBar.setVisibility(View.GONE);
@@ -267,7 +272,7 @@ public class AddGeneActivity extends BaseActivity implements View.OnClickListene
                 Logger.toast(mContext, R.string.toast_already_have_gene);
                 return;
             }
-            UserManager.getInstance().addGene(gene, new OperationCallback() {
+            UserManager.getInstance().addGene(mUsername, gene, new OperationCallback() {
                 @Override
                 public void success() {
                     mProgressBar.setVisibility(View.GONE);
