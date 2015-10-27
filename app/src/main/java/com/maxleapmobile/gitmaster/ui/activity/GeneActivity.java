@@ -44,7 +44,7 @@ public class GeneActivity extends BaseActivity {
     public static final int EDIT_REQUEST_CODE = 101;
 
     private Context mContext;
-    
+
     private Toolbar mToolbar;
     private TextView mTitle;
     private TextView mAddGene;
@@ -165,14 +165,15 @@ public class GeneActivity extends BaseActivity {
                 mProgressBar.setVisibility(View.GONE);
                 if (e == null) {
                     mGenes.clear();
-
                     for (MLObject object : list) {
                         mGenes.add(Gene.from(object));
                     }
                     mGeneAdapter.notifyDataSetChanged();
 
                 } else {
-                    Logger.toast(mContext, getString(R.string.toast_gene_fetch_fail));
+                    if (!(e.getCode() == MLException.OBJECT_NOT_FOUND)) {
+                        Logger.toast(mContext, getString(R.string.toast_gene_fetch_fail));
+                    }
                 }
             }
         });
