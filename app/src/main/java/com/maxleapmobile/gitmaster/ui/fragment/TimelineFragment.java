@@ -28,6 +28,7 @@ import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.ui.adapter.TimeLineAdapter;
 import com.maxleapmobile.gitmaster.util.Const;
+import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private int pageCount = 1;
     private boolean isGettingMore;
     private boolean isEnd;
-    private int eventTargetSize;
+    private int originalTotal = 0;
 
     private Runnable mProgressRunnable = new Runnable() {
         @Override
@@ -87,7 +88,6 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         listview.setOnScrollListener(this);
         if (mEvents == null) {
             mEvents = new ArrayList<>();
-            eventTargetSize = 15;
             fetchEvents();
         }
         if (mAdapter == null) {
@@ -96,8 +96,8 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         listview.setAdapter(mAdapter);
     }
 
-    private void initData() {
-        if (!isEnd && mEvents.size() < eventTargetSize) {
+    private void initData(boolean needFetch) {
+        if (needFetch) {
             fetchEvents();
             return;
         }
@@ -107,7 +107,8 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         } else {
             emptyView.setVisibility(View.GONE);
         }
-        mAdapter.notifyDataSetChanged(eventTargetSize);
+        originalTotal = mEvents.size();
+        mAdapter.notifyDataSetChanged();
         mHandler.removeCallbacks(mProgressRunnable);
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -123,6 +124,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
         isGettingMore = true;
+        Logger.d("pageCount=" + pageCount + "======REQUEST_PER_PAGE=" + REQUEST_PER_PAGE);
         ApiManager.getInstance().getReceivedEvents(username,
                 pageCount, REQUEST_PER_PAGE, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
@@ -140,9 +142,10 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                         }
                         mEvents.addAll(timeLineEvents);
 
-                        pageCount = (pageCount < MAX_PAGE_COUNT) ? pageCount++ : MAX_PAGE_COUNT;
+                        pageCount = (pageCount < MAX_PAGE_COUNT) ? pageCount + 1 : MAX_PAGE_COUNT;
                         isGettingMore = false;
-                        initData();
+                        boolean needRefresh = !isEnd && (mEvents.size() - originalTotal) < GET_PER_PAGE;
+                        initData(needRefresh);
                     }
 
                     @Override
@@ -150,6 +153,9 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                         if (mEvents.size() == 0) {
                             emptyView.setVisibility(View.VISIBLE);
                             emptyView.setText(R.string.time_line_refresh_failed);
+                        }
+                        if (error.getResponse().getStatus() == 422) {
+                            isEnd = true;
                         }
                         isGettingMore = false;
                         mHandler.removeCallbacks(mProgressRunnable);
@@ -161,9 +167,9 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         isEnd = false;
-        pageCount = 0;
+        pageCount = 1;
         mEvents.clear();
-        eventTargetSize = 15;
+        originalTotal = 0;
         fetchEvents();
     }
 
@@ -171,13 +177,8 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if ((firstVisibleItem + visibleItemCount) == totalItemCount && !isGettingMore
                 && totalItemCount >= GET_PER_PAGE && !isEnd) {
-            eventTargetSize = eventTargetSize + GET_PER_PAGE;
-            if (mEvents.size() >= eventTargetSize) {
-                mAdapter.notifyDataSetChanged(eventTargetSize);
-            } else {
-                fetchEvents();
-                mHandler.post(mProgressRunnable);
-            }
+            fetchEvents();
+            mHandler.post(mProgressRunnable);
         }
     }
 

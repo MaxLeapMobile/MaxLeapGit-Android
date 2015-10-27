@@ -39,7 +39,6 @@ public class TimeLineAdapter extends BaseAdapter {
     private Context mContext;
     private List<TimeLineEvent> mEvents;
     private long now;
-    private int count;
 
     public TimeLineAdapter(Context context, List<TimeLineEvent> events) {
         this.mContext = context;
@@ -49,7 +48,7 @@ public class TimeLineAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return count;
+        return mEvents.size();
     }
 
     @Override
@@ -122,10 +121,6 @@ public class TimeLineAdapter extends BaseAdapter {
     public void notifyDataSetChanged() {
         now = getUTCNow();
         super.notifyDataSetChanged();
-    }
-
-    public void notifyDataSetChanged(int count) {
-        this.count = count;
     }
 
     static class ViewHolder {
