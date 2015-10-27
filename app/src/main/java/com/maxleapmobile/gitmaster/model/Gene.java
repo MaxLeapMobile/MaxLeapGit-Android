@@ -10,7 +10,9 @@ package com.maxleapmobile.gitmaster.model;
 
 import com.maxleap.MLObject;
 
-public class Gene {
+import java.io.Serializable;
+
+public class Gene implements Serializable{
     private String language;
     private String skill;
     private String objectId;
