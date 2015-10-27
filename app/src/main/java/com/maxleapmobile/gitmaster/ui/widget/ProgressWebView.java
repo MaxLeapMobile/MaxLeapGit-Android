@@ -17,10 +17,21 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.maxleap.external.volley.RequestQueue;
+import com.maxleap.external.volley.Response;
+import com.maxleap.external.volley.VolleyError;
+import com.maxleap.external.volley.toolbox.StringRequest;
+import com.maxleap.external.volley.toolbox.Volley;
+import com.maxleapmobile.gitmaster.GithubApplication;
+
 public class ProgressWebView extends WebView {
+
+    private static final String READ_ME_SUFFIX = "/blob/master/README.md";
+
     private WebViewProgressBar progressBar;
     private Handler handler;
     private WebView _this;
+
     public ProgressWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         progressBar = new WebViewProgressBar(context);
@@ -38,19 +49,20 @@ public class ProgressWebView extends WebView {
     private class MyWebChromeClient extends WebChromeClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
-            if(newProgress == 100){
+            if (newProgress == 100) {
                 progressBar.setProgress(100);
-                handler.postDelayed(runnable,200);
-            }else if(progressBar.getVisibility() == GONE){
+                handler.postDelayed(runnable, 200);
+            } else if (progressBar.getVisibility() == GONE) {
                 progressBar.setVisibility(VISIBLE);
             }
-            if(newProgress < 5){
+            if (newProgress < 5) {
                 newProgress = 5;
             }
             progressBar.setProgress(newProgress);
             super.onProgressChanged(view, newProgress);
         }
     }
+
     private class MyWebClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -58,10 +70,31 @@ public class ProgressWebView extends WebView {
             return true;
         }
     }
+
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             progressBar.setVisibility(View.GONE);
         }
     };
+
+    public void loadUrl(final String url, boolean isRepo) {
+        final String readMeUrl = url + READ_ME_SUFFIX;
+        if (isRepo) {
+            RequestQueue mQueue = Volley.newRequestQueue(GithubApplication.getInstance());
+            mQueue.add(new StringRequest(readMeUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String s) {
+                    loadUrl(readMeUrl);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    loadUrl(url);
+                }
+            }));
+        } else {
+            loadUrl(readMeUrl);
+        }
+    }
 }

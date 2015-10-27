@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
@@ -27,6 +28,7 @@ import com.maxleapmobile.gitmaster.model.ActionType;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.ui.adapter.TimeLineAdapter;
 import com.maxleapmobile.gitmaster.util.Const;
+import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
@@ -37,18 +39,22 @@ import retrofit.client.Response;
 
 public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
-
-    private static final String TAG = TimelineFragment.class.getSimpleName();
+    private static final int REQUEST_PER_PAGE = 50;
+    private static final int MAX_PAGE_COUNT = 6;
+    private static final int GET_PER_PAGE = 15;
 
     private Context mContext;
     private String username;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listview;
+    private TextView emptyView;
     private TimeLineAdapter mAdapter;
     private Handler mHandler;
     private List<TimeLineEvent> mEvents;
-    private int initPageCount = 0;
+    private int pageCount = 1;
     private boolean isGettingMore;
+    private boolean isEnd;
+    private int originalTotal = 0;
 
     private Runnable mProgressRunnable = new Runnable() {
         @Override
@@ -74,78 +80,103 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void initUI(View view) {
+        emptyView = (TextView) view.findViewById(R.id.timeline_empty_view);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.timeline_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green, R.color.blue);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         listview = (ListView) view.findViewById(R.id.timeline_event_list);
+        listview.setOnScrollListener(this);
         if (mEvents == null) {
             mEvents = new ArrayList<>();
+            fetchEvents();
         }
         if (mAdapter == null) {
             mAdapter = new TimeLineAdapter(mContext, mEvents);
         }
         listview.setAdapter(mAdapter);
-        if (mEvents.size() < Const.PER_PAGE_COUNT) {
-            fetchEvents();
-        }
     }
 
-    private void initData() {
-        if (mEvents.size() < Const.PER_PAGE_COUNT) {
+    private void initData(boolean needFetch) {
+        if (needFetch) {
             fetchEvents();
             return;
         }
+        if (isEnd && mEvents.size() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(R.string.time_line_no_date);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+        originalTotal = mEvents.size();
         mAdapter.notifyDataSetChanged();
         mHandler.removeCallbacks(mProgressRunnable);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void fetchEvents() {
-        if (username == null) {
+        if (username == null || isEnd) {
             mHandler.removeCallbacks(mProgressRunnable);
             mSwipeRefreshLayout.setRefreshing(false);
             return;
         } else {
-            if (mEvents.size() < Const.PER_PAGE_COUNT) {
+            if (mEvents.size() < GET_PER_PAGE) {
                 mHandler.postDelayed(mProgressRunnable, 500);
             }
         }
         isGettingMore = true;
+        Logger.d("pageCount=" + pageCount + "======REQUEST_PER_PAGE=" + REQUEST_PER_PAGE);
         ApiManager.getInstance().getReceivedEvents(username,
-                initPageCount, Const.PER_PAGE_COUNT, new ApiCallback<List<TimeLineEvent>>() {
+                pageCount, REQUEST_PER_PAGE, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
                     public void success(List<TimeLineEvent> timeLineEvents, Response response) {
-                        mEvents.addAll(timeLineEvents);
-                        for (int i = 0; i < mEvents.size(); ) {
-                            if (mEvents.get(i).getType() == ActionType.ForkEvent ||
-                                    mEvents.get(i).getType() == ActionType.WatchEvent) {
+                        if (pageCount == MAX_PAGE_COUNT || REQUEST_PER_PAGE > timeLineEvents.size()) {
+                            isEnd = true;
+                        }
+                        for (int i = 0; i < timeLineEvents.size(); ) {
+                            if (timeLineEvents.get(i).getType() == ActionType.ForkEvent ||
+                                    timeLineEvents.get(i).getType() == ActionType.WatchEvent) {
                                 i++;
                             } else {
-                                mEvents.remove(i);
+                                timeLineEvents.remove(i);
                             }
                         }
-                        initPageCount++;
+                        mEvents.addAll(timeLineEvents);
+
+                        pageCount = (pageCount < MAX_PAGE_COUNT) ? pageCount + 1 : MAX_PAGE_COUNT;
                         isGettingMore = false;
-                        initData();
+                        boolean needRefresh = !isEnd && (mEvents.size() - originalTotal) < GET_PER_PAGE;
+                        initData(needRefresh);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        super.failure(error);
+                        if (mEvents.size() == 0) {
+                            emptyView.setVisibility(View.VISIBLE);
+                            emptyView.setText(R.string.time_line_refresh_failed);
+                        }
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 422) {
+                            isEnd = true;
+                        }
                         isGettingMore = false;
+                        mHandler.removeCallbacks(mProgressRunnable);
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
     }
 
     @Override
     public void onRefresh() {
+        isEnd = false;
+        pageCount = 1;
+        mEvents.clear();
+        originalTotal = 0;
         fetchEvents();
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if ((firstVisibleItem + visibleItemCount) == totalItemCount && !isGettingMore
-                && totalItemCount >= Const.PER_PAGE_COUNT && totalItemCount % Const.PER_PAGE_COUNT == 0) {
+                && totalItemCount >= GET_PER_PAGE && !isEnd) {
             fetchEvents();
             mHandler.post(mProgressRunnable);
         }
