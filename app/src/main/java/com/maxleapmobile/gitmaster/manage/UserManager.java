@@ -162,14 +162,14 @@ public class UserManager {
     }
 
     public void createGenes(final User user) {
-        final HashMap<String, String> skills = new HashMap<>();
-        skills.put("Html", "Html5, Bootstrap");
-        skills.put("Java", "Android, Spring");
-        skills.put("Javascript", "AngularJS, Bootstrap, jQuery, Node");
-        skills.put("Objective-C", "iOS");
-        skills.put("PHP", "Laravel, CodeIgniter");
-        skills.put("Python", "Web Framework");
-        skills.put("Swift", "iOS");
+        final HashMap<String, String[]> skillsMap = new HashMap<>();
+        skillsMap.put("Html", new String[]{"Html5", "Bootstrap"});
+        skillsMap.put("Java", new String[]{"Android", "Spring"});
+        skillsMap.put("Javascript", new String[]{"AngularJS", "Bootstrap", "jQuery", "Node"});
+        skillsMap.put("Objective-C", new String[]{"iOS"});
+        skillsMap.put("PHP", new String[]{"Laravel", "CodeIgniter"});
+        skillsMap.put("Python", new String[]{"Web Framework"});
+        skillsMap.put("Swift", new String[]{"iOS"});
         ApiManager.getInstance().listReposByPage(user.getLogin(), 1, Const.PER_PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
             public void success(List<Repo> repos, Response response) {
@@ -178,14 +178,17 @@ public class UserManager {
                     List<MLObject> genes = new ArrayList<>();
                     for (Repo repo : repos) {
                         if (geneSet.contains(repo.getLanguage())
-                                || skills.get(repo.getLanguage()) == null) {
+                                || skillsMap.get(repo.getLanguage()) == null) {
                             continue;
                         }
-                        MLObject gene = new MLObject("Gene");
-                        gene.put("githubName", user.getLogin());
-                        gene.put("language", repo.getLanguage());
-                        gene.put("skill", skills.get(repo.getLanguage()));
-                        geneSet.add(repo.getLanguage());
+                        String[] skills = skillsMap.get(repo.getLanguage());
+                        for (int i = 0; i < skills.length; i++) {
+                            MLObject gene = new MLObject("Gene");
+                            gene.put("githubName", user.getLogin());
+                            gene.put("language", repo.getLanguage());
+                            gene.put("skill", skills[i]);
+                            geneSet.add(repo.getLanguage());
+                        }
                     }
                     MLDataManager.saveAllInBackground(genes);
                 }
