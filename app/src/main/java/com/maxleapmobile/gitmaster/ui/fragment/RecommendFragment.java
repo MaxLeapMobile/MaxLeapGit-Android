@@ -157,32 +157,36 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     @Override
                     public void done(List<MLObject> list, MLException e) {
                         if (e == null) {
+                            Logger.d("get genes success");
                             genes = new ArrayList<>();
-                            if (e == null) {
-                                for (MLObject o : list) {
-                                    genes.add(Gene.from(o));
-                                }
-                                mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
-                                JSONArray jsonArray = new JSONArray();
-                                for (int i = 0; i < genes.size(); i++) {
-                                    JSONObject jsonObject = new JSONObject();
-                                    try {
-                                        jsonObject.put("language", genes.get(i).getLanguage());
-                                        jsonObject.put("skill", genes.get(i).getSkill());
-                                        jsonArray.put(i, jsonObject);
-                                    } catch (Exception jsonException) {
-
-                                    }
-                                }
-                                mParmasMap.put("genes", jsonArray);
-                                mParmasMap.put("page", page);
-                                mParmasMap.put("per_page", PER_PAGE);
-                                mParmasMap.put("type", "trending");
-                                fetchTrendingGeneDate();
-                            } else {
-                                Logger.toast(mContext, R.string.toast_get_recommend_failed);
+                            for (MLObject o : list) {
+                                genes.add(Gene.from(o));
                             }
+                            if (genes.size() == 0) {
+                                Gene gene = new Gene();
+                                gene.setLanguage("java");
+                                gene.setSkill("android");
+                                genes.add(gene);
+                            }
+                            mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
+                            JSONArray jsonArray = new JSONArray();
+                            for (int i = 0; i < genes.size(); i++) {
+                                JSONObject jsonObject = new JSONObject();
+                                try {
+                                    jsonObject.put("language", genes.get(i).getLanguage());
+                                    jsonObject.put("skill", genes.get(i).getSkill());
+                                    jsonArray.put(i, jsonObject);
+                                } catch (Exception jsonException) {
+
+                                }
+                            }
+                            mParmasMap.put("genes", jsonArray);
+                            mParmasMap.put("page", page);
+                            mParmasMap.put("per_page", PER_PAGE);
+                            mParmasMap.put("type", "trending");
+                            fetchTrendingGeneDate();
                         } else {
+                            Logger.d("get genes failed");
                             Logger.toast(mContext, R.string.toast_get_recommend_failed);
                         }
                     }
@@ -191,16 +195,19 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
 
             @Override
             public void failed(String error) {
+                Logger.d("check login failed");
                 Logger.toast(mContext, R.string.toast_get_recommend_failed);
             }
         });
     }
 
     private void compareGenes() {
+        Logger.d("compareGenes start");
         MLQueryManager.findAllInBackground(MLUser.getCurrentUser().getRelation("genes").getQuery(), new FindCallback<MLObject>() {
             @Override
             public void done(List<MLObject> list, MLException e) {
                 if (e == null) {
+                    Logger.d("compareGenes success");
                     for (int i = 0; i < list.size(); i++) {
                         Gene gene = Gene.from(list.get(i));
                         if (genes.contains(gene)) {
@@ -217,6 +224,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         }
                     }
                 } else {
+                    Logger.d("compareGenes failed");
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
@@ -224,10 +232,12 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void fetchTrendingGeneDate() {
+        Logger.d("fetchTrendingGeneDate start");
         MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
             @Override
             public void done(List<HashMap<String, Object>> list, MLException e) {
                 if (e == null) {
+                    Logger.d("fetchTrendingGeneDate success");
                     if (repos == null) {
                         repos = new ArrayList<>();
                     }
@@ -246,6 +256,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     nowPosition = 0;
                     loadUrl();
                 } else {
+                    Logger.d("fetchTrendingGeneDate failed");
                     Logger.toast(mContext, R.string.toast_get_recommend_failed);
                 }
             }
@@ -261,10 +272,12 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         mProgressBar.setVisibility(View.VISIBLE);
         mParmasMap.put("page", page++);
         mParmasMap.put("type", "search");
+        Logger.d("fetchSearchGeneDate start");
         MLCloudManager.callFunctionInBackground("repositories", mParmasMap, new FunctionCallback<List<HashMap<String, Object>>>() {
             @Override
             public void done(List<HashMap<String, Object>> list, MLException e) {
                 if (e == null) {
+                    Logger.d("fetchSearchGeneDate succes");
                     int length = list.size();
                     if (length < 10) {
                         isEnd = true;
@@ -278,6 +291,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     }
                     loadUrl();
                 } else {
+                    Logger.d("fetchSearchGeneDate failed");
                     Logger.toast(mContext, R.string.toast_get_recommend_failed);
                 }
             }

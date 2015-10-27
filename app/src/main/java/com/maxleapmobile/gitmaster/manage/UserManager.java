@@ -269,7 +269,7 @@ public class UserManager {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    super.failure(error);
+                    callback.failed(error.getMessage());
                 }
             });
         } else {

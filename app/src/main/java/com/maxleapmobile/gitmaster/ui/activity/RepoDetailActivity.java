@@ -92,7 +92,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
             @Override
             public void failure(RetrofitError error) {
                 super.failure(error);
-                if (error.getResponse().getStatus() == 404) {
+                if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
                     mStar.setText(R.string.bottom_label_star);
                 }
             }

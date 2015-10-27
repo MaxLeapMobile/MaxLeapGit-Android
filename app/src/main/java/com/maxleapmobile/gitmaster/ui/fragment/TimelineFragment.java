@@ -154,7 +154,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                             emptyView.setVisibility(View.VISIBLE);
                             emptyView.setText(R.string.time_line_refresh_failed);
                         }
-                        if (error.getResponse().getStatus() == 422) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 422) {
                             isEnd = true;
                         }
                         isGettingMore = false;
