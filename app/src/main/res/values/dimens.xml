@@ -15,6 +15,7 @@
     <dimen name="mine_label_key_size">15sp</dimen>
     <dimen name="mine_label_value_size">25sp</dimen>
     <dimen name="mine_label_width">89dp</dimen>
+    <dimen name="mine_info_label_margin_top">6dp</dimen>
 
     <dimen name="gene_item_margin">0dp</dimen>
 </resources>
