@@ -111,4 +111,6 @@
     <string name="toast_gene_delete_success">Delete gene success</string>
     <string name="toast_gene_fetch_fail">Get gene data failed.</string>
 
+    <string name="exit">Press back again to exit</string>
+
 </resources>
