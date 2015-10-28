@@ -152,9 +152,11 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             genes = new ArrayList<>();
             repos = new ArrayList<>();
             mProgressBar.setVisibility(View.VISIBLE);
+            actionArea.setEnabled(false);
             getGenes();
         } else {
             mProgressBar.setVisibility(View.VISIBLE);
+            actionArea.setEnabled(false);
             compareGenes();
         }
     }
