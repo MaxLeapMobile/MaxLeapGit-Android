@@ -88,7 +88,6 @@ public class LoginActivity extends BaseActivity {
 
     private void requestAccessToken(String code) {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint(OAUTH_URL)
                 .build();
         GithubApi githubApi = restAdapter.create(GithubApi.class);

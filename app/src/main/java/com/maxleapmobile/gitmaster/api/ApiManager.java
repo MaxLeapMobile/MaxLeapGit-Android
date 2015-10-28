@@ -55,7 +55,6 @@ public class ApiManager {
         okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
         okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
         mRestAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setRequestInterceptor(mRequestInterceptor)
                 .setEndpoint(API_URL)
                 .setClient(new OkClient(okHttpClient))
