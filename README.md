@@ -3,6 +3,7 @@
 GitMaster helps you find exciting projects. Simply specify your genes about your language skills，and GitMaster will tell you about new and interesting projects that you never knew existed!
 
 [![Build Status](https://travis-ci.org/MaxLeapMobile/MaxLeapGit-Android.svg?branch=master)](https://travis-ci.org/MaxLeapMobile/MaxLeapGit-Android)
+[![Version Status](https://img.shields.io/badge/version-1.0-green.svg)](https://github.com/MaxLeapMobile/MaxLeapGit-Android/releases)
 
 ## Languages supported
 
