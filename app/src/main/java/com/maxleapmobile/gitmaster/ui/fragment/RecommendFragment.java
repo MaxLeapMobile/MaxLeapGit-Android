@@ -10,6 +10,7 @@ package com.maxleapmobile.gitmaster.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,8 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,7 +31,6 @@ import com.maxleap.MLCloudManager;
 import com.maxleap.MLObject;
 import com.maxleap.MLQuery;
 import com.maxleap.MLQueryManager;
-import com.maxleap.MLUser;
 import com.maxleap.exception.MLException;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
@@ -70,6 +72,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     private ProgressBar starProgressBar;
     private TextView notice3;
     private View skipBtn;
+    private LinearLayout actionArea;
 
     private String username;
     private MLQuery<MLObject> query;
@@ -101,6 +104,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void initUI(View view) {
+        actionArea = (LinearLayout) view.findViewById(R.id.recommend_action_area);
         starProgressBar = (ProgressBar) view.findViewById(R.id.recommend_star_progressbar);
         starText = (TextView) view.findViewById(R.id.recommend_star);
         starText.setOnClickListener(this);
@@ -108,7 +112,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         skipBtn = view.findViewById(R.id.recommend_skip);
         skipBtn.setOnClickListener(this);
         mProgressBar = (ProgressBar) view.findViewById(R.id.repo_progressbar);
-        mProgressBar.setVisibility(View.VISIBLE);
         TextView notice2 = (TextView) view.findViewById(R.id.recommend_notice2);
         SpannableString notice2SS = new SpannableString(mContext.getString(R.string.recommend_notice2_part1)
                 + " " + mContext.getString(R.string.recommend_notice2_part2));
@@ -123,6 +126,14 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         notice3.setOnClickListener(this);
 
         mWebView = (ProgressWebView) view.findViewById(R.id.recommend_webview);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+
 
         mEmptyView = (LinearLayout) view.findViewById(R.id.recommend_empty);
         mEmptyView.setVisibility(View.GONE);
@@ -132,17 +143,17 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             mParmasMap.put("page", page);
             mParmasMap.put("per_page", PER_PAGE);
         }
-        if (repos == null) {
-            genes = new ArrayList<>();
-            repos = new ArrayList<>();
-            getGenes();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isEnd) {
+        if (repos == null) {
+            genes = new ArrayList<>();
+            repos = new ArrayList<>();
+            mProgressBar.setVisibility(View.VISIBLE);
+            getGenes();
+        } else {
             mProgressBar.setVisibility(View.VISIBLE);
             compareGenes();
         }
@@ -173,7 +184,6 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                 } else {
                     Logger.d("get genes failed");
                     if (e.getCode() == MLException.OBJECT_NOT_FOUND) {
-                        isEnd = true;
                         fetchSearchGeneDate();
                     } else {
                         Logger.toast(mContext, R.string.toast_get_recommend_failed);
@@ -219,10 +229,13 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         repos.clear();
                         fetchTrendingGeneDate();
                     } else {
+                        loadUrl();
                         mProgressBar.setVisibility(View.GONE);
                         mEmptyView.setVisibility(View.GONE);
+                        actionArea.setEnabled(true);
                     }
                 } else {
+                    loadUrl();
                     Logger.d("compareGenes failed");
                     mProgressBar.setVisibility(View.GONE);
                 }
@@ -261,8 +274,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void fetchSearchGeneDate() {
-        if (isEnd) {
+        if (isEnd || genes.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
+            actionArea.setEnabled(false);
             if (repos.size() == 0) {
                 notice3.setVisibility(View.INVISIBLE);
             } else {
@@ -337,8 +351,8 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
             return;
         }
         mEmptyView.setVisibility(View.GONE);
+        actionArea.setEnabled(true);
         mWebView.loadUrl(repo.getHtmlUrl(), true);
-        mProgressBar.setVisibility(View.GONE);
         checkIsStar(repo);
     }
 
@@ -379,10 +393,14 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.recommend_notice3:
                 mEmptyView.setVisibility(View.GONE);
+                actionArea.setEnabled(true);
                 isReview = true;
                 mWebView.loadUrl(repos.get(0).getHtmlUrl());
                 break;
             case R.id.recommend_star:
+                if(!actionArea.isEnabled()){
+                    return;
+                }
                 starProgressBar.setVisibility(View.VISIBLE);
                 ApiManager.getInstance().star(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<Object>() {
@@ -399,6 +417,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         });
                 break;
             case R.id.recommend_fork:
+                if(!actionArea.isEnabled()){
+                    return;
+                }
                 ApiManager.getInstance().fork(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<ForkRepo>() {
                             @Override
@@ -422,6 +443,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                         });
                 break;
             case R.id.recommend_skip:
+                if(!actionArea.isEnabled()){
+                    return;
+                }
                 nowPosition++;
                 if (nowPosition == repos.size()) {
                     fetchSearchGeneDate();
