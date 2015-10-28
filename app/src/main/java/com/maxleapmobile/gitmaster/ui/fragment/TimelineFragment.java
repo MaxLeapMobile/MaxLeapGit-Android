@@ -156,6 +156,9 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                         }
                         if (error.getResponse() != null && error.getResponse().getStatus() == 422) {
                             isEnd = true;
+                            if (mEvents.size() == 0) {
+                                emptyView.setText(R.string.time_line_no_date);
+                            }
                         }
                         isGettingMore = false;
                         mHandler.removeCallbacks(mProgressRunnable);
