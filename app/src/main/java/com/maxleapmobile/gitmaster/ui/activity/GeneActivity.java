@@ -48,6 +48,7 @@ public class GeneActivity extends BaseActivity {
     private Toolbar mToolbar;
     private TextView mTitle;
     private TextView mAddGene;
+    private TextView mEmptyView;
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
     private GeneAdapter mGeneAdapter;
@@ -88,6 +89,7 @@ public class GeneActivity extends BaseActivity {
         mTitle = (TextView) findViewById(R.id.title);
         mTitle.setText(R.string.activity_gene_title);
         mProgressBar = (ProgressBar) findViewById(R.id.gene_progressbar);
+        mEmptyView = (TextView) findViewById(R.id.gene_empty);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.gene_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -168,9 +170,18 @@ public class GeneActivity extends BaseActivity {
                     for (MLObject object : list) {
                         mGenes.add(Gene.from(object));
                     }
-                    mGeneAdapter.notifyDataSetChanged();
+                    if (mGenes.size() == 0) {
+                        mRecyclerView.setVisibility(View.GONE);
+                        mEmptyView.setVisibility(View.VISIBLE);
+                    } else {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        mEmptyView.setVisibility(View.GONE);
+                        mGeneAdapter.notifyDataSetChanged();
+                    }
 
                 } else {
+                    mRecyclerView.setVisibility(View.GONE);
+                    mEmptyView.setVisibility(View.VISIBLE);
                     if (!(e.getCode() == MLException.OBJECT_NOT_FOUND)) {
                         Logger.toast(mContext, getString(R.string.toast_gene_fetch_fail));
                     }
