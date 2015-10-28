@@ -23,14 +23,14 @@
     </string-array>
 
     <string-array name="javascript">
-        <item>Angularjs</item>
+        <item>AngularJS</item>
         <item>Bootstrap</item>
-        <item>Jquery</item>
+        <item>jQuery</item>
         <item>Node</item>
     </string-array>
 
     <string-array name="objective">
-        <item>IOS</item>
+        <item>iOS</item>
     </string-array>
 
     <string-array name="php">
@@ -42,7 +42,7 @@
     </string-array>
 
     <string-array name="swift">
-        <item>IOS</item>
+        <item>iOS</item>
     </string-array>
 
     <string-array name="c11">
