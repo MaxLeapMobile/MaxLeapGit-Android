@@ -10,7 +10,7 @@ package com.maxleapmobile.gitmaster.util;
 
 public class Const {
 
-    public static final String CALLBACK_URL = "https://github.com/";
+    public static final String CALLBACK_URL = "http://stackoverflow.com/";
 
     // Preference key
     public static final String ACCESS_TOKEN_KEY = "access_token";

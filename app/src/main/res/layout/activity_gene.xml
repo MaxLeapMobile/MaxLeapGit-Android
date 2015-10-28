@@ -18,6 +18,18 @@
         />
 
     <TextView
+        android:id="@+id/gene_empty"
+        android:layout_below="@+id/gene_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:text="@string/activity_search_empty"
+        android:textColor="@color/color_text_gray"
+        android:textSize="27sp" />
+
+    <TextView
         android:id="@+id/gene_add"
         android:layout_alignParentBottom="true"
         android:background="@color/bottom_label_normal"
