@@ -24,7 +24,6 @@ import android.widget.ProgressBar;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
-import com.maxleapmobile.gitmaster.manage.UserManager;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
 import com.maxleapmobile.gitmaster.model.Organzation;
 import com.maxleapmobile.gitmaster.model.Owner;
@@ -34,6 +33,7 @@ import com.maxleapmobile.gitmaster.ui.activity.UserInfoActivity;
 import com.maxleapmobile.gitmaster.ui.adapter.UserAdapter;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
+import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +94,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
             mUsers = new ArrayList<>();
         }
         if (mFlag == FLAG_USER_FOLLOWING &&
-                mUsername.equals(UserManager.getInstance().getCurrentUser().getLogin())) {
+                mUsername.equals(PreferenceUtil.getString(mContext, Const.USERNAME, null))) {
             mUserAdapter = new UserAdapter(mContext, mUsers, true);
         } else {
             mUserAdapter = new UserAdapter(mContext, mUsers, false);
@@ -140,7 +140,7 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
             }
         };
 
-        if (mUsername.equals(UserManager.getInstance().getCurrentUser().getLogin())) {
+        if (mUsername.equals(PreferenceUtil.getString(mContext, Const.USERNAME, null))) {
             ApiManager.getInstance().getOrg(apiCallback);
         } else {
             ApiManager.getInstance().getUserOrgs(mUsername, apiCallback);

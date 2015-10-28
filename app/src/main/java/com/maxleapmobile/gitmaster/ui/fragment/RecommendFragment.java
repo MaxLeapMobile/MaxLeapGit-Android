@@ -128,7 +128,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         mEmptyView.setVisibility(View.GONE);
         if (mParmasMap == null) {
             mParmasMap = new HashMap();
-            mParmasMap.put("userid", MLUser.getCurrentUser().getUserName());
+            mParmasMap.put("userid", username);
             mParmasMap.put("page", page);
             mParmasMap.put("per_page", PER_PAGE);
         }
