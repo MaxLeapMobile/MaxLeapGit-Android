@@ -41,7 +41,11 @@
         android:textColor="@color/white"/>
 
     <include
+        android:layout_below="@+id/gene_toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         layout="@layout/view_progressbar"
+        android:layout_centerHorizontal="true"
         android:id="@+id/gene_progressbar"/>
 
 </RelativeLayout>
