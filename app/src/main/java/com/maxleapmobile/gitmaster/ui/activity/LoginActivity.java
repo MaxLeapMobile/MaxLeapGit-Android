@@ -39,7 +39,6 @@ import retrofit.client.Response;
 public class LoginActivity extends BaseActivity {
 
     private static final String AUTH_URL = "https://github.com/login/oauth/authorize?";
-    private static final String CALLBACK_URL = "http://stackoverflow.com/";
     private static final String OAUTH_URL = "https://github.com";
 
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -82,7 +81,7 @@ public class LoginActivity extends BaseActivity {
 
         sb = new StringBuilder(AUTH_URL);
         sb.append("client_id=" + ApiKey.GITHUB_ID);
-        sb.append("&redirect_uri=" + CALLBACK_URL);
+        sb.append("&redirect_uri=" + Const.CALLBACK_URL);
         sb.append("&scope=user,repo");
         mWebView.loadUrl(sb.toString());
     }
@@ -116,7 +115,7 @@ public class LoginActivity extends BaseActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Logger.d(TAG, "Redirecting url: " + url);
 
-            if (url.startsWith(CALLBACK_URL)) {
+            if (url.startsWith(Const.CALLBACK_URL + "?code")) {
                 String urls[] = url.split("=");
                 String code = urls[1];
                 requestAccessToken(code);
