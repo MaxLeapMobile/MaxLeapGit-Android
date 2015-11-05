@@ -32,6 +32,7 @@ import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
+import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
@@ -92,7 +93,7 @@ public class LoginActivity extends BaseActivity {
                 .build();
         GithubApi githubApi = retrofit.create(GithubApi.class);
         githubApi.getAccessToken(ApiKey.GITHUB_ID, ApiKey.GITHUB_SECRET, Const.CALLBACK_URL,
-                code).enqueue(new ApiCallback<AccessToken>() {
+                code).enqueue(new Callback<AccessToken>() {
 
             @Override
             public void onResponse(Response<AccessToken> response, Retrofit retrofit) {
@@ -145,25 +146,21 @@ public class LoginActivity extends BaseActivity {
     private void getGithubUserInfo() {
         ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
             @Override
-            public void onResponse(Response<User> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
-                    User user = response.body();
-                    Logger.d(TAG, user.getEmail() + " " + user.getName());
-                    PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
-                    if (isFromPermission) {
-                        toMainActivity();
-                    }
-                    setResult(RESULT_OK);
-                    finish();
+            public void onSuccess(User user) {
+                Logger.d(TAG, user.getEmail() + " " + user.getName());
+                PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
+                if (isFromPermission) {
+                    toMainActivity();
                 }
+                setResult(RESULT_OK);
+                finish();
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFail(Throwable throwable) {
                 Logger.toast(mContext, R.string.toast_login_failed);
                 mWebView.loadUrl(sb.toString());
             }
-
         });
     }
 

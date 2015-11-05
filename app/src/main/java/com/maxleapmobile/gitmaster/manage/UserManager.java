@@ -34,9 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import retrofit.Response;
-import retrofit.Retrofit;
-
 
 public class UserManager {
     private static UserManager instance;
@@ -173,33 +170,30 @@ public class UserManager {
         skillsMap.put("Swift", new String[]{"iOS"});
         ApiManager.getInstance().listReposByPage(user.getLogin(), 1, Const.PER_PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
-                if (response.isSuccess() && response.body() != null) {
-                    List<Repo> repos = response.body();
-                    if (repos != null && !repos.isEmpty()) {
-                        HashSet<String> geneSet = new HashSet<>();
-                        List<MLObject> genes = new ArrayList<>();
-                        for (Repo repo : repos) {
-                            if (geneSet.contains(repo.getLanguage())
-                                    || skillsMap.get(repo.getLanguage()) == null) {
-                                continue;
-                            }
-                            String[] skills = skillsMap.get(repo.getLanguage());
-                            for (int i = 0; i < skills.length; i++) {
-                                MLObject gene = new MLObject("Gene");
-                                gene.put("githubName", user.getLogin());
-                                gene.put("language", repo.getLanguage());
-                                gene.put("skill", skills[i]);
-                                geneSet.add(repo.getLanguage());
-                            }
+            public void onSuccess(List<Repo> repos) {
+                if (repos != null && !repos.isEmpty()) {
+                    HashSet<String> geneSet = new HashSet<>();
+                    List<MLObject> genes = new ArrayList<>();
+                    for (Repo repo : repos) {
+                        if (geneSet.contains(repo.getLanguage())
+                                || skillsMap.get(repo.getLanguage()) == null) {
+                            continue;
                         }
-                        MLDataManager.saveAllInBackground(genes);
+                        String[] skills = skillsMap.get(repo.getLanguage());
+                        for (int i = 0; i < skills.length; i++) {
+                            MLObject gene = new MLObject("Gene");
+                            gene.put("githubName", user.getLogin());
+                            gene.put("language", repo.getLanguage());
+                            gene.put("skill", skills[i]);
+                            geneSet.add(repo.getLanguage());
+                        }
                     }
+                    MLDataManager.saveAllInBackground(genes);
                 }
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFail(Throwable throwable) {
 
             }
         });
@@ -292,26 +286,23 @@ public class UserManager {
         if (mlUser == null) {
             ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
                 @Override
-                public void onResponse(Response<User> response, Retrofit retrofit) {
-                    if (response.isSuccess() && response.body() != null) {
-                        User user = response.body();
-                        SaveUserInfo(user, new OperationCallback() {
-                            @Override
-                            public void success() {
-                                callback.success();
-                            }
+                public void onSuccess(User user) {
+                    SaveUserInfo(user, new OperationCallback() {
+                        @Override
+                        public void success() {
+                            callback.success();
+                        }
 
-                            @Override
-                            public void failed(String error) {
-                                callback.failed(error);
-                            }
-                        });
-                    }
+                        @Override
+                        public void failed(String error) {
+                            callback.failed(error);
+                        }
+                    });
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
-                    callback.failed(t.getMessage());
+                public void onFail(Throwable throwable) {
+                    callback.failed(throwable.getMessage());
                 }
             });
         } else {

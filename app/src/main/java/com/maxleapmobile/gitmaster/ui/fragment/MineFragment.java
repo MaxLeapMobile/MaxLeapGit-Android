@@ -24,21 +24,15 @@ import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.databinding.FragmentUserinfoBinding;
 import com.maxleapmobile.gitmaster.model.Organzation;
-import com.maxleapmobile.gitmaster.model.PageLinks;
-import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.activity.ContainerActivity;
 import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
-import com.squareup.okhttp.Headers;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
-import retrofit.Response;
-import retrofit.Retrofit;
 
 
 public class MineFragment extends Fragment implements View.OnClickListener {
@@ -71,42 +65,44 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getStarCount() {
-        ApiManager.getInstance().listStarRepoByUser(mUsername, 1, 1, new ApiCallback<List<Repo>>() {
-            @Override
-            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
-                    Headers headers = response.headers();
-                    String link = headers.get("Link");
-                    PageLinks pageLinks = new PageLinks(link);
-                    mUserinfoBinding.setPagelinks(pageLinks);
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-        });
+//        ApiManager.getInstance().listStarRepoByUser(mUsername, 1, 1, new ApiCallback<List<Repo>>() {
+//            @Override
+//            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
+//                if (response.isSuccess()) {
+//                    Headers headers = response.headers();
+//                    String link = headers.get("Link");
+//                    PageLinks pageLinks = new PageLinks(link);
+//                    mUserinfoBinding.setPagelinks(pageLinks);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Throwable t) {
+//
+//            }
+//
+//            @Override
+//            public void onSuccess(List<Repo> repos) {
+//
+//            }
+//        });
     }
 
     private void getUserInfo() {
         ApiManager.getInstance().getUser(mUsername, new ApiCallback<User>() {
             @Override
-            public void onResponse(Response<User> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
-                    User user = response.body();
-                    mUserinfoBinding.setUser(user);
-                    Picasso.with(getContext())
-                            .load(user.getAvatarUrl())
-                            .centerCrop().fit()
-                            .transform(new CircleTransform())
-                            .placeholder(R.mipmap.ic_user_portrait_big)
-                            .into(mAvatar);
-                }
+            public void onSuccess(User user) {
+                mUserinfoBinding.setUser(user);
+                Picasso.with(getContext())
+                        .load(user.getAvatarUrl())
+                        .centerCrop().fit()
+                        .transform(new CircleTransform())
+                        .placeholder(R.mipmap.ic_user_portrait_big)
+                        .into(mAvatar);
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFail(Throwable throwable) {
 
             }
         });
@@ -116,38 +112,32 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         if (mUsername.equals(PreferenceUtil.getString(getContext(), Const.USERNAME, ""))) {
             ApiManager.getInstance().getOrg(new ApiCallback<List<Organzation>>() {
                 @Override
-                public void onResponse(Response<List<Organzation>> response, Retrofit retrofit) {
-                    if (response.isSuccess()) {
-                        List<Organzation> organzations = response.body();
-                        String orgs = "";
-                        for (Organzation organzation : organzations) {
-                            orgs += organzation.getLogin() + " ";
-                        }
-                        mUserinfoBinding.setOrgs(orgs);
+                public void onSuccess(List<Organzation> organzations) {
+                    String orgs = "";
+                    for (Organzation organzation : organzations) {
+                        orgs += organzation.getLogin() + " ";
                     }
+                    mUserinfoBinding.setOrgs(orgs);
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
+                public void onFail(Throwable throwable) {
 
                 }
             });
         } else {
             ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
                 @Override
-                public void onResponse(Response<List<Organzation>> response, Retrofit retrofit) {
-                    if (response.isSuccess()) {
-                        List<Organzation> organzations = response.body();
-                        String orgs = "";
-                        for (Organzation organzation : organzations) {
-                            orgs += organzation.getLogin() + " ";
-                        }
-                        mUserinfoBinding.setOrgs(orgs);
+                public void onSuccess(List<Organzation> organzations) {
+                    String orgs = "";
+                    for (Organzation organzation : organzations) {
+                        orgs += organzation.getLogin() + " ";
                     }
+                    mUserinfoBinding.setOrgs(orgs);
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
+                public void onFail(Throwable throwable) {
 
                 }
             });

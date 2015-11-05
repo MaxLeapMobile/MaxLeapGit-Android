@@ -37,6 +37,10 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ApiManager {
     private static final String USER_AGENT = "GitMaster Android";
@@ -81,6 +85,7 @@ public class ApiManager {
                 .baseUrl(API_URL)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
         mGithubApi = mRetrofit.create(GithubApi.class);
@@ -98,8 +103,26 @@ public class ApiManager {
      * Get authenticated user info
      * @param callback
      */
-    public void getCurrentUser(ApiCallback<User> callback) {
-        mGithubApi.getCurrentUser().enqueue(callback);
+    public void getCurrentUser(final ApiCallback callback) {
+        mGithubApi.getCurrentUser()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<User>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        callback.onSuccess(user);
+                    }
+                });
     }
 
     /**
@@ -107,12 +130,48 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getUser(String username, ApiCallback<User> callback) {
-        mGithubApi.getUser(username).enqueue(callback);
+    public void getUser(String username, final ApiCallback<User> callback) {
+        mGithubApi.getUser(username)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<User>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        callback.onSuccess(user);
+                    }
+                });
     }
 
-    public void getRepo(String username, String repoName, ApiCallback<Repo> callback) {
-        mGithubApi.getRepo(username, repoName).enqueue(callback);
+    public void getRepo(String username, String repoName, final ApiCallback<Repo> callback) {
+        mGithubApi.getRepo(username, repoName)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Repo>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Repo repo) {
+                        callback.onSuccess(repo);
+                    }
+                });
     }
 
     /**
@@ -120,8 +179,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void listRepos(String username, ApiCallback<List<Repo>> callback) {
-        mGithubApi.listRepos(username, null, null).enqueue(callback);
+    public void listRepos(String username, final ApiCallback<List<Repo>> callback) {
+        mGithubApi.listRepos(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
     /**
@@ -132,9 +209,27 @@ public class ApiManager {
      * @param callback
      */
     public void listReposByPage(String username, int pageCount, int perPageCount,
-                                ApiCallback<List<Repo>> callback) {
+                                final ApiCallback<List<Repo>> callback) {
         mGithubApi.listRepos(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
 
@@ -145,8 +240,26 @@ public class ApiManager {
      * @param repo repo name
      * @param callback callback
      */
-    public void isStarred(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.starStatus(owner, repo).enqueue(callback);
+    public void isStarred(String owner, String repo, final ApiCallback<Object> callback) {
+        mGithubApi.starStatus(owner, repo)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+                    }
+                });
     }
 
     /**
@@ -156,8 +269,26 @@ public class ApiManager {
      * @param repo repo name
      * @param callback callback
      */
-    public void star(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.star("", owner, repo).enqueue(callback);
+    public void star(String owner, String repo, final ApiCallback<Object> callback) {
+        mGithubApi.star("", owner, repo)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+                    }
+                });
     }
 
     /**
@@ -166,8 +297,26 @@ public class ApiManager {
      * @param repo repo name
      * @param callback callback
      */
-    public void unstart(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.unstar(owner, repo).enqueue(callback);
+    public void unstart(String owner, String repo, final ApiCallback<Object> callback) {
+        mGithubApi.unstar(owner, repo)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+                    }
+                });
     }
 
     /**
@@ -175,8 +324,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void listStarRepoByUser(String username, ApiCallback<List<Repo>> callback) {
-        mGithubApi.listStarredRepoByUser(username, null, null).enqueue(callback);
+    public void listStarRepoByUser(String username, final ApiCallback<List<Repo>> callback) {
+        mGithubApi.listStarredRepoByUser(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
     /**
@@ -187,17 +354,53 @@ public class ApiManager {
      * @param callback
      */
     public void listStarRepoByUser(String username, int pageCount, int perPageCount,
-                                   ApiCallback<List<Repo>> callback) {
+                                   final ApiCallback<List<Repo>> callback) {
         mGithubApi.listStarredRepoByUser(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
     /**
      * List starred repo by authenticated user
      * @param callback
      */
-    public void listStarredRepoByAuthUser(ApiCallback<List<Repo>> callback) {
-        mGithubApi.listStaredRepoByAuthUser(null, null).enqueue(callback);
+    public void listStarredRepoByAuthUser(final ApiCallback<List<Repo>> callback) {
+        mGithubApi.listStaredRepoByAuthUser(null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
 
@@ -208,9 +411,27 @@ public class ApiManager {
      * @param callback
      */
     public void listStarredRepoByAuthUser(int pageCount, int perPageCount,
-                                          ApiCallback<List<Repo>> callback) {
+                                          final ApiCallback<List<Repo>> callback) {
         mGithubApi.listStaredRepoByAuthUser(String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Repo>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Repo> repos) {
+                        callback.onSuccess(repos);
+                    }
+                });
     }
 
     /**
@@ -219,8 +440,26 @@ public class ApiManager {
      * @param repo repo name
      * @param callback
      */
-    public void fork(String owner, String repo, ApiCallback<ForkRepo> callback) {
-        mGithubApi.forkRepo( owner, repo).enqueue(callback);
+    public void fork(String owner, String repo, final ApiCallback<ForkRepo> callback) {
+        mGithubApi.forkRepo(owner, repo)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ForkRepo>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(ForkRepo forkRepo) {
+                        callback.onSuccess(forkRepo);
+                    }
+                });
     }
 
     /**
@@ -228,8 +467,26 @@ public class ApiManager {
      * @param keyword repo name
      * @param callback
      */
-    public void searchRepo(String keyword, ApiCallback<SearchedRepos> callback) {
-        mGithubApi.searchRepo(keyword, null, null, null, null).enqueue(callback);
+    public void searchRepo(String keyword, final ApiCallback<SearchedRepos> callback) {
+        mGithubApi.searchRepo(keyword, null, null, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedRepos>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedRepos searchedRepos) {
+                        callback.onSuccess(searchedRepos);
+                    }
+                });
     }
 
 
@@ -241,9 +498,27 @@ public class ApiManager {
      * @param callback
      */
     public void searchRepo(String keyword, int pageCount, int perPageCount,
-                           ApiCallback<SearchedRepos> callback) {
+                           final ApiCallback<SearchedRepos> callback) {
         mGithubApi.searchRepo(keyword, null, null, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedRepos>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedRepos searchedRepos) {
+                        callback.onSuccess(searchedRepos);
+                    }
+                });
     }
 
     /**
@@ -257,9 +532,27 @@ public class ApiManager {
      */
     public void searchRepo(String keyword, SortEnumRepo sort, OrderEnum order,
                            int pageCount, int perPageCount,
-                           ApiCallback<SearchedRepos> callback) {
+                           final ApiCallback<SearchedRepos> callback) {
         mGithubApi.searchRepo(keyword, sort, order, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedRepos>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedRepos searchedRepos) {
+                        callback.onSuccess(searchedRepos);
+                    }
+                });
     }
 
     /**
@@ -267,8 +560,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void searchUser(String username, ApiCallback<SearchedUsers> callback) {
-        mGithubApi.searchUser(username, null, null, null, null).enqueue(callback);
+    public void searchUser(String username, final ApiCallback<SearchedUsers> callback) {
+        mGithubApi.searchUser(username, null, null, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedUsers>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedUsers searchedUsers) {
+                        callback.onSuccess(searchedUsers);
+                    }
+                });
     }
 
     /**
@@ -279,9 +590,27 @@ public class ApiManager {
      * @param callback
      */
     public void searchUser(String username, int pageCount, int perPageCount,
-                           ApiCallback<SearchedUsers> callback) {
+                           final ApiCallback<SearchedUsers> callback) {
         mGithubApi.searchUser(username, null, null, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedUsers>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedUsers searchedUsers) {
+                        callback.onSuccess(searchedUsers);
+                    }
+                });
     }
 
     /**
@@ -295,9 +624,27 @@ public class ApiManager {
      */
     public void searchUser(String username, SortEnumUser sortEnumUser, OrderEnum orderEnum,
                            int pageCount, int perPageCount,
-                           ApiCallback<SearchedUsers> callback) {
+                           final ApiCallback<SearchedUsers> callback) {
         mGithubApi.searchUser(username, sortEnumUser, orderEnum, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<SearchedUsers>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(SearchedUsers searchedUsers) {
+                        callback.onSuccess(searchedUsers);
+                    }
+                });
     }
 
     /**
@@ -306,8 +653,27 @@ public class ApiManager {
      * @param username specified user
      * @param callback
      */
-    public void followStatus(String username, ApiCallback<Object> callback) {
-        mGithubApi.followStatus(username).enqueue(callback);
+    public void followStatus(String username, final ApiCallback<Object> callback) {
+        mGithubApi.followStatus(username)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+
+                    }
+                });
     }
 
     /**
@@ -316,8 +682,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void follow(String username, ApiCallback<Object> callback) {
-        mGithubApi.follow("", username).enqueue(callback);
+    public void follow(String username, final ApiCallback<Object> callback) {
+        mGithubApi.follow("", username)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+                    }
+                });
     }
 
     /**
@@ -326,8 +710,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void unfollow(String username, ApiCallback<Object> callback) {
-        mGithubApi.unfollow(username).enqueue(callback);
+    public void unfollow(String username, final ApiCallback<Object> callback) {
+        mGithubApi.unfollow(username)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        callback.onSuccess(o);
+                    }
+                });
     }
 
     /**
@@ -335,8 +737,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getFollowersList(String username, ApiCallback<List<Owner>> callback) {
-        mGithubApi.getFollowersList(username, null, null).enqueue(callback);
+    public void getFollowersList(String username, final ApiCallback<List<Owner>> callback) {
+        mGithubApi.getFollowersList(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Owner>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Owner> owners) {
+                        callback.onSuccess(owners);
+                    }
+                });
     }
 
     /**
@@ -347,9 +767,27 @@ public class ApiManager {
      * @param callback
      */
     public void getFollowersList(String username, int pageCount, int perPageCount,
-                                 ApiCallback<List<Owner>> callback) {
+                                 final ApiCallback<List<Owner>> callback) {
         mGithubApi.getFollowersList(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Owner>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Owner> owners) {
+                        callback.onSuccess(owners);
+                    }
+                });
     }
 
     /**
@@ -357,8 +795,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getFollowingList(String username, ApiCallback<List<Owner>> callback) {
-        mGithubApi.getFollowingList(username, null, null).enqueue(callback);
+    public void getFollowingList(String username, final ApiCallback<List<Owner>> callback) {
+        mGithubApi.getFollowingList(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Owner>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Owner> owners) {
+                        callback.onSuccess(owners);
+                    }
+                });
     }
 
     /**
@@ -367,9 +823,27 @@ public class ApiManager {
      * @param callback
      */
     public void getFollowingList(String username, int pageCount, int perPageCount,
-                                 ApiCallback<List<Owner>> callback) {
+                                 final ApiCallback<List<Owner>> callback) {
         mGithubApi.getFollowingList(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Owner>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Owner> owners) {
+                        callback.onSuccess(owners);
+                    }
+                });
     }
 
     /**
@@ -377,8 +851,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getReceivedEvents(String username, ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.receivedEvents(username, null, null).enqueue(callback);
+    public void getReceivedEvents(String username, final ApiCallback<List<TimeLineEvent>> callback) {
+        mGithubApi.receivedEvents(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<TimeLineEvent>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<TimeLineEvent> timeLineEvents) {
+                        callback.onSuccess(timeLineEvents);
+                    }
+                });
     }
 
     /**
@@ -389,9 +881,27 @@ public class ApiManager {
      * @param callback
      */
     public void getReceivedEvents(String username, int pageCount, int perPageCount,
-                                  ApiCallback<List<TimeLineEvent>> callback) {
+                                  final ApiCallback<List<TimeLineEvent>> callback) {
         mGithubApi.receivedEvents(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<TimeLineEvent>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<TimeLineEvent> timeLineEvents) {
+                        callback.onSuccess(timeLineEvents);
+                    }
+                });
     }
 
     /**
@@ -399,8 +909,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getUserEvents(String username, ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.userEvents(username, null, null).enqueue(callback);
+    public void getUserEvents(String username, final ApiCallback<List<TimeLineEvent>> callback) {
+        mGithubApi.userEvents(username, null, null)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<TimeLineEvent>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<TimeLineEvent> timeLineEvents) {
+                        callback.onSuccess(timeLineEvents);
+                    }
+                });
     }
 
     /**
@@ -409,9 +937,27 @@ public class ApiManager {
      * @param callback
      */
     public void getUserEvents(String username, int pageCount, int perPageCount,
-                              ApiCallback<List<TimeLineEvent>> callback) {
+                              final ApiCallback<List<TimeLineEvent>> callback) {
         mGithubApi.userEvents(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount)).enqueue(callback);
+                String.valueOf(perPageCount))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<TimeLineEvent>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<TimeLineEvent> timeLineEvents) {
+                        callback.onSuccess(timeLineEvents);
+                    }
+                });
     }
 
     /**
@@ -421,16 +967,52 @@ public class ApiManager {
      * @param callback
      */
     public void getRepoEvents(String owner, String repoName,
-                              ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.repoEvents(owner, repoName).enqueue(callback);
+                              final ApiCallback<List<TimeLineEvent>> callback) {
+        mGithubApi.repoEvents(owner, repoName)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<TimeLineEvent>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<TimeLineEvent> timeLineEvents) {
+                        callback.onSuccess(timeLineEvents);
+                    }
+                });
     }
 
     /**
      * get org list for auth user
      * @param callback
      */
-    public void getOrg(ApiCallback<List<Organzation>> callback) {
-        mGithubApi.getOrg().enqueue(callback);
+    public void getOrg(final ApiCallback<List<Organzation>> callback) {
+        mGithubApi.getOrg()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Organzation>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Organzation> organzations) {
+                        callback.onSuccess(organzations);
+                    }
+                });
     }
 
     /**
@@ -438,8 +1020,26 @@ public class ApiManager {
      * @param username
      * @param callback
      */
-    public void getUserOrgs(String username, ApiCallback<List<Organzation>> callback) {
-        mGithubApi.getUserOrgs(username).enqueue(callback);
+    public void getUserOrgs(String username, final ApiCallback<List<Organzation>> callback) {
+        mGithubApi.getUserOrgs(username)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Organzation>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(List<Organzation> organzations) {
+                        callback.onSuccess(organzations);
+                    }
+                });
     }
 
 }

@@ -35,6 +35,7 @@ import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import rx.Observable;
 
 public interface GithubApi {
 
@@ -47,99 +48,99 @@ public interface GithubApi {
                         @Field("code") String code);
 
     @GET("user")
-    Call<User> getCurrentUser();
+    Observable<User> getCurrentUser();
 
     @GET("users/{username}")
-    Call<User> getUser(@Path("username") String username);
+    Observable<User> getUser(@Path("username") String username);
 
     @GET("users/{username}/repos")
-    Call<List<Repo>> listRepos(@Path("username") String username,
+    Observable<List<Repo>> listRepos(@Path("username") String username,
                    @Query("page") String pageCount,
                    @Query("per_page") String perPageCount);
 
     @GET("repos/{username}/{repo}")
-    Call<Repo> getRepo(@Path("username") String username,
+    Observable<Repo> getRepo(@Path("username") String username,
                  @Path("repo") String repo);
 
     @GET("user/starred/{owner}/{repo}")
-    Call<Object> starStatus(@Path("owner") String owner,
+    Observable<Object> starStatus(@Path("owner") String owner,
                     @Path("repo") String repo);
 
     @PUT("user/starred/{owner}/{repo}")
-    Call<Object> star(@Body String emptyString,
+    Observable<Object> star(@Body String emptyString,
               @Path("owner") String owner,
               @Path("repo") String repo);
 
     @DELETE("user/starred/{owner}/{repo}")
-    Call<Object> unstar(@Path("owner") String owner,
+    Observable<Object> unstar(@Path("owner") String owner,
                 @Path("repo") String repo);
 
     @GET("users/{username}/starred")
-    Call<List<Repo>> listStarredRepoByUser(@Path("username") String username,
+    Observable<List<Repo>> listStarredRepoByUser(@Path("username") String username,
                                @Query("page") String pageCount,
                                @Query("per_page") String perPageCount);
 
     @GET("/user/starred")
-    Call<List<Repo>> listStaredRepoByAuthUser(@Query("page") String pageCount,
+    Observable<List<Repo>> listStaredRepoByAuthUser(@Query("page") String pageCount,
                                   @Query("per_page") String perPageCount);
 
     @POST("repos/{owner}/{repo}/forks")
-    Call<ForkRepo> forkRepo(
+    Observable<ForkRepo> forkRepo(
                   @Path("owner") String owner,
                   @Path("repo") String repo);
 
     @GET("search/repositories")
-    Call<SearchedRepos> searchRepo(@Query("q") String keyword,
+    Observable<SearchedRepos> searchRepo(@Query("q") String keyword,
                     @Query("sort") SortEnumRepo sort,
                     @Query("order") OrderEnum order,
                     @Query("page") String page,
                     @Query("per_page") String perPage);
 
     @GET("search/users")
-    Call<SearchedUsers> searchUser(@Query("q") String username,
+    Observable<SearchedUsers> searchUser(@Query("q") String username,
                     @Query("sort") SortEnumUser sort,
                     @Query("order") OrderEnum order,
                     @Query("page") String page,
                     @Query("per_page") String perPage);
 
     @GET("user/following/{username}")
-    Call<Object> followStatus(@Path("username") String username);
+    Observable<Object> followStatus(@Path("username") String username);
 
     @PUT("user/following/{username}")
-    Call<Object> follow(@Body String emptyBody,
+    Observable<Object> follow(@Body String emptyBody,
                 @Path("username") String username);
 
     @DELETE("user/following/{username}")
-    Call<Object> unfollow(@Path("username") String username);
+    Observable<Object> unfollow(@Path("username") String username);
 
     @GET("users/{username}/followers")
-    Call<List<Owner>> getFollowersList(@Path("username") String username,
+    Observable<List<Owner>> getFollowersList(@Path("username") String username,
                           @Query("page") String page,
                           @Query("per_page") String perPage);
 
     @GET("users/{username}/following")
-    Call<List<Owner>> getFollowingList(@Path("username") String username,
+    Observable<List<Owner>> getFollowingList(@Path("username") String username,
                           @Query("page") String page,
                           @Query("per_page") String perPage);
 
     @GET("users/{username}/received_events")
-    Call<List<TimeLineEvent>> receivedEvents(@Path("username") String username,
+    Observable<List<TimeLineEvent>> receivedEvents(@Path("username") String username,
                         @Query("page") String page,
                         @Query("per_page") String perPage);
 
     @GET("users/{username}/events")
-    Call<List<TimeLineEvent>> userEvents(@Path("username") String username,
+    Observable<List<TimeLineEvent>> userEvents(@Path("username") String username,
                     @Query("page") String page,
                     @Query("per_page") String perPage);
 
     @GET("repos/{owner}/{repo}/events")
-    Call<List<TimeLineEvent>> repoEvents(@Path("owner") String owner,
+    Observable<List<TimeLineEvent>> repoEvents(@Path("owner") String owner,
                     @Path("repo") String repoName);
 
     @GET("user/orgs")
-    Call<List<Organzation>> getOrg();
+    Observable<List<Organzation>> getOrg();
 
     @GET("users/{username}/orgs")
-    Call<List<Organzation>> getUserOrgs(@Path("username") String username);
+    Observable<List<Organzation>> getUserOrgs(@Path("username") String username);
 
 }
