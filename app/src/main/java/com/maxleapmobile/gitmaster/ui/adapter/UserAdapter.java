@@ -28,8 +28,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class UserAdapter extends BaseAdapter {
     private Context mContext;
@@ -98,17 +98,19 @@ public class UserAdapter extends BaseAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         ApiManager.getInstance().unfollow(item.getLogin(), new ApiCallback<Object>() {
                             @Override
-                            public void success(Object o, Response response) {
-                                if (response.getStatus() == 204) {
-                                    Logger.toast(mContext, R.string.toast_unfollow_success);
-                                    mUsers.remove(item);
-                                    notifyDataSetChanged();
+                            public void onResponse(Response<Object> response, Retrofit retrofit) {
+                                if (response.isSuccess()) {
+                                    if (response.code() == 204) {
+                                        Logger.toast(mContext, R.string.toast_unfollow_success);
+                                        mUsers.remove(item);
+                                        notifyDataSetChanged();
+                                    }
                                 }
                             }
 
                             @Override
-                            public void failure(RetrofitError error) {
-                                super.failure(error);
+                            public void onFailure(Throwable t) {
+
                             }
                         });
                         dialog.dismiss();

@@ -36,7 +36,8 @@ import com.maxleapmobile.gitmaster.util.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class RepoFragment extends Fragment implements AbsListView.OnScrollListener {
     private ProgressBar mProgressBar;
@@ -118,17 +119,25 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().listReposByPage(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
-                if (!repos.isEmpty()) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
+            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    List<Repo> repos = response.body();
+                    if (!repos.isEmpty()) {
+                        if (mIsGettingMore) {
+                            mIsGettingMore = false;
+                        }
+                        if (mPage == 1) {
+                            mRepos.clear();
+                        }
+                        mRepos.addAll(repos);
+                        mRepoAdapter.notifyDataSetChanged();
                     }
-                    if (mPage == 1) {
-                        mRepos.clear();
-                    }
-                    mRepos.addAll(repos);
-                    mRepoAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -142,17 +151,25 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().listStarRepoByUser(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
-                if (!repos.isEmpty()) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
+            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    List<Repo> repos = response.body();
+                    if (!repos.isEmpty()) {
+                        if (mIsGettingMore) {
+                            mIsGettingMore = false;
+                        }
+                        if (mPage == 1) {
+                            mRepos.clear();
+                        }
+                        mRepos.addAll(repos);
+                        mRepoAdapter.notifyDataSetChanged();
                     }
-                    if (mPage == 1) {
-                        mRepos.clear();
-                    }
-                    mRepos.addAll(repos);
-                    mRepoAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -168,28 +185,36 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().searchRepo(mKeyWord, mSortEnumRepo, OrderEnum.DESC, mPage, PAGE_COUNT, new ApiCallback<SearchedRepos>() {
             @Override
-            public void success(SearchedRepos searchedRepos, Response response) {
-                if (searchedRepos != null) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
+            public void onResponse(Response<SearchedRepos> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    SearchedRepos searchedRepos = response.body();
+                    if (searchedRepos != null) {
+                        if (mIsGettingMore) {
+                            mIsGettingMore = false;
+                        }
+                        if (mPage == 1) {
+                            mRepos.clear();
+                        }
+                        List<SearchedRepos.Item> items = searchedRepos.getItems();
+                        for (SearchedRepos.Item item : items) {
+                            Repo repo = new Repo();
+                            repo.setName(item.getName());
+                            repo.setDescription(item.getDescription());
+                            repo.setHtmlUrl(item.getHtmlUrl());
+                            Owner owner = new Owner();
+                            owner.setAvatarUrl(item.getOwner().getAvatarUrl());
+                            owner.setLogin(item.getOwner().getLogin());
+                            repo.setOwner(owner);
+                            mRepos.add(repo);
+                        }
+                        mRepoAdapter.notifyDataSetChanged();
                     }
-                    if (mPage == 1) {
-                        mRepos.clear();
-                    }
-                    List<SearchedRepos.Item> items = searchedRepos.getItems();
-                    for (SearchedRepos.Item item : items) {
-                        Repo repo = new Repo();
-                        repo.setName(item.getName());
-                        repo.setDescription(item.getDescription());
-                        repo.setHtmlUrl(item.getHtmlUrl());
-                        Owner owner = new Owner();
-                        owner.setAvatarUrl(item.getOwner().getAvatarUrl());
-                        owner.setLogin(item.getOwner().getLogin());
-                        repo.setOwner(owner);
-                        mRepos.add(repo);
-                    }
-                    mRepoAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });

@@ -32,13 +32,14 @@ import com.maxleapmobile.gitmaster.ui.activity.GeneActivity;
 import com.maxleapmobile.gitmaster.util.CircleTransform;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
+import com.squareup.okhttp.Headers;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Header;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
+
 
 public class MineFragment extends Fragment implements View.OnClickListener {
 
@@ -72,21 +73,18 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private void getStarCount() {
         ApiManager.getInstance().listStarRepoByUser(mUsername, 1, 1, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
-                List<Header> headers = response.getHeaders();
-                String link = "";
-                for (Header header : headers) {
-                    if (header.getName().equals("Link")) {
-                        link = header.getValue();
-                    }
+            public void onResponse(Response<List<Repo>> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    Headers headers = response.headers();
+                    String link = headers.get("Link");
+                    PageLinks pageLinks = new PageLinks(link);
+                    mUserinfoBinding.setPagelinks(pageLinks);
                 }
-                PageLinks pageLinks = new PageLinks(link);
-                mUserinfoBinding.setPagelinks(pageLinks);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
+            public void onFailure(Throwable t) {
+
             }
         });
     }
@@ -94,19 +92,22 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private void getUserInfo() {
         ApiManager.getInstance().getUser(mUsername, new ApiCallback<User>() {
             @Override
-            public void success(User user, Response response) {
-                mUserinfoBinding.setUser(user);
-                Picasso.with(getContext())
-                        .load(user.getAvatarUrl())
-                        .centerCrop().fit()
-                        .transform(new CircleTransform())
-                        .placeholder(R.mipmap.ic_user_portrait_big)
-                        .into(mAvatar);
+            public void onResponse(Response<User> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    User user = response.body();
+                    mUserinfoBinding.setUser(user);
+                    Picasso.with(getContext())
+                            .load(user.getAvatarUrl())
+                            .centerCrop().fit()
+                            .transform(new CircleTransform())
+                            .placeholder(R.mipmap.ic_user_portrait_big)
+                            .into(mAvatar);
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
+            public void onFailure(Throwable t) {
+
             }
         });
     }
@@ -115,33 +116,39 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         if (mUsername.equals(PreferenceUtil.getString(getContext(), Const.USERNAME, ""))) {
             ApiManager.getInstance().getOrg(new ApiCallback<List<Organzation>>() {
                 @Override
-                public void success(List<Organzation> organzations, Response response) {
-                    String orgs = "";
-                    for (Organzation organzation : organzations) {
-                        orgs += organzation.getLogin() + " ";
+                public void onResponse(Response<List<Organzation>> response, Retrofit retrofit) {
+                    if (response.isSuccess()) {
+                        List<Organzation> organzations = response.body();
+                        String orgs = "";
+                        for (Organzation organzation : organzations) {
+                            orgs += organzation.getLogin() + " ";
+                        }
+                        mUserinfoBinding.setOrgs(orgs);
                     }
-                    mUserinfoBinding.setOrgs(orgs);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFailure(Throwable t) {
+
                 }
             });
         } else {
             ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
                 @Override
-                public void success(List<Organzation> organzations, Response response) {
-                    String orgs = "";
-                    for (Organzation organzation : organzations) {
-                        orgs += organzation.getLogin() + " ";
+                public void onResponse(Response<List<Organzation>> response, Retrofit retrofit) {
+                    if (response.isSuccess()) {
+                        List<Organzation> organzations = response.body();
+                        String orgs = "";
+                        for (Organzation organzation : organzations) {
+                            orgs += organzation.getLogin() + " ";
+                        }
+                        mUserinfoBinding.setOrgs(orgs);
                     }
-                    mUserinfoBinding.setOrgs(orgs);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFailure(Throwable t) {
+
                 }
             });
         }

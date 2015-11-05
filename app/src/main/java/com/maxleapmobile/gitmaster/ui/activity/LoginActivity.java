@@ -32,14 +32,13 @@ import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class LoginActivity extends BaseActivity {
 
     private static final String AUTH_URL = "https://github.com/login/oauth/authorize?";
-    private static final String OAUTH_URL = "https://github.com";
 
     private static final String TAG = LoginActivity.class.getSimpleName();
     public static final String FROM_PERMISSION_ACTIVITY = "from_permission_activity";
@@ -87,26 +86,30 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void requestAccessToken(String code) {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(OAUTH_URL)
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://github.com/")
                 .build();
-        GithubApi githubApi = restAdapter.create(GithubApi.class);
-
+        GithubApi githubApi = retrofit.create(GithubApi.class);
         githubApi.getAccessToken(ApiKey.GITHUB_ID, ApiKey.GITHUB_SECRET, Const.CALLBACK_URL,
-                code, new ApiCallback<AccessToken>() {
-                    @Override
-                    public void success(AccessToken accessToken, Response response) {
-                        Logger.d(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
-                        PreferenceUtil.putString(mContext, Const.ACCESS_TOKEN_KEY,
-                                accessToken.getAccessToken());
-                        getGithubUserInfo();
-                    }
+                code).enqueue(new ApiCallback<AccessToken>() {
 
-                    @Override
-                    public void failure(RetrofitError error) {
-                        super.failure(error);
-                    }
-                });
+            @Override
+            public void onResponse(Response<AccessToken> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    AccessToken accessToken = response.body();
+                    Logger.d(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
+                    PreferenceUtil.putString(mContext, Const.ACCESS_TOKEN_KEY,
+                            accessToken.getAccessToken());
+                    getGithubUserInfo();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
     }
 
     private class OauthWebViewClient extends WebViewClient {
@@ -142,22 +145,25 @@ public class LoginActivity extends BaseActivity {
     private void getGithubUserInfo() {
         ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
             @Override
-            public void success(User user, Response response) {
-                Logger.d(TAG, user.getEmail() + " " + user.getName());
-                PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
-                if (isFromPermission) {
-                    toMainActivity();
+            public void onResponse(Response<User> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    User user = response.body();
+                    Logger.d(TAG, user.getEmail() + " " + user.getName());
+                    PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
+                    if (isFromPermission) {
+                        toMainActivity();
+                    }
+                    setResult(RESULT_OK);
+                    finish();
                 }
-                setResult(RESULT_OK);
-                finish();
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
+            public void onFailure(Throwable t) {
                 Logger.toast(mContext, R.string.toast_login_failed);
                 mWebView.loadUrl(sb.toString());
             }
+
         });
     }
 

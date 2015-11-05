@@ -38,7 +38,8 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class UserFragment extends Fragment implements AbsListView.OnScrollListener {
     private Context mContext;
@@ -125,17 +126,25 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiCallback<List<Organzation>> apiCallback = new ApiCallback<List<Organzation>>() {
             @Override
-            public void success(List<Organzation> organzations, Response response) {
-                if (organzations != null) {
-                    for (Organzation item : organzations) {
-                        Owner user = new Owner();
-                        user.setAvatarUrl(item.getAvatarUrl());
-                        user.setLogin(item.getLogin());
-                        user.setHtmlUrl(item.getReposUrl());
-                        mUsers.add(user);
+            public void onResponse(Response<List<Organzation>> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    List<Organzation> organzations = response.body();
+                    if (organzations != null) {
+                        for (Organzation item : organzations) {
+                            Owner user = new Owner();
+                            user.setAvatarUrl(item.getAvatarUrl());
+                            user.setLogin(item.getLogin());
+                            user.setHtmlUrl(item.getReposUrl());
+                            mUsers.add(user);
+                        }
+                        mUserAdapter.notifyDataSetChanged();
                     }
-                    mUserAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         };
@@ -155,8 +164,9 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().getFollowersList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
             @Override
-            public void success(List<Owner> owners, Response response) {
-                if (!owners.isEmpty()) {
+            public void onResponse(Response<List<Owner>> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    List<Owner> owners = response.body();
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
                     }
@@ -166,6 +176,11 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                     mUsers.addAll(owners);
                     mUserAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -179,8 +194,9 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().getFollowingList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
             @Override
-            public void success(List<Owner> owners, Response response) {
-                if (!owners.isEmpty()) {
+            public void onResponse(Response<List<Owner>> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    List<Owner> owners = response.body();
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
                     }
@@ -190,6 +206,11 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                     mUsers.addAll(owners);
                     mUserAdapter.notifyDataSetChanged();
                 }
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -205,8 +226,10 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().searchUser(keyWord, mSortEnumUser, OrderEnum.DESC, page, PAGE_COUNT, new ApiCallback<SearchedUsers>() {
             @Override
-            public void success(SearchedUsers searchedUsers, Response response) {
-                if (searchedUsers != null) {
+            public void onResponse(Response<SearchedUsers> response, Retrofit retrofit) {
+                if (response.isSuccess() && response.body() != null) {
+                    SearchedUsers searchedUsers = response.body();
+
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
                     }
@@ -224,7 +247,11 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                     mUserAdapter.notifyDataSetChanged();
                 }
                 mProgressBar.setVisibility(View.GONE);
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }

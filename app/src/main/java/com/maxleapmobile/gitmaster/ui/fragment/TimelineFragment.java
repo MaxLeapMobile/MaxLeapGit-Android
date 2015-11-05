@@ -34,8 +34,8 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
@@ -128,37 +128,39 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         ApiManager.getInstance().getReceivedEvents(username,
                 pageCount, REQUEST_PER_PAGE, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
-                    public void success(List<TimeLineEvent> timeLineEvents, Response response) {
-                        if (pageCount == MAX_PAGE_COUNT || REQUEST_PER_PAGE > timeLineEvents.size()) {
-                            isEnd = true;
-                        }
-                        for (int i = 0; i < timeLineEvents.size(); ) {
-                            if (timeLineEvents.get(i).getType() == ActionType.ForkEvent ||
-                                    timeLineEvents.get(i).getType() == ActionType.WatchEvent) {
-                                i++;
-                            } else {
-                                timeLineEvents.remove(i);
+                    public void onResponse(Response<List<TimeLineEvent>> response, Retrofit retrofit) {
+                        if (response.isSuccess() && response.body() != null) {
+                            List<TimeLineEvent> timeLineEvents = response.body();
+                            if (pageCount == MAX_PAGE_COUNT || REQUEST_PER_PAGE > timeLineEvents.size()) {
+                                isEnd = true;
                             }
-                        }
-                        mEvents.addAll(timeLineEvents);
+                            for (int i = 0; i < timeLineEvents.size(); ) {
+                                if (timeLineEvents.get(i).getType() == ActionType.ForkEvent ||
+                                        timeLineEvents.get(i).getType() == ActionType.WatchEvent) {
+                                    i++;
+                                } else {
+                                    timeLineEvents.remove(i);
+                                }
+                            }
+                            mEvents.addAll(timeLineEvents);
 
-                        pageCount = (pageCount < MAX_PAGE_COUNT) ? pageCount + 1 : MAX_PAGE_COUNT;
-                        isGettingMore = false;
-                        boolean needRefresh = !isEnd && (mEvents.size() - originalTotal) < GET_PER_PAGE;
-                        initData(needRefresh);
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        if (mEvents.size() == 0) {
-                            emptyView.setVisibility(View.VISIBLE);
-                            emptyView.setText(R.string.time_line_refresh_failed);
-                        }
-                        if (error.getResponse() != null && error.getResponse().getStatus() == 422) {
+                            pageCount = (pageCount < MAX_PAGE_COUNT) ? pageCount + 1 : MAX_PAGE_COUNT;
+                            isGettingMore = false;
+                            boolean needRefresh = !isEnd && (mEvents.size() - originalTotal) < GET_PER_PAGE;
+                            initData(needRefresh);
+                        } else if (response.isSuccess() && response.code() == 422) { //TODO
                             isEnd = true;
                             if (mEvents.size() == 0) {
                                 emptyView.setText(R.string.time_line_no_date);
                             }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        if (mEvents.size() == 0) {
+                            emptyView.setVisibility(View.VISIBLE);
+                            emptyView.setText(R.string.time_line_refresh_failed);
                         }
                         isGettingMore = false;
                         mHandler.removeCallbacks(mProgressRunnable);

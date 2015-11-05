@@ -22,8 +22,8 @@ import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class RepoDetailActivity extends BaseActivity implements View.OnClickListener {
 
@@ -69,32 +69,35 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
         ApiManager.getInstance().getRepo(mRepoOwner, mRepoName, new ApiCallback<Repo>() {
             @Override
-            public void success(Repo repo, Response response) {
-                mProgressBar.setVisibility(View.GONE);
-                mWebView.loadUrl(repo.getHtmlUrl(), true);
+            public void onResponse(Response<Repo> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    Repo repo = response.body();
+                    mProgressBar.setVisibility(View.GONE);
+                    mWebView.loadUrl(repo.getHtmlUrl(), true);
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
+            public void onFailure(Throwable t) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
 
         ApiManager.getInstance().isStarred(mRepoOwner, mRepoName, new ApiCallback<Object>() {
             @Override
-            public void success(Object o, Response response) {
-                if (response.getStatus() == 204) {
-                    mStar.setText(R.string.bottom_label_unstar);
+            public void onResponse(Response<Object> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    if (response.code() == 204) {
+                        mStar.setText(R.string.bottom_label_unstar);
+                    } else if (response.code() == 404) {
+                        mStar.setText(R.string.bottom_label_star);
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-                if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                    mStar.setText(R.string.bottom_label_star);
-                }
+            public void onFailure(Throwable t) {
+
             }
         });
 
@@ -111,13 +114,16 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.repo_fork:
                 ApiManager.getInstance().fork(mRepoOwner, mRepoName, new ApiCallback<ForkRepo>() {
                     @Override
-                    public void success(ForkRepo forkRepo, Response response) {
-                        Logger.toast(getApplicationContext(), getString(R.string.toast_fork_success) + forkRepo.getFullName());
+                    public void onResponse(Response<ForkRepo> response, Retrofit retrofit) {
+                        if (response.isSuccess()) {
+                            ForkRepo forkRepo = response.body();
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_fork_success) + forkRepo.getFullName());
+                        }
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        super.failure(error);
+                    public void onFailure(Throwable t) {
                         Logger.toast(getApplicationContext(), getString(R.string.toast_fork_failed));
                     }
                 });
@@ -129,30 +135,41 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
         if (mStar.getText().equals(getString(R.string.bottom_label_star))) {
             ApiManager.getInstance().star(mRepoOwner, mRepoName, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
-                    if (response.getStatus() == 204) {
-                        Logger.toast(getApplicationContext(), getString(R.string.toast_star_success));
-                        mStar.setText(R.string.bottom_label_unstar);
+                public void onResponse(Response<Object> response, Retrofit retrofit) {
+                    if (response.isSuccess()) {
+                        if (response.code() == 204) {
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_star_success));
+                            mStar.setText(R.string.bottom_label_unstar);
+                        } else if (response.code() == 404) {
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_star_failed));
+                        }
                     }
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFailure(Throwable t) {
                     Logger.toast(getApplicationContext(), getString(R.string.toast_star_failed));
                 }
             });
         } else {
             ApiManager.getInstance().unstart(mRepoOwner, mRepoName, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
-                    Logger.toast(getApplicationContext(), getString(R.string.toast_unstar_success));
-                    mStar.setText(R.string.bottom_label_star);
+                public void onResponse(Response<Object> response, Retrofit retrofit) {
+                    if (response.isSuccess()) {
+                        if (response.code() == 204) {
+                            Logger.toast(getApplicationContext(),
+                                    getString(R.string.toast_unstar_success));
+                            mStar.setText(R.string.bottom_label_star);
+                        } else if (response.code() == 404) {
+                            Logger.toast(getApplicationContext(), getString(R.string.toast_unstar_failed));
+                        }
+                    }
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFailure(Throwable t) {
                     Logger.toast(getApplicationContext(), getString(R.string.toast_unstar_failed));
                 }
             });

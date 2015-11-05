@@ -25,25 +25,29 @@ import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
+import com.squareup.okhttp.HttpUrl;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
 
 public class ApiManager {
     private static final String USER_AGENT = "GitMaster Android";
     private static final String ACCEPT = "application/vnd.github.v3+json";
 
-    private static final String API_URL = "https://api.github.com";
+    private static final String API_URL = "https://api.github.com/";
 
     private static ApiManager mInstance;
 
     private Context mContext;
-    private RestAdapter mRestAdapter;
+    private Retrofit mRetrofit;
     private GithubApi mGithubApi;
     private String mAccessToken;
 
@@ -51,16 +55,35 @@ public class ApiManager {
         mContext = GithubApplication.getInstance();
         mAccessToken = PreferenceUtil.getString(mContext,
                 Const.ACCESS_TOKEN_KEY, null);
+
         OkHttpClient okHttpClient = new OkHttpClient();
         okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
         okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
-        mRestAdapter = new RestAdapter.Builder()
-                .setRequestInterceptor(mRequestInterceptor)
-                .setEndpoint(API_URL)
-                .setClient(new OkClient(okHttpClient))
+        okHttpClient.interceptors().add(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                HttpUrl url = chain.request().httpUrl()
+                        .newBuilder()
+                        .addQueryParameter("access_token", mAccessToken)
+                        .build();
+
+                Request request = chain.request();
+                Request newRequest;
+                newRequest = request.newBuilder()
+                        .url(url)
+                        .addHeader("User-Agent", USER_AGENT)
+                        .addHeader("Accept", ACCEPT)
+                        .build();
+                return chain.proceed(newRequest);
+            }
+        });
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        mGithubApi = mRestAdapter.create(GithubApi.class);
+        mGithubApi = mRetrofit.create(GithubApi.class);
     }
 
 
@@ -76,7 +99,7 @@ public class ApiManager {
      * @param callback
      */
     public void getCurrentUser(ApiCallback<User> callback) {
-        mGithubApi.getCurrentUser(callback);
+        mGithubApi.getCurrentUser().enqueue(callback);
     }
 
     /**
@@ -85,11 +108,11 @@ public class ApiManager {
      * @param callback
      */
     public void getUser(String username, ApiCallback<User> callback) {
-        mGithubApi.getUser(username, callback);
+        mGithubApi.getUser(username).enqueue(callback);
     }
 
     public void getRepo(String username, String repoName, ApiCallback<Repo> callback) {
-        mGithubApi.getRepo(username, repoName, callback);
+        mGithubApi.getRepo(username, repoName).enqueue(callback);
     }
 
     /**
@@ -98,7 +121,7 @@ public class ApiManager {
      * @param callback
      */
     public void listRepos(String username, ApiCallback<List<Repo>> callback) {
-        mGithubApi.listRepos(username, null, null, callback);
+        mGithubApi.listRepos(username, null, null).enqueue(callback);
     }
 
     /**
@@ -111,7 +134,7 @@ public class ApiManager {
     public void listReposByPage(String username, int pageCount, int perPageCount,
                                 ApiCallback<List<Repo>> callback) {
         mGithubApi.listRepos(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
 
@@ -123,7 +146,7 @@ public class ApiManager {
      * @param callback callback
      */
     public void isStarred(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.starStatus(owner, repo, callback);
+        mGithubApi.starStatus(owner, repo).enqueue(callback);
     }
 
     /**
@@ -134,7 +157,7 @@ public class ApiManager {
      * @param callback callback
      */
     public void star(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.star("", owner, repo, callback);
+        mGithubApi.star("", owner, repo).enqueue(callback);
     }
 
     /**
@@ -144,7 +167,7 @@ public class ApiManager {
      * @param callback callback
      */
     public void unstart(String owner, String repo, ApiCallback<Object> callback) {
-        mGithubApi.unstar(owner, repo, callback);
+        mGithubApi.unstar(owner, repo).enqueue(callback);
     }
 
     /**
@@ -153,7 +176,7 @@ public class ApiManager {
      * @param callback
      */
     public void listStarRepoByUser(String username, ApiCallback<List<Repo>> callback) {
-        mGithubApi.listStarredRepoByUser(username, null, null, callback);
+        mGithubApi.listStarredRepoByUser(username, null, null).enqueue(callback);
     }
 
     /**
@@ -166,7 +189,7 @@ public class ApiManager {
     public void listStarRepoByUser(String username, int pageCount, int perPageCount,
                                    ApiCallback<List<Repo>> callback) {
         mGithubApi.listStarredRepoByUser(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -174,7 +197,7 @@ public class ApiManager {
      * @param callback
      */
     public void listStarredRepoByAuthUser(ApiCallback<List<Repo>> callback) {
-        mGithubApi.listStaredRepoByAuthUser(null, null, callback);
+        mGithubApi.listStaredRepoByAuthUser(null, null).enqueue(callback);
     }
 
 
@@ -187,7 +210,7 @@ public class ApiManager {
     public void listStarredRepoByAuthUser(int pageCount, int perPageCount,
                                           ApiCallback<List<Repo>> callback) {
         mGithubApi.listStaredRepoByAuthUser(String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -197,7 +220,7 @@ public class ApiManager {
      * @param callback
      */
     public void fork(String owner, String repo, ApiCallback<ForkRepo> callback) {
-        mGithubApi.forkRepo(new TypedJsonString(""), owner, repo, callback);
+        mGithubApi.forkRepo( owner, repo).enqueue(callback);
     }
 
     /**
@@ -206,7 +229,7 @@ public class ApiManager {
      * @param callback
      */
     public void searchRepo(String keyword, ApiCallback<SearchedRepos> callback) {
-        mGithubApi.searchRepo(keyword, null, null, null, null, callback);
+        mGithubApi.searchRepo(keyword, null, null, null, null).enqueue(callback);
     }
 
 
@@ -220,7 +243,7 @@ public class ApiManager {
     public void searchRepo(String keyword, int pageCount, int perPageCount,
                            ApiCallback<SearchedRepos> callback) {
         mGithubApi.searchRepo(keyword, null, null, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -236,7 +259,7 @@ public class ApiManager {
                            int pageCount, int perPageCount,
                            ApiCallback<SearchedRepos> callback) {
         mGithubApi.searchRepo(keyword, sort, order, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -245,7 +268,7 @@ public class ApiManager {
      * @param callback
      */
     public void searchUser(String username, ApiCallback<SearchedUsers> callback) {
-        mGithubApi.searchUser(username, null, null, null, null, callback);
+        mGithubApi.searchUser(username, null, null, null, null).enqueue(callback);
     }
 
     /**
@@ -258,7 +281,7 @@ public class ApiManager {
     public void searchUser(String username, int pageCount, int perPageCount,
                            ApiCallback<SearchedUsers> callback) {
         mGithubApi.searchUser(username, null, null, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -274,7 +297,7 @@ public class ApiManager {
                            int pageCount, int perPageCount,
                            ApiCallback<SearchedUsers> callback) {
         mGithubApi.searchUser(username, sortEnumUser, orderEnum, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -284,7 +307,7 @@ public class ApiManager {
      * @param callback
      */
     public void followStatus(String username, ApiCallback<Object> callback) {
-        mGithubApi.followStatus(username, callback);
+        mGithubApi.followStatus(username).enqueue(callback);
     }
 
     /**
@@ -294,7 +317,7 @@ public class ApiManager {
      * @param callback
      */
     public void follow(String username, ApiCallback<Object> callback) {
-        mGithubApi.follow("", username, callback);
+        mGithubApi.follow("", username).enqueue(callback);
     }
 
     /**
@@ -304,7 +327,7 @@ public class ApiManager {
      * @param callback
      */
     public void unfollow(String username, ApiCallback<Object> callback) {
-        mGithubApi.unfollow(username, callback);
+        mGithubApi.unfollow(username).enqueue(callback);
     }
 
     /**
@@ -313,7 +336,7 @@ public class ApiManager {
      * @param callback
      */
     public void getFollowersList(String username, ApiCallback<List<Owner>> callback) {
-        mGithubApi.getFollowersList(username, null, null, callback);
+        mGithubApi.getFollowersList(username, null, null).enqueue(callback);
     }
 
     /**
@@ -326,7 +349,7 @@ public class ApiManager {
     public void getFollowersList(String username, int pageCount, int perPageCount,
                                  ApiCallback<List<Owner>> callback) {
         mGithubApi.getFollowersList(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -335,7 +358,7 @@ public class ApiManager {
      * @param callback
      */
     public void getFollowingList(String username, ApiCallback<List<Owner>> callback) {
-        mGithubApi.getFollowingList(username, null, null, callback);
+        mGithubApi.getFollowingList(username, null, null).enqueue(callback);
     }
 
     /**
@@ -346,7 +369,7 @@ public class ApiManager {
     public void getFollowingList(String username, int pageCount, int perPageCount,
                                  ApiCallback<List<Owner>> callback) {
         mGithubApi.getFollowingList(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -355,7 +378,7 @@ public class ApiManager {
      * @param callback
      */
     public void getReceivedEvents(String username, ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.receivedEvents(username, null, null, callback);
+        mGithubApi.receivedEvents(username, null, null).enqueue(callback);
     }
 
     /**
@@ -368,7 +391,7 @@ public class ApiManager {
     public void getReceivedEvents(String username, int pageCount, int perPageCount,
                                   ApiCallback<List<TimeLineEvent>> callback) {
         mGithubApi.receivedEvents(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -377,7 +400,7 @@ public class ApiManager {
      * @param callback
      */
     public void getUserEvents(String username, ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.userEvents(username, null, null, callback);
+        mGithubApi.userEvents(username, null, null).enqueue(callback);
     }
 
     /**
@@ -388,7 +411,7 @@ public class ApiManager {
     public void getUserEvents(String username, int pageCount, int perPageCount,
                               ApiCallback<List<TimeLineEvent>> callback) {
         mGithubApi.userEvents(username, String.valueOf(pageCount),
-                String.valueOf(perPageCount), callback);
+                String.valueOf(perPageCount)).enqueue(callback);
     }
 
     /**
@@ -399,7 +422,7 @@ public class ApiManager {
      */
     public void getRepoEvents(String owner, String repoName,
                               ApiCallback<List<TimeLineEvent>> callback) {
-        mGithubApi.repoEvents(owner, repoName, callback);
+        mGithubApi.repoEvents(owner, repoName).enqueue(callback);
     }
 
     /**
@@ -407,7 +430,7 @@ public class ApiManager {
      * @param callback
      */
     public void getOrg(ApiCallback<List<Organzation>> callback) {
-        mGithubApi.getOrg(callback);
+        mGithubApi.getOrg().enqueue(callback);
     }
 
     /**
@@ -416,17 +439,7 @@ public class ApiManager {
      * @param callback
      */
     public void getUserOrgs(String username, ApiCallback<List<Organzation>> callback) {
-        mGithubApi.getUserOrgs(username, callback);
+        mGithubApi.getUserOrgs(username).enqueue(callback);
     }
-
-    RequestInterceptor mRequestInterceptor = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestFacade request) {
-            // add header
-            request.addHeader("User-Agent", USER_AGENT);
-            request.addHeader("Accept", ACCEPT);
-            request.addQueryParam("access_token", mAccessToken);
-        }
-    };
 
 }
