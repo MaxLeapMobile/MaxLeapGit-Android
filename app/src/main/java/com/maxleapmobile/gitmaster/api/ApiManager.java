@@ -28,8 +28,8 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Response;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
@@ -58,8 +58,6 @@ public class ApiManager {
 
     private ApiManager() {
         mContext = GithubApplication.getInstance();
-        mAccessToken = PreferenceUtil.getString(mContext,
-                Const.ACCESS_TOKEN_KEY, null);
 
         OkHttpClient okHttpClient = new OkHttpClient();
         okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
@@ -67,10 +65,17 @@ public class ApiManager {
         okHttpClient.interceptors().add(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
-                HttpUrl url = chain.request().httpUrl()
-                        .newBuilder()
-                        .addQueryParameter("access_token", mAccessToken)
-                        .build();
+                mAccessToken = PreferenceUtil.getString(mContext,
+                        Const.ACCESS_TOKEN_KEY, null);
+                HttpUrl url;
+                if (mAccessToken != null) {
+                    url = chain.request().httpUrl()
+                            .newBuilder()
+                            .addQueryParameter("access_token", mAccessToken)
+                            .build();
+                } else {
+                    url = chain.request().httpUrl();
+                }
 
                 Request request = chain.request();
                 Request newRequest;
@@ -98,6 +103,10 @@ public class ApiManager {
             mInstance = new ApiManager();
         }
         return mInstance;
+    }
+
+    public GithubApi getGithubApi() {
+        return mGithubApi;
     }
 
     /**

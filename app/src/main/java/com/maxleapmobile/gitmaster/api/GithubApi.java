@@ -25,7 +25,6 @@ import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
 
-import retrofit.Call;
 import retrofit.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -44,7 +43,7 @@ public interface GithubApi {
     @Headers("Accept: application/json")
     @FormUrlEncoded
     @POST("https://github.com/login/oauth/access_token")
-    Call<AccessToken> getAccessToken(@Field("client_id") String clientId,
+    Observable<AccessToken> getAccessToken(@Field("client_id") String clientId,
                         @Field("client_secret") String secret,
                         @Field("redirect_uri") String callbackUrl,
                         @Field("code") String code);

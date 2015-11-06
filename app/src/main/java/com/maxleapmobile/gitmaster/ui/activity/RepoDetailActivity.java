@@ -28,7 +28,6 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
     public static final String REPONAME = "reponame";
 
     private Toolbar mToolbar;
-    private TextView mTitle;
     private ProgressWebView mWebView;
     private TextView mStar;
     private TextView mFork;
@@ -48,6 +47,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.repo_toolbar);
+        mToolbar.setTitle(mRepoName);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -56,8 +56,6 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
                 finish();
             }
         });
-        mTitle = (TextView) findViewById(R.id.title);
-        mTitle.setText(mRepoName);
         mWebView = (ProgressWebView) findViewById(R.id.repo_webview);
         mStar = (TextView) findViewById(R.id.repo_star);
         mFork = (TextView) findViewById(R.id.repo_fork);
