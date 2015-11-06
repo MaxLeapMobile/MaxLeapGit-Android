@@ -21,10 +21,12 @@ import com.maxleapmobile.gitmaster.model.SortEnumRepo;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.model.User;
+import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
 
 import retrofit.Call;
+import retrofit.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
@@ -79,6 +81,11 @@ public interface GithubApi {
     Observable<List<Repo>> listStarredRepoByUser(@Path("username") String username,
                                @Query("page") String pageCount,
                                @Query("per_page") String perPageCount);
+
+    @GET("users/{username}/starred")
+    Observable<Response<ResponseBody>> countStar(@Path("username") String username,
+                                                 @Query("page") String pageCount,
+                                                 @Query("per_page") String perPageCount);
 
     @GET("/user/starred")
     Observable<List<Repo>> listStaredRepoByAuthUser(@Query("page") String pageCount,

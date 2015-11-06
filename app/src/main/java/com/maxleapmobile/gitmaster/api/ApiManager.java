@@ -28,8 +28,9 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.util.List;
@@ -373,6 +374,29 @@ public class ApiManager {
                     @Override
                     public void onNext(List<Repo> repos) {
                         callback.onSuccess(repos);
+                    }
+                });
+    }
+
+    public void countStar(String username,
+                          final ApiCallback<retrofit.Response<ResponseBody>> callback) {
+        mGithubApi.countStar(username, "1", "1")
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<retrofit.Response<ResponseBody>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFail(e);
+                    }
+
+                    @Override
+                    public void onNext(retrofit.Response<ResponseBody> response) {
+                        callback.onSuccess(response);
                     }
                 });
     }
