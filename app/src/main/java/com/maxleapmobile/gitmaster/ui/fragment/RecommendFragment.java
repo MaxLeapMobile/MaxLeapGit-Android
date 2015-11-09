@@ -297,6 +297,9 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                     if (length < 10) {
                         isEnd = true;
                     }
+                    if(length == 0){
+                        return;
+                    }
                     for (int i = 0; i < length; i++) {
                         try {
                             repos.add(from(list.get(i)));

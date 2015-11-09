@@ -23,7 +23,7 @@ public class GithubApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        Logger.setLogOpen(true);
+        Logger.setLogOpen(false);
 
         MaxLeap.initialize(this, ApiKey.MAXLEAP_APP_ID, ApiKey.MAXLEAP_CLIENT_KEY);
         FlurryAgent.init(this, ApiKey.FLURRY_KEY);
