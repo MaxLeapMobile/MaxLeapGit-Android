@@ -8,9 +8,11 @@
  */
 package com.maxleapmobile.gitmaster.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -35,6 +37,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
     private String mRepoOwner;
     private String mRepoName;
+    private String mUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,10 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.repo_toolbar);
-        mToolbar.setTitle(mRepoName);
+        TextView titleView = (TextView) findViewById(R.id.title);
+        ImageButton shareBtn = (ImageButton) findViewById(R.id.share);
+        shareBtn.setOnClickListener(this);
+        titleView.setText(mRepoName);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -67,6 +73,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
             public void onSuccess(Repo repo) {
                 mProgressBar.setVisibility(View.GONE);
                 mWebView.loadUrl(repo.getHtmlUrl(), true);
+                mUrl = repo.getHtmlUrl();
             }
 
             @Override
@@ -110,6 +117,17 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
                         Logger.toast(getApplicationContext(), getString(R.string.toast_fork_failed));
                     }
                 });
+                break;
+            case R.id.share:
+                if (mUrl == null) {
+                    Logger.toast(getApplicationContext(), getString(R.string.toast_share_loading));
+                } else {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, mRepoName + "\n" + mUrl);
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+                }
                 break;
         }
     }

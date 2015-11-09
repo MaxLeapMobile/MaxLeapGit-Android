@@ -7,7 +7,7 @@
 
     <include
         android:id="@+id/repo_toolbar"
-        layout="@layout/view_toolbar"/>
+        layout="@layout/view_toolbar_repo"/>
 
     <com.maxleapmobile.gitmaster.ui.widget.ProgressWebView
         android:id="@+id/repo_webview"
