@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.maxleap.MLAnalytics;
+import com.maxleap.MaxLeap;
 import com.maxleapmobile.gitmaster.ApiKey;
 
 import net.hockeyapp.android.CrashManager;
@@ -32,11 +34,13 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         CrashManager.register(this, ApiKey.HOCKEY_APP_ID);
+        MLAnalytics.onResume(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        MLAnalytics.onPause(this);
     }
 
     @Override
@@ -48,4 +52,5 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
+
 }
