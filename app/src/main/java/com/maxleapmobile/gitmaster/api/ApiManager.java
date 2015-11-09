@@ -1079,7 +1079,7 @@ public class ApiManager {
         if (PreferenceUtil.getString(mContext, Const.USERNAME, "").equals(username)) {
             getAuthUserOrg(callback);
         } else {
-            getOrgs(username, callback);
+            getUserOrgs(username, callback);
         }
     }
 
