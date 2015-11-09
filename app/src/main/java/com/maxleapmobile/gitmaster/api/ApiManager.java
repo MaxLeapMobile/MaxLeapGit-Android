@@ -1026,7 +1026,7 @@ public class ApiManager {
      * get org list for auth user
      * @param callback
      */
-    public void getOrg(final ApiCallback<List<Organzation>> callback) {
+    public void getAuthUserOrg(final ApiCallback<List<Organzation>> callback) {
         mGithubApi.getOrg()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1073,6 +1073,14 @@ public class ApiManager {
                         callback.onSuccess(organzations);
                     }
                 });
+    }
+
+    public void getOrgs(String username, ApiCallback<List<Organzation>> callback) {
+        if (PreferenceUtil.getString(mContext, Const.USERNAME, "").equals(username)) {
+            getAuthUserOrg(callback);
+        } else {
+            getOrgs(username, callback);
+        }
     }
 
 }

@@ -105,39 +105,22 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getOrgs() {
-        if (mUsername.equals(PreferenceUtil.getString(getContext(), Const.USERNAME, ""))) {
-            ApiManager.getInstance().getOrg(new ApiCallback<List<Organzation>>() {
-                @Override
-                public void onSuccess(List<Organzation> organzations) {
-                    String orgs = "";
-                    for (Organzation organzation : organzations) {
-                        orgs += organzation.getLogin() + " ";
-                    }
-                    mUserinfoBinding.setOrgs(orgs);
+        ApiManager.getInstance().getOrgs(mUsername, new ApiCallback<List<Organzation>>() {
+            @Override
+            public void onSuccess(List<Organzation> organzations) {
+                String orgs = "";
+                for (Organzation organzation : organzations) {
+                    orgs += organzation.getLogin() + " ";
                 }
+                mUserinfoBinding.setOrgs(orgs);
+            }
 
-                @Override
-                public void onFail(Throwable throwable) {
+            @Override
+            public void onFail(Throwable throwable) {
 
-                }
-            });
-        } else {
-            ApiManager.getInstance().getUserOrgs(mUsername, new ApiCallback<List<Organzation>>() {
-                @Override
-                public void onSuccess(List<Organzation> organzations) {
-                    String orgs = "";
-                    for (Organzation organzation : organzations) {
-                        orgs += organzation.getLogin() + " ";
-                    }
-                    mUserinfoBinding.setOrgs(orgs);
-                }
+            }
+        });
 
-                @Override
-                public void onFail(Throwable throwable) {
-
-                }
-            });
-        }
     }
 
     private void initViews(View view) {

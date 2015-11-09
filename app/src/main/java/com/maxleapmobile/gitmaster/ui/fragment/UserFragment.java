@@ -143,11 +143,8 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
             }
         };
 
-        if (mUsername.equals(PreferenceUtil.getString(mContext, Const.USERNAME, null))) {
-            ApiManager.getInstance().getOrg(apiCallback);
-        } else {
-            ApiManager.getInstance().getUserOrgs(mUsername, apiCallback);
-        }
+
+        ApiManager.getInstance().getOrgs(mUsername, apiCallback);
     }
 
     private void fetchFollowerData(int page) {
