@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class UserManager {
     private static UserManager instance;
@@ -172,7 +170,7 @@ public class UserManager {
         skillsMap.put("Swift", new String[]{"iOS"});
         ApiManager.getInstance().listReposByPage(user.getLogin(), 1, Const.PER_PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
+            public void onSuccess(List<Repo> repos) {
                 if (repos != null && !repos.isEmpty()) {
                     HashSet<String> geneSet = new HashSet<>();
                     List<MLObject> genes = new ArrayList<>();
@@ -192,6 +190,11 @@ public class UserManager {
                     }
                     MLDataManager.saveAllInBackground(genes);
                 }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+
             }
         });
     }
@@ -283,7 +286,7 @@ public class UserManager {
         if (mlUser == null) {
             ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
                 @Override
-                public void success(User user, Response response) {
+                public void onSuccess(User user) {
                     SaveUserInfo(user, new OperationCallback() {
                         @Override
                         public void success() {
@@ -298,8 +301,8 @@ public class UserManager {
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    callback.failed(error.getMessage());
+                public void onFail(Throwable throwable) {
+                    callback.failed(throwable.getMessage());
                 }
             });
         } else {

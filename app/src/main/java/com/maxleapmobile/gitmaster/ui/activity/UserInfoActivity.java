@@ -20,9 +20,6 @@ import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.ui.fragment.MineFragment;
 import com.maxleapmobile.gitmaster.util.Const;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 public class UserInfoActivity extends BaseActivity implements View.OnClickListener {
 
     private Toolbar mToolbar;
@@ -70,20 +67,15 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     private void followStatus() {
         ApiManager.getInstance().followStatus(mUsername, new ApiCallback<Object>() {
             @Override
-            public void success(Object o, Response response) {
-                if (response.getStatus() == 204) {
-                    mFollowStatus = true;
-                    mFollow.setText(getString(R.string.activity_userinfo_unfollow));
-                }
+            public void onSuccess(Object o) {
+                mFollowStatus = true;
+                mFollow.setText(getString(R.string.activity_userinfo_unfollow));
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-                if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                    mFollowStatus = false;
-                    mFollow.setText(getString(R.string.activity_userinfo_follow));
-                }
+            public void onFail(Throwable throwable) {
+                mFollowStatus = false;
+                mFollow.setText(getString(R.string.activity_userinfo_follow));
             }
         });
 
@@ -95,14 +87,13 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         if (mFollowStatus) {
             ApiManager.getInstance().unfollow(mUsername, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
+                public void onSuccess(Object o) {
                     mFollowStatus = false;
                     mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFail(Throwable throwable) {
                     mFollowStatus = true;
                     mFollow.setText(getString(R.string.activity_userinfo_unfollow));
                 }
@@ -110,14 +101,13 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         } else {
             ApiManager.getInstance().follow(mUsername, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
+                public void onSuccess(Object o) {
                     mFollowStatus = true;
                     mFollow.setText(getString(R.string.activity_userinfo_unfollow));
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFail(Throwable throwable) {
                     mFollowStatus = false;
                     mFollow.setText(getString(R.string.activity_userinfo_follow));
                 }

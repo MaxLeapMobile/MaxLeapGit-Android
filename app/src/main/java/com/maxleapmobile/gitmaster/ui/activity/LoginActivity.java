@@ -19,12 +19,12 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.maxleapmobile.gitmaster.ApiKey;
 import com.maxleapmobile.gitmaster.R;
 import com.maxleapmobile.gitmaster.api.ApiManager;
 import com.maxleapmobile.gitmaster.api.GithubApi;
-import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.AccessToken;
 import com.maxleapmobile.gitmaster.model.User;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
@@ -32,14 +32,15 @@ import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class LoginActivity extends BaseActivity {
 
     private static final String AUTH_URL = "https://github.com/login/oauth/authorize?";
-    private static final String OAUTH_URL = "https://github.com";
 
     private static final String TAG = LoginActivity.class.getSimpleName();
     public static final String FROM_PERMISSION_ACTIVITY = "from_permission_activity";
@@ -47,6 +48,7 @@ public class LoginActivity extends BaseActivity {
     private StringBuilder sb;
     private Context mContext;
     private ProgressWebView mWebView;
+    private ProgressBar mProgressBar;
     private boolean isFromPermission;
 
     @Override
@@ -74,6 +76,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void initViews() {
+        mProgressBar = (ProgressBar) findViewById(R.id.login_progressbar);
         isFromPermission = getIntent().getBooleanExtra(FROM_PERMISSION_ACTIVITY, false);
         mWebView = (ProgressWebView) findViewById(R.id.login_webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -87,26 +90,47 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void requestAccessToken(String code) {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(OAUTH_URL)
-                .build();
-        GithubApi githubApi = restAdapter.create(GithubApi.class);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mWebView.setVisibility(View.GONE);
+        final GithubApi githubApi = ApiManager.getInstance().getGithubApi();
 
-        githubApi.getAccessToken(ApiKey.GITHUB_ID, ApiKey.GITHUB_SECRET, Const.CALLBACK_URL,
-                code, new ApiCallback<AccessToken>() {
+        githubApi.getAccessToken(ApiKey.GITHUB_ID, ApiKey.GITHUB_SECRET, Const.CALLBACK_URL, code)
+                .flatMap(new Func1<AccessToken, Observable<User>>() {
                     @Override
-                    public void success(AccessToken accessToken, Response response) {
-                        Logger.d(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
+                    public Observable<User> call(AccessToken accessToken) {
+                        Logger.i(TAG, accessToken.getAccessToken() + " " + accessToken.getTokenType());
                         PreferenceUtil.putString(mContext, Const.ACCESS_TOKEN_KEY,
                                 accessToken.getAccessToken());
-                        getGithubUserInfo();
+                        return githubApi.getCurrentUser();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<User>() {
+                    @Override
+                    public void onCompleted() {
+                        if (isFromPermission) {
+                            toMainActivity();
+                        }
+                        setResult(RESULT_OK);
+                        finish();
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        super.failure(error);
+                    public void onError(Throwable e) {
+                        Logger.toast(mContext, R.string.toast_login_failed);
+                        mWebView.loadUrl(sb.toString());
+                        mWebView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        mProgressBar.setVisibility(View.GONE);
+                        Logger.i(TAG, user.getEmail() + " " + user.getName());
+                        PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
                     }
                 });
+
     }
 
     private class OauthWebViewClient extends WebViewClient {
@@ -137,28 +161,6 @@ public class LoginActivity extends BaseActivity {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
         }
-    }
-
-    private void getGithubUserInfo() {
-        ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
-            @Override
-            public void success(User user, Response response) {
-                Logger.d(TAG, user.getEmail() + " " + user.getName());
-                PreferenceUtil.putString(mContext, Const.USERNAME, user.getLogin());
-                if (isFromPermission) {
-                    toMainActivity();
-                }
-                setResult(RESULT_OK);
-                finish();
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-                Logger.toast(mContext, R.string.toast_login_failed);
-                mWebView.loadUrl(sb.toString());
-            }
-        });
     }
 
     private void toMainActivity() {

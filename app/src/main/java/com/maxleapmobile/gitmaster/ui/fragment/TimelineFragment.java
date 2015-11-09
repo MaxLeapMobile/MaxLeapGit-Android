@@ -34,9 +34,6 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
     private static final int REQUEST_PER_PAGE = 50;
@@ -128,7 +125,7 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
         ApiManager.getInstance().getReceivedEvents(username,
                 pageCount, REQUEST_PER_PAGE, new ApiCallback<List<TimeLineEvent>>() {
                     @Override
-                    public void success(List<TimeLineEvent> timeLineEvents, Response response) {
+                    public void onSuccess(List<TimeLineEvent> timeLineEvents) {
                         if (pageCount == MAX_PAGE_COUNT || REQUEST_PER_PAGE > timeLineEvents.size()) {
                             isEnd = true;
                         }
@@ -146,19 +143,20 @@ public class TimelineFragment extends Fragment implements SwipeRefreshLayout.OnR
                         isGettingMore = false;
                         boolean needRefresh = !isEnd && (mEvents.size() - originalTotal) < GET_PER_PAGE;
                         initData(needRefresh);
+
+//                        if (response.isSuccess() && response.code() == 422) { //TODO
+//                            isEnd = true;
+//                            if (mEvents.size() == 0) {
+//                                emptyView.setText(R.string.time_line_no_date);
+//                            }
+//                        }
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onFail(Throwable throwable) {
                         if (mEvents.size() == 0) {
                             emptyView.setVisibility(View.VISIBLE);
                             emptyView.setText(R.string.time_line_refresh_failed);
-                        }
-                        if (error.getResponse() != null && error.getResponse().getStatus() == 422) {
-                            isEnd = true;
-                            if (mEvents.size() == 0) {
-                                emptyView.setText(R.string.time_line_no_date);
-                            }
                         }
                         isGettingMore = false;
                         mHandler.removeCallbacks(mProgressRunnable);

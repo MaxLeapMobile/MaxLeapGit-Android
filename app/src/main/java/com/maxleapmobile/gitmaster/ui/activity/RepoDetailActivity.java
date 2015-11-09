@@ -22,16 +22,12 @@ import com.maxleapmobile.gitmaster.model.Repo;
 import com.maxleapmobile.gitmaster.ui.widget.ProgressWebView;
 import com.maxleapmobile.gitmaster.util.Logger;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 public class RepoDetailActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String OWNER = "owner";
     public static final String REPONAME = "reponame";
 
     private Toolbar mToolbar;
-    private TextView mTitle;
     private ProgressWebView mWebView;
     private TextView mStar;
     private TextView mFork;
@@ -51,6 +47,7 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.repo_toolbar);
+        mToolbar.setTitle(mRepoName);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -59,8 +56,6 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
                 finish();
             }
         });
-        mTitle = (TextView) findViewById(R.id.title);
-        mTitle.setText(mRepoName);
         mWebView = (ProgressWebView) findViewById(R.id.repo_webview);
         mStar = (TextView) findViewById(R.id.repo_star);
         mFork = (TextView) findViewById(R.id.repo_fork);
@@ -69,32 +64,26 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
 
         ApiManager.getInstance().getRepo(mRepoOwner, mRepoName, new ApiCallback<Repo>() {
             @Override
-            public void success(Repo repo, Response response) {
+            public void onSuccess(Repo repo) {
                 mProgressBar.setVisibility(View.GONE);
                 mWebView.loadUrl(repo.getHtmlUrl(), true);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
 
         ApiManager.getInstance().isStarred(mRepoOwner, mRepoName, new ApiCallback<Object>() {
             @Override
-            public void success(Object o, Response response) {
-                if (response.getStatus() == 204) {
-                    mStar.setText(R.string.bottom_label_unstar);
-                }
+            public void onSuccess(Object o) {
+                mStar.setText(R.string.bottom_label_unstar);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                super.failure(error);
-                if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                    mStar.setText(R.string.bottom_label_star);
-                }
+            public void onFail(Throwable throwable) {
+                mStar.setText(R.string.bottom_label_star);
             }
         });
 
@@ -111,13 +100,13 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.repo_fork:
                 ApiManager.getInstance().fork(mRepoOwner, mRepoName, new ApiCallback<ForkRepo>() {
                     @Override
-                    public void success(ForkRepo forkRepo, Response response) {
-                        Logger.toast(getApplicationContext(), getString(R.string.toast_fork_success) + forkRepo.getFullName());
+                    public void onSuccess(ForkRepo forkRepo) {
+                        Logger.toast(getApplicationContext(),
+                                getString(R.string.toast_fork_success) + forkRepo.getFullName());
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        super.failure(error);
+                    public void onFail(Throwable throwable) {
                         Logger.toast(getApplicationContext(), getString(R.string.toast_fork_failed));
                     }
                 });
@@ -129,30 +118,29 @@ public class RepoDetailActivity extends BaseActivity implements View.OnClickList
         if (mStar.getText().equals(getString(R.string.bottom_label_star))) {
             ApiManager.getInstance().star(mRepoOwner, mRepoName, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
-                    if (response.getStatus() == 204) {
-                        Logger.toast(getApplicationContext(), getString(R.string.toast_star_success));
-                        mStar.setText(R.string.bottom_label_unstar);
-                    }
+                public void onSuccess(Object o) {
+                    Logger.toast(getApplicationContext(),
+                            getString(R.string.toast_star_success));
+                    mStar.setText(R.string.bottom_label_unstar);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
-                    Logger.toast(getApplicationContext(), getString(R.string.toast_star_failed));
+                public void onFail(Throwable throwable) {
+                    Logger.toast(getApplicationContext(),
+                            getString(R.string.toast_star_failed));
                 }
             });
         } else {
             ApiManager.getInstance().unstart(mRepoOwner, mRepoName, new ApiCallback<Object>() {
                 @Override
-                public void success(Object o, Response response) {
-                    Logger.toast(getApplicationContext(), getString(R.string.toast_unstar_success));
+                public void onSuccess(Object o) {
+                    Logger.toast(getApplicationContext(),
+                            getString(R.string.toast_unstar_success));
                     mStar.setText(R.string.bottom_label_star);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    super.failure(error);
+                public void onFail(Throwable throwable) {
                     Logger.toast(getApplicationContext(), getString(R.string.toast_unstar_failed));
                 }
             });

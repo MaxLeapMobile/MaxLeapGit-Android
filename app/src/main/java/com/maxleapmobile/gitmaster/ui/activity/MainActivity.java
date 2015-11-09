@@ -27,9 +27,6 @@ import com.maxleapmobile.gitmaster.util.Const;
 import com.maxleapmobile.gitmaster.util.Logger;
 import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -161,7 +158,7 @@ public class MainActivity extends BaseActivity
     private void getGithubUserInfo() {
         ApiManager.getInstance().getCurrentUser(new ApiCallback<User>() {
             @Override
-            public void success(User user, Response response) {
+            public void onSuccess(User user) {
                 user.setAccessToken(PreferenceUtil.getString(MainActivity.this,
                         Const.ACCESS_TOKEN_KEY, null));
                 UserManager.getInstance().SaveUserInfo(user, new OperationCallback() {
@@ -176,7 +173,8 @@ public class MainActivity extends BaseActivity
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFail(Throwable throwable) {
+
             }
         });
     }

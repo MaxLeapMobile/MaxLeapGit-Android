@@ -46,7 +46,6 @@ public class GeneActivity extends BaseActivity {
     private Context mContext;
 
     private Toolbar mToolbar;
-    private TextView mTitle;
     private TextView mAddGene;
     private TextView mEmptyView;
     private ProgressBar mProgressBar;
@@ -77,6 +76,7 @@ public class GeneActivity extends BaseActivity {
 
     private void initViews() {
         mToolbar = (Toolbar) findViewById(R.id.gene_toolbar);
+        mToolbar.setTitle(R.string.activity_gene_title);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -86,8 +86,6 @@ public class GeneActivity extends BaseActivity {
             }
         });
 
-        mTitle = (TextView) findViewById(R.id.title);
-        mTitle.setText(R.string.activity_gene_title);
         mProgressBar = (ProgressBar) findViewById(R.id.gene_progressbar);
         mEmptyView = (TextView) findViewById(R.id.gene_empty);
 

@@ -38,8 +38,6 @@ import com.maxleapmobile.gitmaster.util.PreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.client.Response;
-
 public class UserFragment extends Fragment implements AbsListView.OnScrollListener {
     private Context mContext;
     private ProgressBar mProgressBar;
@@ -125,7 +123,8 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiCallback<List<Organzation>> apiCallback = new ApiCallback<List<Organzation>>() {
             @Override
-            public void success(List<Organzation> organzations, Response response) {
+            public void onSuccess(List<Organzation> organzations) {
+                mProgressBar.setVisibility(View.GONE);
                 if (organzations != null) {
                     for (Organzation item : organzations) {
                         Owner user = new Owner();
@@ -136,15 +135,16 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
                     }
                     mUserAdapter.notifyDataSetChanged();
                 }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         };
 
-        if (mUsername.equals(PreferenceUtil.getString(mContext, Const.USERNAME, null))) {
-            ApiManager.getInstance().getOrg(apiCallback);
-        } else {
-            ApiManager.getInstance().getUserOrgs(mUsername, apiCallback);
-        }
+
+        ApiManager.getInstance().getOrgs(mUsername, apiCallback);
     }
 
     private void fetchFollowerData(int page) {
@@ -155,17 +155,20 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().getFollowersList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
             @Override
-            public void success(List<Owner> owners, Response response) {
-                if (!owners.isEmpty()) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
-                    }
-                    if (mPage == 1) {
-                        mUsers.clear();
-                    }
-                    mUsers.addAll(owners);
-                    mUserAdapter.notifyDataSetChanged();
+            public void onSuccess(List<Owner> owners) {
+                mProgressBar.setVisibility(View.GONE);
+                if (mIsGettingMore) {
+                    mIsGettingMore = false;
                 }
+                if (mPage == 1) {
+                    mUsers.clear();
+                }
+                mUsers.addAll(owners);
+                mUserAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -179,17 +182,20 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().getFollowingList(mUsername, page, PAGE_COUNT, new ApiCallback<List<Owner>>() {
             @Override
-            public void success(List<Owner> owners, Response response) {
-                if (!owners.isEmpty()) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
-                    }
-                    if (mPage == 1) {
-                        mUsers.clear();
-                    }
-                    mUsers.addAll(owners);
-                    mUserAdapter.notifyDataSetChanged();
+            public void onSuccess(List<Owner> owners) {
+                mProgressBar.setVisibility(View.GONE);
+                if (mIsGettingMore) {
+                    mIsGettingMore = false;
                 }
+                if (mPage == 1) {
+                    mUsers.clear();
+                }
+                mUsers.addAll(owners);
+                mUserAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -205,27 +211,30 @@ public class UserFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().searchUser(keyWord, mSortEnumUser, OrderEnum.DESC, page, PAGE_COUNT, new ApiCallback<SearchedUsers>() {
             @Override
-            public void success(SearchedUsers searchedUsers, Response response) {
-                if (searchedUsers != null) {
-                    if (mIsGettingMore) {
-                        mIsGettingMore = false;
-                    }
-                    if (mPage == 1) {
-                        mUsers.clear();
-                    }
-                    List<SearchedUsers.Item> items = searchedUsers.getItems();
-                    for (SearchedUsers.Item item : items) {
-                        Owner user = new Owner();
-                        user.setAvatarUrl(item.getAvatarUrl());
-                        user.setLogin(item.getLogin());
-                        user.setHtmlUrl(item.getHtmlUrl());
-                        mUsers.add(user);
-                    }
-                    mUserAdapter.notifyDataSetChanged();
-                }
+            public void onSuccess(SearchedUsers searchedUsers) {
                 mProgressBar.setVisibility(View.GONE);
-
+                if (mIsGettingMore) {
+                    mIsGettingMore = false;
+                }
+                if (mPage == 1) {
+                    mUsers.clear();
+                }
+                List<SearchedUsers.Item> items = searchedUsers.getItems();
+                for (SearchedUsers.Item item : items) {
+                    Owner user = new Owner();
+                    user.setAvatarUrl(item.getAvatarUrl());
+                    user.setLogin(item.getLogin());
+                    user.setHtmlUrl(item.getHtmlUrl());
+                    mUsers.add(user);
+                }
+                mUserAdapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void onFail(Throwable t) {
+                mProgressBar.setVisibility(View.GONE);
+            }
+
         });
     }
 

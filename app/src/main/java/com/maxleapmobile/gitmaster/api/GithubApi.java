@@ -9,7 +9,6 @@
 package com.maxleapmobile.gitmaster.api;
 
 
-import com.maxleapmobile.gitmaster.calllback.ApiCallback;
 import com.maxleapmobile.gitmaster.model.AccessToken;
 import com.maxleapmobile.gitmaster.model.ForkRepo;
 import com.maxleapmobile.gitmaster.model.OrderEnum;
@@ -22,9 +21,11 @@ import com.maxleapmobile.gitmaster.model.SortEnumRepo;
 import com.maxleapmobile.gitmaster.model.SortEnumUser;
 import com.maxleapmobile.gitmaster.model.TimeLineEvent;
 import com.maxleapmobile.gitmaster.model.User;
+import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
 
+import retrofit.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
@@ -35,131 +36,117 @@ import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import rx.Observable;
 
 public interface GithubApi {
 
     @Headers("Accept: application/json")
     @FormUrlEncoded
-    @POST("/login/oauth/access_token")
-    void getAccessToken(@Field("client_id") String clientId,
+    @POST("https://github.com/login/oauth/access_token")
+    Observable<AccessToken> getAccessToken(@Field("client_id") String clientId,
                         @Field("client_secret") String secret,
                         @Field("redirect_uri") String callbackUrl,
-                        @Field("code") String code,
-                        ApiCallback<AccessToken> callback);
+                        @Field("code") String code);
 
-    @GET("/user")
-    void getCurrentUser(ApiCallback<User> callback);
+    @GET("user")
+    Observable<User> getCurrentUser();
 
-    @GET("/users/{username}")
-    void getUser(@Path("username") String username,
-                 ApiCallback<User> callback);
+    @GET("users/{username}")
+    Observable<User> getUser(@Path("username") String username);
 
-    @GET("/users/{username}/repos")
-    void listRepos(@Path("username") String username,
+    @GET("users/{username}/repos")
+    Observable<List<Repo>> listRepos(@Path("username") String username,
                    @Query("page") String pageCount,
-                   @Query("per_page") String perPageCount,
-                   ApiCallback<List<Repo>> callback);
+                   @Query("per_page") String perPageCount);
 
-    @GET("/repos/{username}/{repo}")
-    void getRepo(@Path("username") String username,
-                 @Path("repo") String repo,
-                 ApiCallback<Repo> callback);
+    @GET("repos/{username}/{repo}")
+    Observable<Repo> getRepo(@Path("username") String username,
+                 @Path("repo") String repo);
 
-    @GET("/user/starred/{owner}/{repo}")
-    void starStatus(@Path("owner") String owner,
-                    @Path("repo") String repo,
-                    ApiCallback<Object> callback);
+    @GET("user/starred/{owner}/{repo}")
+    Observable<Object> starStatus(@Path("owner") String owner,
+                    @Path("repo") String repo);
 
-    @PUT("/user/starred/{owner}/{repo}")
-    void star(@Body String emptyString,
+    @PUT("user/starred/{owner}/{repo}")
+    Observable<Object> star(@Body String emptyString,
               @Path("owner") String owner,
-              @Path("repo") String repo,
-              ApiCallback<Object> callback);
+              @Path("repo") String repo);
 
-    @DELETE("/user/starred/{owner}/{repo}")
-    void unstar(@Path("owner") String owner,
-                @Path("repo") String repo,
-                ApiCallback<Object> callback);
+    @DELETE("user/starred/{owner}/{repo}")
+    Observable<Object> unstar(@Path("owner") String owner,
+                @Path("repo") String repo);
 
-    @GET("/users/{username}/starred")
-    void listStarredRepoByUser(@Path("username") String username,
+    @GET("users/{username}/starred")
+    Observable<List<Repo>> listStarredRepoByUser(@Path("username") String username,
                                @Query("page") String pageCount,
-                               @Query("per_page") String perPageCount,
-                               ApiCallback<List<Repo>> callback);
+                               @Query("per_page") String perPageCount);
+
+    @GET("users/{username}/starred")
+    Observable<Response<ResponseBody>> countStar(@Path("username") String username,
+                                                 @Query("page") String pageCount,
+                                                 @Query("per_page") String perPageCount);
 
     @GET("/user/starred")
-    void listStaredRepoByAuthUser(@Query("page") String pageCount,
-                                  @Query("per_page") String perPageCount,
-                                  ApiCallback<List<Repo>> callback);
+    Observable<List<Repo>> listStaredRepoByAuthUser(@Query("page") String pageCount,
+                                  @Query("per_page") String perPageCount);
 
-    @POST("/repos/{owner}/{repo}/forks")
-    void forkRepo(@Body TypedJsonString emptyBody,
+    @POST("repos/{owner}/{repo}/forks")
+    Observable<ForkRepo> forkRepo(
                   @Path("owner") String owner,
-                  @Path("repo") String repo,
-                  ApiCallback<ForkRepo> callback);
+                  @Path("repo") String repo);
 
-    @GET("/search/repositories")
-    void searchRepo(@Query("q") String keyword,
+    @GET("search/repositories")
+    Observable<SearchedRepos> searchRepo(@Query("q") String keyword,
                     @Query("sort") SortEnumRepo sort,
                     @Query("order") OrderEnum order,
                     @Query("page") String page,
-                    @Query("per_page") String perPage,
-                    ApiCallback<SearchedRepos> callback);
+                    @Query("per_page") String perPage);
 
-    @GET("/search/users")
-    void searchUser(@Query("q") String username,
+    @GET("search/users")
+    Observable<SearchedUsers> searchUser(@Query("q") String username,
                     @Query("sort") SortEnumUser sort,
                     @Query("order") OrderEnum order,
                     @Query("page") String page,
-                    @Query("per_page") String perPage,
-                    ApiCallback<SearchedUsers> callback);
+                    @Query("per_page") String perPage);
 
-    @GET("/user/following/{username}")
-    void followStatus(@Path("username") String username,
-                      ApiCallback<Object> callback);
+    @GET("user/following/{username}")
+    Observable<Object> followStatus(@Path("username") String username);
 
-    @PUT("/user/following/{username}")
-    void follow(@Body String emptyBody,
-                @Path("username") String username,
-                ApiCallback<Object> callback);
+    @PUT("user/following/{username}")
+    Observable<Object> follow(@Body String emptyBody,
+                @Path("username") String username);
 
-    @DELETE("/user/following/{username}")
-    void unfollow(@Path("username") String username,
-                  ApiCallback<Object> callback);
+    @DELETE("user/following/{username}")
+    Observable<Object> unfollow(@Path("username") String username);
 
-    @GET("/users/{username}/followers")
-    void getFollowersList(@Path("username") String username,
+    @GET("users/{username}/followers")
+    Observable<List<Owner>> getFollowersList(@Path("username") String username,
                           @Query("page") String page,
-                          @Query("per_page") String perPage,
-                          ApiCallback<List<Owner>> callback);
+                          @Query("per_page") String perPage);
 
-    @GET("/users/{username}/following")
-    void getFollowingList(@Path("username") String username,
+    @GET("users/{username}/following")
+    Observable<List<Owner>> getFollowingList(@Path("username") String username,
                           @Query("page") String page,
-                          @Query("per_page") String perPage,
-                          ApiCallback<List<Owner>> callback);
+                          @Query("per_page") String perPage);
 
-    @GET("/users/{username}/received_events")
-    void receivedEvents(@Path("username") String username,
+    @GET("users/{username}/received_events")
+    Observable<List<TimeLineEvent>> receivedEvents(@Path("username") String username,
                         @Query("page") String page,
-                        @Query("per_page") String perPage,
-                        ApiCallback<List<TimeLineEvent>> callback);
+                        @Query("per_page") String perPage);
 
-    @GET("/users/{username}/events")
-    void userEvents(@Path("username") String username,
+    @GET("users/{username}/events")
+    Observable<List<TimeLineEvent>> userEvents(@Path("username") String username,
                     @Query("page") String page,
-                    @Query("per_page") String perPage,
-                    ApiCallback<List<TimeLineEvent>> callback);
+                    @Query("per_page") String perPage);
 
-    @GET("/repos/{owner}/{repo}/events")
-    void repoEvents(@Path("owner") String owner,
-                    @Path("repo") String repoName,
-                    ApiCallback<List<TimeLineEvent>> callback);
+    @GET("repos/{owner}/{repo}/events")
+    Observable<List<TimeLineEvent>> repoEvents(@Path("owner") String owner,
+                    @Path("repo") String repoName);
 
-    @GET("/user/orgs")
-    void getOrg(ApiCallback<List<Organzation>> callback);
+    @GET("user/orgs")
+    Observable<List<Organzation>> getOrg();
 
-    @GET("/users/{username}/orgs")
-    void getUserOrgs(@Path("username") String username, ApiCallback<List<Organzation>> callback);
+    @GET("users/{username}/orgs")
+    Observable<List<Organzation>> getUserOrgs(@Path("username") String username);
 
 }

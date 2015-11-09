@@ -36,8 +36,6 @@ import com.maxleapmobile.gitmaster.util.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.client.Response;
-
 public class RepoFragment extends Fragment implements AbsListView.OnScrollListener {
     private ProgressBar mProgressBar;
     private RepoAdapter mRepoAdapter;
@@ -118,7 +116,8 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().listReposByPage(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
+            public void onSuccess(List<Repo> repos) {
+                mProgressBar.setVisibility(View.GONE);
                 if (!repos.isEmpty()) {
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
@@ -129,6 +128,10 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                     mRepos.addAll(repos);
                     mRepoAdapter.notifyDataSetChanged();
                 }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -142,7 +145,8 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().listStarRepoByUser(mUsername, mPage, PAGE_COUNT, new ApiCallback<List<Repo>>() {
             @Override
-            public void success(List<Repo> repos, Response response) {
+            public void onSuccess(List<Repo> repos) {
+                mProgressBar.setVisibility(View.GONE);
                 if (!repos.isEmpty()) {
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
@@ -153,6 +157,10 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                     mRepos.addAll(repos);
                     mRepoAdapter.notifyDataSetChanged();
                 }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -168,7 +176,8 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
         mProgressBar.setVisibility(View.VISIBLE);
         ApiManager.getInstance().searchRepo(mKeyWord, mSortEnumRepo, OrderEnum.DESC, mPage, PAGE_COUNT, new ApiCallback<SearchedRepos>() {
             @Override
-            public void success(SearchedRepos searchedRepos, Response response) {
+            public void onSuccess(SearchedRepos searchedRepos) {
+                mProgressBar.setVisibility(View.GONE);
                 if (searchedRepos != null) {
                     if (mIsGettingMore) {
                         mIsGettingMore = false;
@@ -190,6 +199,10 @@ public class RepoFragment extends Fragment implements AbsListView.OnScrollListen
                     }
                     mRepoAdapter.notifyDataSetChanged();
                 }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
                 mProgressBar.setVisibility(View.GONE);
             }
         });

@@ -56,9 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 public class RecommendFragment extends Fragment implements View.OnClickListener {
 
     private static final int PER_PAGE = 10;
@@ -363,21 +360,14 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
         ApiManager.getInstance().isStarred(repo.getOwner().getLogin(),
                 repo.getName(), new ApiCallback<Object>() {
                     @Override
-                    public void success(Object o, Response response) {
-                        if (response.getStatus() == 204) {
-                            checkRepo.setIsStar(true);
-                        }
+                    public void onSuccess(Object o) {
+                        checkRepo.setIsStar(true);
                         dbHelper.updateRepo(checkRepo);
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                            checkRepo.setIsStar(false);
-                        } else {
-                            super.failure(error);
-                            return;
-                        }
+                    public void onFail(Throwable throwable) {
+                        checkRepo.setIsStar(false);
                         dbHelper.updateRepo(checkRepo);
                     }
                 });
@@ -407,13 +397,13 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                 ApiManager.getInstance().star(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<Object>() {
                             @Override
-                            public void success(Object o, Response response) {
+                            public void onSuccess(Object o) {
                                 showStarResult(R.string.toast_star_recommend_success);
                                 skipBtn.performClick();
                             }
 
                             @Override
-                            public void failure(RetrofitError error) {
+                            public void onFail(Throwable throwable) {
                                 showStarResult(R.string.toast_star_recommend_failed);
                             }
                         });
@@ -425,7 +415,7 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                 ApiManager.getInstance().fork(repos.get(nowPosition).getOwner().getLogin(), repos.get(nowPosition).getName(),
                         new ApiCallback<ForkRepo>() {
                             @Override
-                            public void success(ForkRepo forkRepo, Response response) {
+                            public void onSuccess(ForkRepo forkRepo) {
                                 if (dbRecRepo.getId() != 0) {
                                     dbRecRepo.setIsFork(true);
                                     dbHelper.updateRepo(dbRecRepo);
@@ -439,8 +429,8 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
                             }
 
                             @Override
-                            public void failure(RetrofitError error) {
-                                super.failure(error);
+                            public void onFail(Throwable throwable) {
+
                             }
                         });
                 break;
