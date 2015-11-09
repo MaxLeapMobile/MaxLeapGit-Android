@@ -41,5 +41,7 @@
 -keep class com.flurry.** { *; }
 
 
+-dontwarn rx.**
+-keep class rx.** { *; }
 
 
