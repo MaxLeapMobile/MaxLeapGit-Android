@@ -44,4 +44,6 @@
 -dontwarn rx.**
 -keep class rx.** { *; }
 
+-keep class android.support.v7.widget.LinearLayoutManager { *; }
+
 
