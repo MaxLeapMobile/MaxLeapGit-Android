@@ -84,11 +84,11 @@ public class DBHelper extends SQLiteOpenHelper {
             dbRecRepo.setRepo_id(cursor.getLong(cursor
                     .getColumnIndex(RecommendRepoTable.Columns.ID)));
             dbRecRepo.setIsStar(cursor.getInt(cursor
-                    .getColumnIndex(RecommendRepoTable.Columns.IS_STAR)) == 0 ? false : true);
+                    .getColumnIndex(RecommendRepoTable.Columns.IS_STAR))!= 0);
             dbRecRepo.setIsFork(cursor.getInt(cursor
-                    .getColumnIndex(RecommendRepoTable.Columns.IS_FORK)) == 0 ? false : true);
+                    .getColumnIndex(RecommendRepoTable.Columns.IS_FORK)) != 0);
             dbRecRepo.setIsSkip(cursor.getInt(cursor
-                    .getColumnIndex(RecommendRepoTable.Columns.IS_SKIP)) == 0 ? false : true);
+                    .getColumnIndex(RecommendRepoTable.Columns.IS_SKIP)) != 0);
             dbRecRepo.setCreateTime(cursor.getLong(cursor
                     .getColumnIndex(RecommendRepoTable.Columns.CREATE_TIME)));
         }

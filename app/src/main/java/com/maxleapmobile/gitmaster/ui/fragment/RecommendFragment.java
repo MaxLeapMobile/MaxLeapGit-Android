@@ -341,13 +341,17 @@ public class RecommendFragment extends Fragment implements View.OnClickListener 
     }
 
     private void loadUrl() {
+        if (nowPosition >= repos.size()) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            return;
+        }
         Repo repo = repos.get(nowPosition);
         dbRecRepo = dbHelper.getRepoById(repo.getId());
         if (dbRecRepo == null) {
             dbRecRepo = new DBRecRepo();
             dbRecRepo.setRepo_id(repo.getId());
         }
-        if (dbRecRepo.isStar() || isReview ? false : dbRecRepo.isSkip() || dbRecRepo.isFork()) {
+        if (dbRecRepo.isStar() || (isReview && dbRecRepo.isSkip()) || dbRecRepo.isFork()) {
             nowPosition++;
             loadUrl();
             return;
