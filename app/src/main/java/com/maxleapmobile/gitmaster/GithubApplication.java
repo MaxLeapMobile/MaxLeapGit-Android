@@ -13,7 +13,6 @@ import android.app.Application;
 import com.flurry.android.FlurryAgent;
 import com.maxleap.MaxLeap;
 import com.maxleapmobile.gitmaster.database.DBHelper;
-import com.maxleapmobile.gitmaster.util.Logger;
 
 public class GithubApplication extends Application {
 
@@ -23,7 +22,6 @@ public class GithubApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        Logger.setLogOpen(false);
 
         MaxLeap.initialize(this, ApiKey.MAXLEAP_APP_ID, ApiKey.MAXLEAP_CLIENT_KEY);
         FlurryAgent.init(this, ApiKey.FLURRY_KEY);

@@ -12,23 +12,25 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.maxleapmobile.gitmaster.BuildConfig;
+
 public class Logger {
     private final static String LOG_TAG = "Debug_Logger";
 
-    private static boolean logOpen;
+    private static boolean logOpen = BuildConfig.LOG_DEBUG;
 
     public static void d(String content) {
-        if (logOpen)
+        if (BuildConfig.LOG_DEBUG)
             Log.d(LOG_TAG, content);
     }
 
     public static void d(String tag, String content) {
-        if (logOpen)
+        if (BuildConfig.LOG_DEBUG)
             Log.d(tag, content);
     }
 
     public static void e(String content) {
-        if (logOpen)
+        if (BuildConfig.LOG_DEBUG)
             Log.e(LOG_TAG, content);
     }
 

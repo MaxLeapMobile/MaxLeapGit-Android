@@ -8,7 +8,7 @@
     <dimen name="nav_header_height">160dp</dimen>
 
     <!-- mine fragment -->
-    <dimen name="mine_card_height">72dp</dimen>
+    <dimen name="mine_card_height">64dp</dimen>
     <dimen name="mine_avatar_size">54dp</dimen>
     <dimen name="mine_info_label_height">70dp</dimen>
     <dimen name="mine_card_padding">8dp</dimen>

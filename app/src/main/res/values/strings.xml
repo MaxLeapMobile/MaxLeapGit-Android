@@ -69,6 +69,8 @@
     <string name="mine_label_company">Company</string>
     <string name="mine_label_joinin">Join In</string>
     <string name="mine_label_organzation">Organization</string>
+    <string name="mine_label_default_amount">0</string>
+    <string name="mine_label_default_value">N/A</string>
 
     <!-- timeline fragment -->
     <string name="time_line_less_than_one_minute">less than one minute</string>

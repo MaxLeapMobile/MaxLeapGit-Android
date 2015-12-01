@@ -80,6 +80,7 @@ public class LoginActivity extends BaseActivity {
         isFromPermission = getIntent().getBooleanExtra(FROM_PERMISSION_ACTIVITY, false);
         mWebView = (ProgressWebView) findViewById(R.id.login_webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.clearCache(true);
         mWebView.setWebViewClient(new OauthWebViewClient());
 
         sb = new StringBuilder(AUTH_URL);

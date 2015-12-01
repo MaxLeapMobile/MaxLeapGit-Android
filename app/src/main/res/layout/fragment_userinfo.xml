@@ -1,429 +1,357 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/userinfo_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <data>
-        <variable
-            name="user"
-            type="com.maxleapmobile.gitmaster.model.User"/>
-
-        <variable
-            name="pagelinks"
-            type="com.maxleapmobile.gitmaster.model.PageLinks"/>
-
-        <variable
-            name="orgs"
-            type="String"/>
-
-    </data>
-
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/userinfo_content"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/userinfo_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="210dp"
         >
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/userinfo_header"
+        <RelativeLayout
+            android:id="@+id/mine_header_layout"
             android:layout_width="match_parent"
-            android:layout_height="210dp"
-            >
+            android:layout_height="wrap_content"
+            app:layout_collapseMode="parallax"
+            app:layout_scrollFlags="scroll|enterAlways">
+
+
+            <ImageView
+                android:id="@+id/mine_avatar"
+                android:layout_width="@dimen/mine_avatar_size"
+                android:layout_height="@dimen/mine_avatar_size"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/mine_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mine_avatar"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/white"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/mine_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mine_username"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/grey"
+                android:textSize="16sp"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/mine_info_label_height"
+            android:layout_below="@+id/mine_header_layout"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            app:layout_collapseMode="pin">
+
 
             <RelativeLayout
-                android:id="@+id/mine_header_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_collapseMode="parallax"
-                app:layout_scrollFlags="scroll|enterAlways">
-
-
-                <ImageView
-                    android:id="@+id/mine_avatar"
-                    android:layout_width="@dimen/mine_avatar_size"
-                    android:layout_height="@dimen/mine_avatar_size"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"/>
+                android:id="@+id/mine_followers_layout"
+                android:layout_width="@dimen/mine_label_width"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
 
                 <TextView
-                    android:id="@+id/mine_username"
+                    android:id="@+id/mine_followers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/mine_avatar"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"
-                    android:text="@{user.name}"
+                    android:layout_marginTop="@dimen/mine_info_label_margin_top"
                     android:textColor="@color/white"
-                    android:textSize="20sp"/>
+                    android:text="@string/mine_label_default_amount"
+                    android:textSize="@dimen/mine_label_value_size"/>
 
                 <TextView
-                    android:id="@+id/mine_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/mine_username"
+                    android:layout_below="@+id/mine_followers"
                     android:layout_centerHorizontal="true"
-                    android:text="@{user.login}"
-                    android:textColor="@color/grey"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/mine_label_followers"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_key_size"/>
+
+            </RelativeLayout>
+
+            <include
+                layout="@layout/item_divider"/>
+
+
+            <RelativeLayout
+                android:id="@+id/mine_followering_layout"
+                android:layout_width="@dimen/mine_label_width"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/mine_followings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/mine_label_default_amount"
+                    android:layout_marginTop="@dimen/mine_info_label_margin_top"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_value_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mine_followings"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/mine_label_following"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_key_size"/>
+
+            </RelativeLayout>
+
+
+            <include
+                layout="@layout/item_divider"/>
+
+
+            <RelativeLayout
+                android:id="@+id/mine_repos_layout"
+                android:layout_width="@dimen/mine_label_width"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/mine_repos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/mine_label_default_amount"
+                    android:layout_marginTop="@dimen/mine_info_label_margin_top"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_value_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mine_repos"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/mine_label_repos"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_key_size"/>
+
+            </RelativeLayout>
+
+
+            <include
+                layout="@layout/item_divider"/>
+
+
+            <RelativeLayout
+                android:id="@+id/mine_stars_layout"
+                android:layout_width="@dimen/mine_label_width"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/mine_stars"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/mine_label_default_amount"
+                    android:layout_marginTop="@dimen/mine_info_label_margin_top"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_value_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mine_stars"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/mine_label_stars"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mine_label_key_size"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userinfo_header"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:id="@+id/userinfo_gene"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/mine_card_height"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:paddingTop="@dimen/mine_card_padding"
+                    android:text="@string/mine_label_gene"
+                    android:textColor="@color/label_name_color"
                     android:textSize="16sp"/>
 
             </RelativeLayout>
 
-            <LinearLayout
+            <include
+                layout="@layout/item_horizontal_divider"/>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/mine_info_label_height"
-                android:layout_below="@+id/mine_header_layout"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="16dp"
-                android:background="@color/colorPrimary"
-                android:orientation="horizontal"
-                app:layout_collapseMode="pin">
+                android:layout_height="@dimen/mine_card_height"
+                android:layout_gravity="center_vertical">
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_followers"
-                    android:layout_width="@dimen/mine_label_width"
-                    android:layout_height="match_parent"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardElevation="2dp"
-                    >
+                <TextView
+                    android:id="@+id/label_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:paddingTop="@dimen/mine_card_padding"
+                    android:text="@string/mine_label_location"
+                    android:textColor="@color/label_name_color"
+                    android:textSize="16sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/mine_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/label_location"
+                    android:ellipsize="end"
+                    android:text="@string/mine_label_default_value"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:singleLine="true"
+                    android:textColor="@color/label_value_color"
+                    android:textSize="14sp"/>
 
-                        <TextView
-                            android:id="@+id/mine_followers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="@dimen/mine_info_label_margin_top"
-                            android:text="@{String.valueOf(user.followers)}"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/mine_label_value_size"/>
+            </RelativeLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/mine_followers"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/mine_label_followers"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/mine_label_key_size"/>
+            <include
+                layout="@layout/item_horizontal_divider"/>
 
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <include
-                    layout="@layout/item_divider"/>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_followerings"
-                    android:layout_width="@dimen/mine_label_width"
-                    android:layout_height="match_parent"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardElevation="2dp"
-                    >
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/mine_followings"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="@dimen/mine_info_label_margin_top"
-                            android:text="@{String.valueOf(user.following)}"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/mine_label_value_size"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/mine_followings"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/mine_label_following"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/mine_label_key_size"/>
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <include
-                    layout="@layout/item_divider"/>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_repos"
-                    android:layout_width="@dimen/mine_label_width"
-                    android:layout_height="match_parent"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardElevation="2dp"
-                    >
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/mine_repos"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="@dimen/mine_info_label_margin_top"
-                            android:textSize="@dimen/mine_label_value_size"
-                            android:textColor="@color/white"
-                            android:text="@{String.valueOf(user.publicRepos)}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                        <TextView
-                            android:layout_below="@+id/mine_repos"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:textSize="@dimen/mine_label_key_size"
-                            android:textColor="@color/white"
-                            android:text="@string/mine_label_repos"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <include
-                    layout="@layout/item_divider"/>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_stars"
-                    android:layout_width="@dimen/mine_label_width"
-                    android:layout_height="match_parent"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardElevation="2dp"
-                    >
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/mine_stars"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="@dimen/mine_info_label_margin_top"
-                            android:textSize="@dimen/mine_label_value_size"
-                            android:textColor="@color/white"
-                            android:text="@{pagelinks.page}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                        <TextView
-                            android:layout_below="@+id/mine_stars"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            android:textSize="@dimen/mine_label_key_size"
-                            android:textColor="@color/white"
-                            android:text="@string/mine_label_stars"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-            </LinearLayout>
-
-        </android.support.design.widget.AppBarLayout>
-
-        <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/userinfo_header"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="@dimen/mine_card_height"
+                android:layout_gravity="center_vertical">
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_gene"
+                <TextView
+                    android:id="@+id/label_company"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginTop="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    >
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:paddingTop="@dimen/mine_card_padding"
+                    android:text="@string/mine_label_company"
+                    android:textColor="@color/label_name_color"
+                    android:textSize="16sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/mine_card_padding"
-                            android:text="@string/mine_label_gene"
-                            android:textColor="@color/label_name_color"
-                            android:textSize="16sp"/>
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
+                <TextView
+                    android:id="@+id/mine_company"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/mine_card_height"
-                    android:layout_marginBottom="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    >
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/label_company"
+                    android:ellipsize="end"
+                    android:text="@string/mine_label_default_value"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:singleLine="true"
+                    android:textColor="@color/label_value_color"
+                    android:textSize="14sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
+            </RelativeLayout>
 
-                        <TextView
-                            android:id="@+id/label_location"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:text="@string/mine_label_location"
-                            android:textColor="@color/label_name_color"
-                            android:textSize="16sp"/>
+            <include
+                layout="@layout/item_horizontal_divider"/>
 
-                        <TextView
-                            android:id="@+id/mine_location"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_location"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:textColor="@color/label_value_color"
-                            android:textSize="14sp"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:text="@{user.location}"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/mine_card_height"
+                android:layout_gravity="center_vertical">
 
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
+                <TextView
+                    android:id="@+id/label_joinin"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/mine_card_height"
-                    android:layout_marginBottom="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    >
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:paddingTop="@dimen/mine_card_padding"
+                    android:text="@string/mine_label_joinin"
+                    android:textColor="@color/label_name_color"
+                    android:textSize="16sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/label_company"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:text="@string/mine_label_company"
-                            android:textColor="@color/label_name_color"
-                            android:textSize="16sp"/>
-
-                        <TextView
-                            android:id="@+id/mine_company"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_company"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:textColor="@color/label_value_color"
-                            android:textSize="14sp"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:text="@{user.company}"/>
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
+                <TextView
+                    android:id="@+id/mine_join_in"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/mine_card_height"
-                    android:layout_marginBottom="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    >
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/label_joinin"
+                    android:text="@string/mine_label_default_value"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:textColor="@color/label_value_color"
+                    android:textSize="14sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
+            </RelativeLayout>
 
-                        <TextView
-                            android:id="@+id/label_joinin"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:text="@string/mine_label_joinin"
-                            android:textColor="@color/label_name_color"
-                            android:textSize="16sp"/>
+            <include
+                layout="@layout/item_horizontal_divider"/>
 
-                        <TextView
-                            android:id="@+id/mine_join_in"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_joinin"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:textColor="@color/label_value_color"
-                            android:textSize="14sp"
-                            android:text="@{user.createAt.substring(0, 10)}"/>
+            <RelativeLayout
+                android:id="@+id/userinfo_orgs"
+                android:layout_width="match_parent"
+                android:clickable="true"
+                android:layout_height="@dimen/mine_card_height"
+                android:layout_gravity="center_vertical">
 
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/mine_card_orgs"
+                <TextView
+                    android:id="@+id/label_organzation"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/mine_card_height"
-                    android:layout_marginBottom="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    >
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:paddingTop="@dimen/mine_card_padding"
+                    android:text="@string/mine_label_organzation"
+                    android:textColor="@color/label_name_color"
+                    android:textSize="16sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
+                <TextView
+                    android:id="@+id/mine_orgs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/label_organzation"
+                    android:ellipsize="end"
+                    android:text="@string/mine_label_default_value"
+                    android:paddingLeft="@dimen/mine_card_padding"
+                    android:singleLine="true"
+                    android:textColor="@color/label_value_color"
+                    android:textSize="14sp"
+                    />
 
-                        <TextView
-                            android:id="@+id/label_organzation"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:text="@string/mine_label_organzation"
-                            android:textColor="@color/label_name_color"
-                            android:textSize="16sp"/>
+            </RelativeLayout>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/label_organzation"
-                            android:paddingLeft="@dimen/mine_card_padding"
-                            android:textColor="@color/label_value_color"
-                            android:textSize="14sp"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:text="@{orgs}"
-                            />
-
-                    </RelativeLayout>
-
-                </android.support.v7.widget.CardView>
-
-            </LinearLayout>
+        </LinearLayout>
 
 
-        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
-    </android.support.design.widget.CoordinatorLayout>
-
-</layout>
+</android.support.design.widget.CoordinatorLayout>

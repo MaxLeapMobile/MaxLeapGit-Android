@@ -87,6 +87,9 @@ public class ApiManager {
                 return chain.proceed(newRequest);
             }
         });
+
+        okHttpClient.interceptors().add(new LoggingInterceptor());
+
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .client(okHttpClient)
